@@ -1,0 +1,4 @@
+79 passed, 1 non-failing test-client deprecation warning in 93.92 seconds.
+JavaScript syntax and Python compilation checks passed.
+Browser ZIP CRC and UTF-8 round trip passed against Python zipfile.
+No paid API calls, production deployment or independent security audit.

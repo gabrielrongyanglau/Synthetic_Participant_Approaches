@@ -1,0 +1,15 @@
+{
+  "human_n": 2709,
+  "datasets": 8,
+  "reference": "Invented demonstration reference",
+  "ci": "Mean \u00b1 1.96 \u00d7 sample SD of repetition scores / sqrt(scorable runs)",
+  "original_protocol": false,
+  "source": "Invented demonstration data \u2014 not LLM outputs or proposal findings",
+  "fixed_human_reference": true,
+  "settings": {
+    "n": 100,
+    "repetitions": 1,
+    "seed": 20261029
+  },
+  "algorithm": "Local resampling, perturbation and illustrative outcome model."
+}

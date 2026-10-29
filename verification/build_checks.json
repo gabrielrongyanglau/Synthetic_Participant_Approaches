@@ -1,0 +1,39 @@
+{
+  "app_version": "3.0.0",
+  "hosting": "Vercel FastAPI",
+  "access": "Public; no accounts",
+  "application_storage": "Request and browser memory only",
+  "required_environment_variables": [
+    "OPENAI_API_KEY"
+  ],
+  "database_required": false,
+  "invitation_required": false,
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "medium",
+  "max_output_tokens": 128000,
+  "provider_store_parameter": false,
+  "provider_background_mode": true,
+  "provider_cleanup": "Best effort after browser receipt; provider retention still applies",
+  "tests_passed": 79,
+  "test_seconds": 93.92,
+  "live_api_calls": 0,
+  "live_vercel_deployment_tested": false,
+  "independent_security_audit": false,
+  "preserved_core": {
+    "spa/metrics.py": "32a0092aec84f549116f5fb04ec037d8abac532b60ed7ec9370d9458af33347d",
+    "spa/analysis.py": "9544388780890ffcc44cf9b7eec661527c928d39d3834c757425993867d165fe",
+    "spa/study.py": "d6ea465fbecba21a68d2f3e9e28cfc40b97cb17dba95592f8c6b0dce14b1f985",
+    "spa/verify.py": "63da4c8d935118cd1e28bb8f6425c1392588466d1739187a1afa9ad8a1d53ca7",
+    "spa/workflow.py": "a14deb18c48cf950786aa23bdf598a664034c9cbb7a84ce11939f22faf4a4b94",
+    "spa/prompts.py": "cb149cbe2ab012a23f9d7856494f401c4a1185e9c79f55ff5abef4e88d688551",
+    "prompts/methods.json": "91658c4ed155debf852f86ef016183859688c35104cec1c82d2e97471fbe4d51",
+    "config/study.yaml": "d71ef14885c33c091717a0cd943c95700bf73d83e366b8827f9bdedbc9876c9a"
+  },
+  "historical_reference_verification": {
+    "passed": 6374,
+    "numeric_cells": 5935,
+    "text_flags": 439,
+    "max_absolute_difference": 3.35231842285566e-13
+  },
+  "browser_checks": "Public demonstration and mocked AI completion through two methods; previews, quality flags and CSV/ZIP controls"
+}

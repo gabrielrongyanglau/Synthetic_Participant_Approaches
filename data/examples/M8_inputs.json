@@ -1,0 +1,907 @@
+{
+  "fixed": [
+    {
+      "participant_id": 1,
+      "B1PRAGE_2019": 81,
+      "B1PRSEX": 1,
+      "B1PB1": 6,
+      "B1PB19": 2,
+      "B1PF7A": 1,
+      "B1SN1A": 8
+    },
+    {
+      "participant_id": 2,
+      "B1PRAGE_2019": 66,
+      "B1PRSEX": 2,
+      "B1PB1": 5,
+      "B1PB19": 1,
+      "B1PF7A": 4,
+      "B1SN1A": 46
+    },
+    {
+      "participant_id": 3,
+      "B1PRAGE_2019": 63,
+      "B1PRSEX": 1,
+      "B1PB1": 1,
+      "B1PB19": 4,
+      "B1PF7A": 5,
+      "B1SN1A": 10
+    },
+    {
+      "participant_id": 4,
+      "B1PRAGE_2019": 29,
+      "B1PRSEX": 2,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 6,
+      "B1SN1A": 22
+    },
+    {
+      "participant_id": 5,
+      "B1PRAGE_2019": 53,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 2,
+      "B1PF7A": 5,
+      "B1SN1A": 32
+    },
+    {
+      "participant_id": 6,
+      "B1PRAGE_2019": 28,
+      "B1PRSEX": 2,
+      "B1PB1": 5,
+      "B1PB19": 2,
+      "B1PF7A": 5,
+      "B1SN1A": 8
+    },
+    {
+      "participant_id": 7,
+      "B1PRAGE_2019": 47,
+      "B1PRSEX": 1,
+      "B1PB1": 12,
+      "B1PB19": 5,
+      "B1PF7A": 4,
+      "B1SN1A": 5
+    },
+    {
+      "participant_id": 8,
+      "B1PRAGE_2019": 78,
+      "B1PRSEX": 1,
+      "B1PB1": 12,
+      "B1PB19": 5,
+      "B1PF7A": 4,
+      "B1SN1A": 18
+    },
+    {
+      "participant_id": 9,
+      "B1PRAGE_2019": 76,
+      "B1PRSEX": 1,
+      "B1PB1": 4,
+      "B1PB19": 1,
+      "B1PF7A": 5,
+      "B1SN1A": 29
+    },
+    {
+      "participant_id": 10,
+      "B1PRAGE_2019": 58,
+      "B1PRSEX": 2,
+      "B1PB1": 3,
+      "B1PB19": 5,
+      "B1PF7A": 5,
+      "B1SN1A": 34
+    },
+    {
+      "participant_id": 11,
+      "B1PRAGE_2019": 73,
+      "B1PRSEX": 1,
+      "B1PB1": 1,
+      "B1PB19": 3,
+      "B1PF7A": 2,
+      "B1SN1A": 2
+    },
+    {
+      "participant_id": 12,
+      "B1PRAGE_2019": 28,
+      "B1PRSEX": 1,
+      "B1PB1": 9,
+      "B1PB19": 2,
+      "B1PF7A": 1,
+      "B1SN1A": 45
+    },
+    {
+      "participant_id": 13,
+      "B1PRAGE_2019": 61,
+      "B1PRSEX": 1,
+      "B1PB1": 8,
+      "B1PB19": 1,
+      "B1PF7A": 1,
+      "B1SN1A": 30
+    },
+    {
+      "participant_id": 14,
+      "B1PRAGE_2019": 44,
+      "B1PRSEX": 2,
+      "B1PB1": 9,
+      "B1PB19": 3,
+      "B1PF7A": 4,
+      "B1SN1A": 14
+    },
+    {
+      "participant_id": 15,
+      "B1PRAGE_2019": 51,
+      "B1PRSEX": 2,
+      "B1PB1": 2,
+      "B1PB19": 5,
+      "B1PF7A": 6,
+      "B1SN1A": 11
+    },
+    {
+      "participant_id": 16,
+      "B1PRAGE_2019": 37,
+      "B1PRSEX": 1,
+      "B1PB1": 5,
+      "B1PB19": 1,
+      "B1PF7A": 4,
+      "B1SN1A": 22
+    },
+    {
+      "participant_id": 17,
+      "B1PRAGE_2019": 43,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 2,
+      "B1PF7A": 2,
+      "B1SN1A": 5
+    },
+    {
+      "participant_id": 18,
+      "B1PRAGE_2019": 83,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 4,
+      "B1PF7A": 4,
+      "B1SN1A": 42
+    },
+    {
+      "participant_id": 19,
+      "B1PRAGE_2019": 28,
+      "B1PRSEX": 1,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 6,
+      "B1SN1A": 21
+    },
+    {
+      "participant_id": 20,
+      "B1PRAGE_2019": 72,
+      "B1PRSEX": 2,
+      "B1PB1": 7,
+      "B1PB19": 5,
+      "B1PF7A": 1,
+      "B1SN1A": 19
+    },
+    {
+      "participant_id": 21,
+      "B1PRAGE_2019": 54,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 3,
+      "B1PF7A": 3,
+      "B1SN1A": 18
+    },
+    {
+      "participant_id": 22,
+      "B1PRAGE_2019": 35,
+      "B1PRSEX": 1,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 1,
+      "B1SN1A": 4
+    },
+    {
+      "participant_id": 23,
+      "B1PRAGE_2019": 81,
+      "B1PRSEX": 1,
+      "B1PB1": 12,
+      "B1PB19": 1,
+      "B1PF7A": 1,
+      "B1SN1A": 38
+    },
+    {
+      "participant_id": 24,
+      "B1PRAGE_2019": 76,
+      "B1PRSEX": 1,
+      "B1PB1": 2,
+      "B1PB19": 2,
+      "B1PF7A": 6,
+      "B1SN1A": 30
+    },
+    {
+      "participant_id": 25,
+      "B1PRAGE_2019": 59,
+      "B1PRSEX": 1,
+      "B1PB1": 8,
+      "B1PB19": 1,
+      "B1PF7A": 1,
+      "B1SN1A": 17
+    },
+    {
+      "participant_id": 26,
+      "B1PRAGE_2019": 64,
+      "B1PRSEX": 1,
+      "B1PB1": 7,
+      "B1PB19": 5,
+      "B1PF7A": 5,
+      "B1SN1A": 5
+    },
+    {
+      "participant_id": 27,
+      "B1PRAGE_2019": 62,
+      "B1PRSEX": 2,
+      "B1PB1": 12,
+      "B1PB19": 1,
+      "B1PF7A": 6,
+      "B1SN1A": 4
+    },
+    {
+      "participant_id": 28,
+      "B1PRAGE_2019": 31,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 1,
+      "B1PF7A": 3,
+      "B1SN1A": 35
+    },
+    {
+      "participant_id": 29,
+      "B1PRAGE_2019": 30,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 5,
+      "B1PF7A": 5,
+      "B1SN1A": 12
+    },
+    {
+      "participant_id": 30,
+      "B1PRAGE_2019": 67,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 1,
+      "B1PF7A": 6,
+      "B1SN1A": 9
+    },
+    {
+      "participant_id": 31,
+      "B1PRAGE_2019": 52,
+      "B1PRSEX": 1,
+      "B1PB1": 11,
+      "B1PB19": 1,
+      "B1PF7A": 2,
+      "B1SN1A": 8
+    },
+    {
+      "participant_id": 32,
+      "B1PRAGE_2019": 63,
+      "B1PRSEX": 2,
+      "B1PB1": 3,
+      "B1PB19": 4,
+      "B1PF7A": 6,
+      "B1SN1A": 23
+    },
+    {
+      "participant_id": 33,
+      "B1PRAGE_2019": 57,
+      "B1PRSEX": 2,
+      "B1PB1": 1,
+      "B1PB19": 3,
+      "B1PF7A": 5,
+      "B1SN1A": 46
+    },
+    {
+      "participant_id": 34,
+      "B1PRAGE_2019": 42,
+      "B1PRSEX": 1,
+      "B1PB1": 1,
+      "B1PB19": 4,
+      "B1PF7A": 2,
+      "B1SN1A": 10
+    },
+    {
+      "participant_id": 35,
+      "B1PRAGE_2019": 52,
+      "B1PRSEX": 2,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 4,
+      "B1SN1A": 29
+    },
+    {
+      "participant_id": 36,
+      "B1PRAGE_2019": 48,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 1,
+      "B1PF7A": 5,
+      "B1SN1A": 35
+    },
+    {
+      "participant_id": 37,
+      "B1PRAGE_2019": 45,
+      "B1PRSEX": 1,
+      "B1PB1": 8,
+      "B1PB19": 1,
+      "B1PF7A": 2,
+      "B1SN1A": 45
+    },
+    {
+      "participant_id": 38,
+      "B1PRAGE_2019": 64,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 3,
+      "B1PF7A": 6,
+      "B1SN1A": 39
+    },
+    {
+      "participant_id": 39,
+      "B1PRAGE_2019": 82,
+      "B1PRSEX": 1,
+      "B1PB1": 7,
+      "B1PB19": 3,
+      "B1PF7A": 5,
+      "B1SN1A": 23
+    },
+    {
+      "participant_id": 40,
+      "B1PRAGE_2019": 35,
+      "B1PRSEX": 2,
+      "B1PB1": 2,
+      "B1PB19": 3,
+      "B1PF7A": 1,
+      "B1SN1A": 25
+    },
+    {
+      "participant_id": 41,
+      "B1PRAGE_2019": 58,
+      "B1PRSEX": 2,
+      "B1PB1": 5,
+      "B1PB19": 3,
+      "B1PF7A": 5,
+      "B1SN1A": 8
+    },
+    {
+      "participant_id": 42,
+      "B1PRAGE_2019": 29,
+      "B1PRSEX": 1,
+      "B1PB1": 12,
+      "B1PB19": 4,
+      "B1PF7A": 5,
+      "B1SN1A": 5
+    },
+    {
+      "participant_id": 43,
+      "B1PRAGE_2019": 34,
+      "B1PRSEX": 2,
+      "B1PB1": 9,
+      "B1PB19": 2,
+      "B1PF7A": 1,
+      "B1SN1A": 29
+    },
+    {
+      "participant_id": 44,
+      "B1PRAGE_2019": 80,
+      "B1PRSEX": 2,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 5,
+      "B1SN1A": 35
+    },
+    {
+      "participant_id": 45,
+      "B1PRAGE_2019": 35,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 1,
+      "B1PF7A": 3,
+      "B1SN1A": 37
+    },
+    {
+      "participant_id": 46,
+      "B1PRAGE_2019": 43,
+      "B1PRSEX": 1,
+      "B1PB1": 10,
+      "B1PB19": 3,
+      "B1PF7A": 1,
+      "B1SN1A": 10
+    },
+    {
+      "participant_id": 47,
+      "B1PRAGE_2019": 73,
+      "B1PRSEX": 2,
+      "B1PB1": 11,
+      "B1PB19": 3,
+      "B1PF7A": 6,
+      "B1SN1A": 19
+    },
+    {
+      "participant_id": 48,
+      "B1PRAGE_2019": 29,
+      "B1PRSEX": 1,
+      "B1PB1": 7,
+      "B1PB19": 4,
+      "B1PF7A": 5,
+      "B1SN1A": 41
+    },
+    {
+      "participant_id": 49,
+      "B1PRAGE_2019": 56,
+      "B1PRSEX": 2,
+      "B1PB1": 12,
+      "B1PB19": 1,
+      "B1PF7A": 4,
+      "B1SN1A": 30
+    },
+    {
+      "participant_id": 50,
+      "B1PRAGE_2019": 50,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 2,
+      "B1PF7A": 5,
+      "B1SN1A": 42
+    },
+    {
+      "participant_id": 51,
+      "B1PRAGE_2019": 41,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 1,
+      "B1PF7A": 5,
+      "B1SN1A": 33
+    },
+    {
+      "participant_id": 52,
+      "B1PRAGE_2019": 83,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 3,
+      "B1PF7A": 3,
+      "B1SN1A": 27
+    },
+    {
+      "participant_id": 53,
+      "B1PRAGE_2019": 78,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 3,
+      "B1PF7A": 2,
+      "B1SN1A": 13
+    },
+    {
+      "participant_id": 54,
+      "B1PRAGE_2019": 83,
+      "B1PRSEX": 2,
+      "B1PB1": 1,
+      "B1PB19": 3,
+      "B1PF7A": 2,
+      "B1SN1A": 33
+    },
+    {
+      "participant_id": 55,
+      "B1PRAGE_2019": 62,
+      "B1PRSEX": 1,
+      "B1PB1": 1,
+      "B1PB19": 2,
+      "B1PF7A": 2,
+      "B1SN1A": 18
+    },
+    {
+      "participant_id": 56,
+      "B1PRAGE_2019": 72,
+      "B1PRSEX": 1,
+      "B1PB1": 12,
+      "B1PB19": 5,
+      "B1PF7A": 5,
+      "B1SN1A": 44
+    },
+    {
+      "participant_id": 57,
+      "B1PRAGE_2019": 65,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 5,
+      "B1PF7A": 2,
+      "B1SN1A": 40
+    },
+    {
+      "participant_id": 58,
+      "B1PRAGE_2019": 57,
+      "B1PRSEX": 1,
+      "B1PB1": 2,
+      "B1PB19": 2,
+      "B1PF7A": 2,
+      "B1SN1A": 34
+    },
+    {
+      "participant_id": 59,
+      "B1PRAGE_2019": 38,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 4,
+      "B1PF7A": 1,
+      "B1SN1A": 32
+    },
+    {
+      "participant_id": 60,
+      "B1PRAGE_2019": 78,
+      "B1PRSEX": 1,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 3,
+      "B1SN1A": 21
+    },
+    {
+      "participant_id": 61,
+      "B1PRAGE_2019": 47,
+      "B1PRSEX": 1,
+      "B1PB1": 10,
+      "B1PB19": 3,
+      "B1PF7A": 3,
+      "B1SN1A": 9
+    },
+    {
+      "participant_id": 62,
+      "B1PRAGE_2019": 28,
+      "B1PRSEX": 1,
+      "B1PB1": 9,
+      "B1PB19": 3,
+      "B1PF7A": 1,
+      "B1SN1A": 17
+    },
+    {
+      "participant_id": 63,
+      "B1PRAGE_2019": 46,
+      "B1PRSEX": 1,
+      "B1PB1": 4,
+      "B1PB19": 4,
+      "B1PF7A": 3,
+      "B1SN1A": 17
+    },
+    {
+      "participant_id": 64,
+      "B1PRAGE_2019": 71,
+      "B1PRSEX": 1,
+      "B1PB1": 9,
+      "B1PB19": 1,
+      "B1PF7A": 2,
+      "B1SN1A": 46
+    },
+    {
+      "participant_id": 65,
+      "B1PRAGE_2019": 36,
+      "B1PRSEX": 1,
+      "B1PB1": 10,
+      "B1PB19": 4,
+      "B1PF7A": 5,
+      "B1SN1A": 4
+    },
+    {
+      "participant_id": 66,
+      "B1PRAGE_2019": 83,
+      "B1PRSEX": 2,
+      "B1PB1": 2,
+      "B1PB19": 4,
+      "B1PF7A": 3,
+      "B1SN1A": 9
+    },
+    {
+      "participant_id": 67,
+      "B1PRAGE_2019": 47,
+      "B1PRSEX": 2,
+      "B1PB1": 9,
+      "B1PB19": 4,
+      "B1PF7A": 3,
+      "B1SN1A": 14
+    },
+    {
+      "participant_id": 68,
+      "B1PRAGE_2019": 67,
+      "B1PRSEX": 2,
+      "B1PB1": 1,
+      "B1PB19": 4,
+      "B1PF7A": 5,
+      "B1SN1A": 47
+    },
+    {
+      "participant_id": 69,
+      "B1PRAGE_2019": 53,
+      "B1PRSEX": 2,
+      "B1PB1": 12,
+      "B1PB19": 1,
+      "B1PF7A": 3,
+      "B1SN1A": 19
+    },
+    {
+      "participant_id": 70,
+      "B1PRAGE_2019": 47,
+      "B1PRSEX": 2,
+      "B1PB1": 9,
+      "B1PB19": 5,
+      "B1PF7A": 5,
+      "B1SN1A": 30
+    },
+    {
+      "participant_id": 71,
+      "B1PRAGE_2019": 64,
+      "B1PRSEX": 1,
+      "B1PB1": 11,
+      "B1PB19": 4,
+      "B1PF7A": 3,
+      "B1SN1A": 29
+    },
+    {
+      "participant_id": 72,
+      "B1PRAGE_2019": 39,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 2,
+      "B1PF7A": 3,
+      "B1SN1A": 33
+    },
+    {
+      "participant_id": 73,
+      "B1PRAGE_2019": 48,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 5,
+      "B1PF7A": 5,
+      "B1SN1A": 36
+    },
+    {
+      "participant_id": 74,
+      "B1PRAGE_2019": 67,
+      "B1PRSEX": 2,
+      "B1PB1": 11,
+      "B1PB19": 4,
+      "B1PF7A": 2,
+      "B1SN1A": 5
+    },
+    {
+      "participant_id": 75,
+      "B1PRAGE_2019": 36,
+      "B1PRSEX": 1,
+      "B1PB1": 12,
+      "B1PB19": 1,
+      "B1PF7A": 4,
+      "B1SN1A": 9
+    },
+    {
+      "participant_id": 76,
+      "B1PRAGE_2019": 45,
+      "B1PRSEX": 1,
+      "B1PB1": 11,
+      "B1PB19": 1,
+      "B1PF7A": 3,
+      "B1SN1A": 42
+    },
+    {
+      "participant_id": 77,
+      "B1PRAGE_2019": 56,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 3,
+      "B1PF7A": 4,
+      "B1SN1A": 33
+    },
+    {
+      "participant_id": 78,
+      "B1PRAGE_2019": 83,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 5,
+      "B1PF7A": 3,
+      "B1SN1A": 44
+    },
+    {
+      "participant_id": 79,
+      "B1PRAGE_2019": 47,
+      "B1PRSEX": 1,
+      "B1PB1": 2,
+      "B1PB19": 1,
+      "B1PF7A": 2,
+      "B1SN1A": 12
+    },
+    {
+      "participant_id": 80,
+      "B1PRAGE_2019": 82,
+      "B1PRSEX": 1,
+      "B1PB1": 1,
+      "B1PB19": 2,
+      "B1PF7A": 5,
+      "B1SN1A": 10
+    },
+    {
+      "participant_id": 81,
+      "B1PRAGE_2019": 67,
+      "B1PRSEX": 1,
+      "B1PB1": 7,
+      "B1PB19": 1,
+      "B1PF7A": 4,
+      "B1SN1A": 39
+    },
+    {
+      "participant_id": 82,
+      "B1PRAGE_2019": 70,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 2,
+      "B1PF7A": 2,
+      "B1SN1A": 44
+    },
+    {
+      "participant_id": 83,
+      "B1PRAGE_2019": 64,
+      "B1PRSEX": 2,
+      "B1PB1": 9,
+      "B1PB19": 5,
+      "B1PF7A": 3,
+      "B1SN1A": 1
+    },
+    {
+      "participant_id": 84,
+      "B1PRAGE_2019": 83,
+      "B1PRSEX": 2,
+      "B1PB1": 8,
+      "B1PB19": 4,
+      "B1PF7A": 2,
+      "B1SN1A": 47
+    },
+    {
+      "participant_id": 85,
+      "B1PRAGE_2019": 40,
+      "B1PRSEX": 1,
+      "B1PB1": 4,
+      "B1PB19": 5,
+      "B1PF7A": 1,
+      "B1SN1A": 28
+    },
+    {
+      "participant_id": 86,
+      "B1PRAGE_2019": 35,
+      "B1PRSEX": 1,
+      "B1PB1": 9,
+      "B1PB19": 3,
+      "B1PF7A": 2,
+      "B1SN1A": 16
+    },
+    {
+      "participant_id": 87,
+      "B1PRAGE_2019": 68,
+      "B1PRSEX": 1,
+      "B1PB1": 9,
+      "B1PB19": 1,
+      "B1PF7A": 5,
+      "B1SN1A": 29
+    },
+    {
+      "participant_id": 88,
+      "B1PRAGE_2019": 57,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 5,
+      "B1PF7A": 1,
+      "B1SN1A": 7
+    },
+    {
+      "participant_id": 89,
+      "B1PRAGE_2019": 49,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 2,
+      "B1PF7A": 4,
+      "B1SN1A": 15
+    },
+    {
+      "participant_id": 90,
+      "B1PRAGE_2019": 51,
+      "B1PRSEX": 1,
+      "B1PB1": 4,
+      "B1PB19": 2,
+      "B1PF7A": 6,
+      "B1SN1A": 27
+    },
+    {
+      "participant_id": 91,
+      "B1PRAGE_2019": 84,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 1,
+      "B1PF7A": 1,
+      "B1SN1A": 23
+    },
+    {
+      "participant_id": 92,
+      "B1PRAGE_2019": 30,
+      "B1PRSEX": 2,
+      "B1PB1": 3,
+      "B1PB19": 3,
+      "B1PF7A": 2,
+      "B1SN1A": 27
+    },
+    {
+      "participant_id": 93,
+      "B1PRAGE_2019": 63,
+      "B1PRSEX": 1,
+      "B1PB1": 8,
+      "B1PB19": 1,
+      "B1PF7A": 6,
+      "B1SN1A": 20
+    },
+    {
+      "participant_id": 94,
+      "B1PRAGE_2019": 63,
+      "B1PRSEX": 2,
+      "B1PB1": 5,
+      "B1PB19": 4,
+      "B1PF7A": 2,
+      "B1SN1A": 10
+    },
+    {
+      "participant_id": 95,
+      "B1PRAGE_2019": 36,
+      "B1PRSEX": 1,
+      "B1PB1": 10,
+      "B1PB19": 2,
+      "B1PF7A": 6,
+      "B1SN1A": 37
+    },
+    {
+      "participant_id": 96,
+      "B1PRAGE_2019": 40,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 1,
+      "B1PF7A": 1,
+      "B1SN1A": 43
+    },
+    {
+      "participant_id": 97,
+      "B1PRAGE_2019": 45,
+      "B1PRSEX": 1,
+      "B1PB1": 3,
+      "B1PB19": 4,
+      "B1PF7A": 4,
+      "B1SN1A": 30
+    },
+    {
+      "participant_id": 98,
+      "B1PRAGE_2019": 56,
+      "B1PRSEX": 2,
+      "B1PB1": 10,
+      "B1PB19": 3,
+      "B1PF7A": 5,
+      "B1SN1A": 33
+    },
+    {
+      "participant_id": 99,
+      "B1PRAGE_2019": 76,
+      "B1PRSEX": 1,
+      "B1PB1": 1,
+      "B1PB19": 2,
+      "B1PF7A": 5,
+      "B1SN1A": 28
+    },
+    {
+      "participant_id": 100,
+      "B1PRAGE_2019": 35,
+      "B1PRSEX": 2,
+      "B1PB1": 4,
+      "B1PB19": 4,
+      "B1PF7A": 6,
+      "B1SN1A": 2
+    }
+  ],
+  "pilot": null,
+  "summary": null,
+  "quota_audit": null
+}

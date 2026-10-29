@@ -1,0 +1,21 @@
+{
+  "human_n": 2709,
+  "datasets": 8000,
+  "reference": "Full 2,709-person human reference",
+  "ci": "Mean \u00b1 1.96 \u00d7 sample SD of repetition scores / sqrt(scorable runs)",
+  "original_protocol": true,
+  "source": "Original MIDUS study",
+  "fixed_human_reference": true,
+  "engine_sha256": "0eb571ec053323dd5d6f851d554b27b02ebd5a6c80c0610ca89943e0d204cc96",
+  "original_settings": {
+    "participants_per_method_per_run": 100,
+    "repetitions_per_method": 1000,
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "medium"
+  },
+  "verification": {
+    "cells_checked": 6374,
+    "cells_passed": 6374,
+    "maximum_absolute_difference": 3.35231842285566e-13
+  }
+}
