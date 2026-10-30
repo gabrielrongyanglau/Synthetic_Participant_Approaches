@@ -10,9 +10,13 @@ from spa.study import predictors,selected_fields
  ('demographics',[7]),('psychology',[7,8])])
 def test_compatibility(information,methods):assert compatible_methods(information)==methods
 
+def example_proportions():
+    from spa.study import PROJECT_ROOT
+    return pd.read_csv(PROJECT_ROOT/'data/examples/SPA4_proportions_example.csv',dtype={'category':str})
+
 @pytest.mark.parametrize('method',range(1,9))
 def test_own_inputs_need_no_benchmark(method,study,reference):
-    assets={'sample_SPA4':reference[study['demographic_covariates']].iloc[200:250],'pilot_SPA5':reference.iloc[:50],
+    assets={'proportions_SPA4':example_proportions(),'pilot_SPA5':reference.iloc[:50],
       'pilot_SPA6':reference.iloc[50:100],'profiles_SPA8':reference[predictors(study)].iloc[:100],
       'profiles_SPA7':reference[study['demographic_covariates']].iloc[:100]}
     context=prepare_context(study,method,100,assets=assets,population='Middle-aged and older adults.')
@@ -55,12 +59,13 @@ def test_pilot_and_samples_are_exactly_fifty_and_profiles_fixed(study,reference)
     for rows in (49,51,100):
         for m in (5,6):
             with pytest.raises(ValueError,match='exactly 50'):prepare_context(study,m,100,assets={f'pilot_SPA{m}':reference.iloc[:rows]})
-        with pytest.raises(ValueError,match='exactly 50'):prepare_context(study,4,100,assets={'sample_SPA4':reference[study['demographic_covariates']].iloc[:rows]})
-    sample=reference[study['demographic_covariates']].iloc[:50]
-    ctx=prepare_context(study,4,100,assets={'sample_SPA4':sample})
-    sex=study['demographic_covariates'][1];share=sample[sex].value_counts(normalize=True)
+    table=example_proportions()
+    ctx=prepare_context(study,4,100,assets={'proportions_SPA4':table})
+    sex=study['demographic_covariates'][1];target=table[table.variable==sex]
     built=pd.DataFrame(ctx['fixed'])[sex].value_counts(normalize=True)
-    assert all(abs(built.get(k,0)-v)<=.011 for k,v in share.items())
+    assert all(abs(built.get(int(k),0)-v)<=.011 for k,v in zip(target.category,target.proportion))
+    age=pd.DataFrame(ctx['fixed'])[study['demographic_covariates'][0]]
+    assert age.between(28,84).all()
     assets={'profiles_SPA7':reference[study['demographic_covariates']].iloc[:100]}
     a=prepare_context(study,7,100,assets=assets)
     for f in study['demographic_covariates']:assert a['fixed'][0][f]==reference.iloc[0][f]

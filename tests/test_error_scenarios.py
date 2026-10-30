@@ -11,7 +11,7 @@ from spa.public import PUBLIC
 from conftest import local_rows
 
 H={'X-SPA-Request':'1'}
-KEYS={4:'sample_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}
+KEYS={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}
 
 @pytest.fixture
 def client(monkeypatch):
@@ -36,7 +36,7 @@ def test_catalogue_entries_are_complete():
  ('out of range',5,'value_out_of_range'),('decimal category',5,'not_whole_number'),('blank outcome',5,'missing_required_value'),
  ('49 rows',5,'wrong_row_count'),('51 rows',6,'wrong_row_count'),('all identical',5,'duplicate_participants'),
  ('10 copies',6,'duplicate_participants'),('99 profiles',8,'too_few_profiles'),('one person',7,'duplicate_participants'),
- ('one person',4,'duplicate_participants'),('ragged',5,'ragged_rows')])
+('ragged',5,'ragged_rows')])
 def test_upload_errors_are_specific(client,case,m,expected):
     f=example(client,m);text={
      'empty':lambda:'',
@@ -183,3 +183,51 @@ def test_reference_errors(client):
     for text,code in [('', 'file_empty'),('a,b\n1,2\n','reference_unusable')]:
         assert client.post('/api/compare',json={'csv':text,'datasets':rows},headers=H).json()['code']==code
     assert client.post('/api/compare',json={'csv':'a,b\n1,2\n','datasets':{}},headers=H).json()['code'] in ('no_dataset','reference_unusable')
+
+def proportions(client):return pd.read_csv(io.StringIO(client.get('/api/example/SPA4_template.csv').text),dtype={'category':str})
+
+@pytest.mark.parametrize('case,expected',[
+ ('missing demographic','missing_demographic'),('unknown variable','unknown_variable'),('unknown category','unknown_category'),
+ ('duplicate category','duplicate_category'),('text proportion','invalid_proportion'),('negative proportion','invalid_proportion'),
+ ('sum too low','proportions_sum'),('overlapping age bands','invalid_age_band'),('age outside range','invalid_age_band'),
+ ('decimal age','invalid_age_band'),('missing proportion column','missing_columns')])
+def test_proportion_errors_are_specific(client,case,expected):
+    t=proportions(client);sex=t.index[t.variable=='sex'][0];age=t.index[t.variable=='age']
+    f={'missing demographic':lambda:t[t.variable!='religious_preference'],
+       'unknown variable':lambda:t.assign(variable=t.variable.replace('sex','gender')),
+       'unknown category':lambda:t.assign(category=t.category.where(t.index!=sex,'9')),
+       'duplicate category':lambda:pd.concat([t,t.loc[[sex]]]),
+       'text proportion':lambda:t.assign(proportion=t.proportion.astype(object).where(t.index!=sex,'half')),
+       'negative proportion':lambda:t.assign(proportion=t.proportion.where(t.index!=sex,-0.1)),
+       'sum too low':lambda:t.assign(proportion=t.proportion.where(t.variable!='sex',0.3)),
+       'overlapping age bands':lambda:t.assign(upper=t.upper.where(t.index!=age[0],45)),
+       'age outside range':lambda:t.assign(lower=t.lower.where(t.index!=age[0],18)),
+       'decimal age':lambda:t.assign(lower=t.lower.where(t.index!=age[0],28.5)),
+       'missing proportion column':lambda:t.drop(columns=['proportion'])}[case]()
+    r=check(client,4,f.to_csv(index=False));body=r.json()
+    assert r.status_code==400 and body['code']==expected,(case,body)
+    assert body['advice'] and 'B1P' not in body['detail']+body['advice']
+
+def test_proportion_rounding_and_percentages_are_fixed_automatically(client):
+    t=proportions(client)
+    r=check(client,4,t.assign(proportion=t.proportion*100).to_csv(index=False));assert r.status_code==200,r.text
+    assert 'percentages_converted' in {w['code'] for w in r.json()['warnings']}
+    off=t.assign(proportion=t.proportion.where(t.variable!='sex',t.proportion*1.01))
+    r=check(client,4,off.to_csv(index=False));assert r.status_code==200,r.text
+    assert 'proportions_rescaled' in {w['code'] for w in r.json()['warnings']}
+    r=check(client,4,t.drop(columns=['category_label']).to_csv(index=False));assert r.status_code==200,r.text
+    plan=client.post('/api/prepare',json={'methods':[4],'consent':True,'examples':False,'assets':{KEYS[4]:off.to_csv(index=False)}},headers=H)
+    assert plan.status_code==200,plan.text
+
+def test_custom_proportions_use_declared_categories(client):
+    study=custom_study()
+    tools=client.post('/api/custom-tools',json=dict(study=study),headers=H).json()
+    t=pd.read_csv(io.StringIO(tools['templates']['proportions']),dtype={'category':str})
+    assert r_ok(client.post('/api/check-inputs',json=dict(study=study,methods=[4],examples=False,assets={KEYS[4]:t.to_csv(index=False)}),headers=H))
+    bad=t.assign(category=t.category.where(t.index!=0,'7'))
+    r=client.post('/api/check-inputs',json=dict(study=study,methods=[4],examples=False,assets={KEYS[4]:bad.to_csv(index=False)}),headers=H)
+    assert r.json()['code']=='unknown_category'
+
+def r_ok(r):
+    assert r.status_code==200,r.text
+    return True

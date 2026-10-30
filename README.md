@@ -50,11 +50,11 @@ The toolkit uses SPA1–SPA8 throughout, numbered as in the revised proposal (Ta
 
 ## Upload templates
 
-Every upload has one row per participant and one column per variable. Each approach offers a template to revise (pre-filled with fictional example participants) plus a ZIP with a blank template, variable guide and instructions:
+SPA5 to SPA8 uploads have one row per participant and one column per variable. The SPA4 upload has one row per demographic category. Each approach offers a template to revise (pre-filled with fictional examples) plus a ZIP with a blank template, variable guide and instructions:
 
 | Approach | Upload | Rows |
 | --- | --- | --- |
-| SPA4 | Demographic sample; the toolkit matches its proportions | exactly 50 |
+| SPA4 | Target proportions: `variable`, `category`, `category_label` (for reference), `lower` and `upper` (age bands only) and `proportion`. Proportions add up to 1 within each demographic. No participant data. | one per category |
 | SPA5, SPA6 | Pilot sample with every variable and both outcomes | exactly 50 |
 | SPA7 | Demographic profiles, one per synthetic participant | 100 |
 | SPA8 | Demographic and psychological profiles, one per synthetic participant | 100 |

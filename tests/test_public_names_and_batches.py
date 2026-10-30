@@ -53,7 +53,7 @@ def test_dataset_csv_and_codebook_use_public_names(client):
 @pytest.mark.parametrize('method',[4,5,6,7,8])
 def test_uploads_with_public_names_are_accepted(client,method):
     example=f'SPA{method}_template.csv'
-    key={4:'sample_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}[method]
+    key={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}[method]
     csv=client.get('/api/example/'+example).text
     assert not contains_code(csv)
     r=client.post('/api/check-inputs',json={'methods':[method],'examples':False,'assets':{key:csv}},headers=H)
@@ -109,13 +109,13 @@ def test_no_m_style_approach_labels_anywhere(client):
         hit=M_LABEL.search(r.text)
         assert not hit,(r.request.url,r.text[max(0,hit.start()-60):hit.end()+60])
 
-@pytest.mark.parametrize('method,rows',[(4,50),(5,50),(6,50),(7,100),(8,100)])
+@pytest.mark.parametrize('method,rows',[(5,50),(6,50),(7,100),(8,100)])
 def test_templates_have_one_row_per_participant(client,method,rows):
     s=load_study()
     frame=pd.read_csv(io.StringIO(client.get(f'/api/example/SPA{method}_template.csv').text))
     blank=pd.read_csv(io.StringIO(client.get(f'/api/template/{method}').text))
     assert len(frame)==rows and list(frame)==list(blank) and len(blank)==0
-    expected={4:s['demographic_covariates'],5:selected_fields(s),6:selected_fields(s),7:s['demographic_covariates']}.get(method)
+    expected={5:selected_fields(s),6:selected_fields(s),7:s['demographic_covariates']}.get(method)
     if expected:assert list(frame)==[PUBLIC.get(f,f) for f in expected]
     else:assert set(PUBLIC[c] for c in s['demographic_covariates']+s['psychological_predictors'])==set(frame)
 
@@ -132,7 +132,7 @@ def test_spa8_uses_psychology_and_spa7_demographics_only():
     bank=_j.load(open('prompts/methods.json'))['prompts']
     assert next(p for p in bank if p['method']==7)['user'] in b8['input'] or 'Predictor' in next(p for p in bank if p['method']==7)['name']
 
-@pytest.mark.parametrize('method,key',[(4,'sample_SPA4'),(5,'pilot_SPA5'),(6,'pilot_SPA6'),(7,'profiles_SPA7'),(8,'profiles_SPA8')])
+@pytest.mark.parametrize('method,key',[(4,'proportions_SPA4'),(5,'pilot_SPA5'),(6,'pilot_SPA6'),(7,'profiles_SPA7'),(8,'profiles_SPA8')])
 def test_uploaded_inputs_survive_browser_number_serialisation(client,monkeypatch,method,key):
     """A browser turns 3.0 into 3; submission must still verify against the signed plan."""
     fake=FakeProvider();monkeypatch.setattr(jobs,'provider',lambda:fake)

@@ -72,9 +72,21 @@ function invalidateReview(){reviewedRequest=null;if($('inputsConfirmed'))$('inpu
 function csvText(rows){if(!rows.length)return '';const keys=Object.keys(rows[0]),quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';return [keys,...rows.map(r=>keys.map(k=>r[k]))].map(r=>r.map(quote).join(',')).join('\r\n')}
 function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=el('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 
-const ROWS={4:50,5:50,6:50,7:100,8:100};
-function inputRule(m){return m===4?'Demographic sample: exactly 50 participants, one row each, one column per demographic. The toolkit uses the proportions in this sample to build 100 new demographic profiles.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including both outcomes. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
-function inputInstructions(m,custom){return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
+const ROWS={5:50,6:50,7:100,8:100};
+function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. The toolkit builds 100 demographic profiles that match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including both outcomes. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
+function proportionInstructions(m,custom){return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
+
+${inputRule(m)}
+
+1. Open template.csv. Each row is one category of one demographic variable.
+2. Keep the header row and the variable and category columns as they are. category_label shows what each code means and is for reference only.
+3. Replace the example values in the proportion column with your target proportions. Within each variable they add up to 1, for example 0.48 and 0.52. Percentages that add up to 100 are converted automatically, and rounding differences of up to 0.02 are adjusted.
+4. ${custom?'Every demographic you defined needs its rows.':'Every demographic needs its rows. For age, lower and upper give each band in whole years. You can change the bands, keeping them within the eligible ages and separate from each other.'}
+5. A category you leave out counts as 0. To include participants with no recorded value, add a row with the category missing.
+6. Upload the file and choose Check inputs. Any problems are listed before a paid request is made.
+The example proportions are fictional. Replace them with the targets for your population.
+`}
+function inputInstructions(m,custom){if(m===4)return proportionInstructions(m,custom);return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
 
 ${inputRule(m)}
 
@@ -117,7 +129,7 @@ async function reviewInputs(){
   $('runReview').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 
-const uploadMap={4:'sample_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'};
+const uploadMap={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'};
 function inputs(){
   invalidateReview();
   $('n').value='100';$('repetitions').value='1';
@@ -128,12 +140,12 @@ function inputs(){
   const old={};$('uploads').querySelectorAll('input').forEach(x=>old[x.dataset.asset]=x);$('uploads').replaceChildren();
   if(own)for(const m of [...selected].sort()){
     if(!uploadMap[m])continue;
-    const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'demographic sample':m<7?'pilot sample':'participant profiles'} (${ROWS[m]} rows)`),f=old[key]||el('input');
+    const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'target proportions (one row per category)':(m<7?'pilot sample':'participant profiles')+` (${ROWS[m]} rows)`}`),f=old[key]||el('input');
     f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=()=>{invalidateReview();notice('');if(f.files[0])try{checkFile(f.files[0])}catch(e){notice(e,true)}};label.append(f);
     d.append(label,el('p',inputRule(m),'help'));
     const links=el('div',undefined,'link-row');let a;
-    if(Research.custom()){a=el('button',`Download the template to revise (CSV, ${ROWS[m]} example rows)`);a.type='button';a.className='link';a.addEventListener('click',action(()=>Research.downloadTemplate(m)))}
-    else{a=el('a',`Download the template to revise (CSV, ${ROWS[m]} example rows)`);a.href=`/api/example/SPA${m}_template.csv`;a.download=`SPA${m}_template.csv`}
+    const what=m===4?'example proportions':`${ROWS[m]} example rows`;if(Research.custom()){a=el('button',`Download the template to revise (CSV, ${what})`);a.type='button';a.className='link';a.addEventListener('click',action(()=>Research.downloadTemplate(m)))}
+    else{a=el('a',`Download the template to revise (CSV, ${what})`);a.href=`/api/example/SPA${m}_template.csv`;a.download=`SPA${m}_template.csv`}
     const blank=el('button','Instructions and variable guide (ZIP)');blank.type='button';blank.className='link';
     blank.onclick=action(async()=>{if(Research.custom())await Research.blankTemplate(m);else{const [t,e]=await Promise.all([fetch('/api/template/'+m,{cache:'no-store'}),fetch(`/api/example/SPA${m}_template.csv`,{cache:'no-store'})]);if(!t.ok||!e.ok)throw Error('The template could not be downloaded. Try again.');saveBlob(makeZip({'template.csv':await e.text(),'blank_template.csv':await t.text(),'input_variable_guide.csv':csvText(cfg.variable_guide),'READ_ME.txt':inputInstructions(m,false)}),`SPA${m}_template_and_instructions.zip`)}});
     links.append(a,blank);d.append(links);$('uploads').append(d);

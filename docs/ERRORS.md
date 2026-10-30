@@ -8,7 +8,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 
 | Code | Title | Message | What the user is told to do | Automatic handling |
 | --- | --- | --- | --- | --- |
-| `file_empty` | The file is empty | ‹label› has no rows of data. | Download the template, fill one row per participant, keep the header row and upload it again. | User action |
+| `file_empty` | The file is empty | ‹label› has no rows of data. | Download the template for your approach, fill it in, keep the header row and upload it again. | User action |
 | `not_csv` | Upload a CSV file | ‹label› looks like ‹kind›. The toolkit reads comma-separated (CSV) files. | Open the file in Excel or another spreadsheet program and use Save As › CSV UTF-8 (comma delimited). Then upload the .csv file. | User action |
 | `wrong_delimiter` | Columns are separated by the wrong character | ‹label› uses "‹delimiter›" between columns. The toolkit needs commas between columns. | Save the file as CSV UTF-8 (comma delimited). Some regional Excel settings save "CSV" files with semicolons, so choose the comma-delimited option. | User action |
 | `ragged_rows` | Some rows have the wrong number of values | Row ‹row› of ‹label› has ‹found› values but the header has ‹expected› columns. | Check that row for extra commas, for example decimal commas (3,5 written for 3.5) or a typed note, and for missing cells. Each row needs one value, or a blank, for every column. Use full stops for decimals. | User action |
@@ -25,6 +25,18 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `too_few_profiles` | Not enough participant profiles | ‹label› needs at least ‹expected› participants, one per synthetic participant. This file has ‹found› rows. | Add profiles until there are at least ‹expected› rows. If you have more, the toolkit selects ‹expected› at random. | User action |
 | `duplicate_participants` | The same participant appears many times | ‹label› contains ‹unique› distinct participant(s) across ‹rows› rows. ‹duplicates› row(s) are exact copies of another row. | Check for rows copied or filled down by mistake. Each row must be a different participant, because repeated people distort the averages and relationships the AI learns from. | User action |
 | `invalid_input` | Check your inputs | ‹detail› | Correct the file or setting named above, then choose Check inputs again. | User action |
+
+## SPA4 target proportions
+
+| Code | Title | Message | What the user is told to do | Automatic handling |
+| --- | --- | --- | --- | --- |
+| `missing_demographic` | Demographic variables are missing | ‹label› has no proportions for ‹count› demographic variable(s): ‹columns›. | Add rows for each listed variable, with proportions that add up to 1. The template lists every variable and category. | User action |
+| `unknown_variable` | Unknown demographic variable | Row ‹row› of ‹label› names "‹value›" in the variable column. | Use one of these variable names: ‹allowed›. Copy them from the template. | User action |
+| `unknown_category` | Unknown category code | Row ‹row› of ‹label› gives category "‹value›" for ‹variable›. | Use one of the codes for ‹variable›: ‹allowed›. The category_label column in the template shows what each code means. Use "missing" for the share of participants with no recorded value. | User action |
+| `duplicate_category` | A category appears twice | Row ‹row› of ‹label› repeats category "‹value›" for ‹variable›. | Keep one row per category and combine their proportions. | User action |
+| `invalid_proportion` | A proportion is outside 0 to 1 | Row ‹row› of ‹label› gives "‹value›" as the proportion for ‹variable›, category ‹category›. | Use a number from 0 to 1, for example 0.25 for 25%. Write decimals with a full stop. Use 0 for a category with no participants. | User action |
+| `proportions_sum` | Proportions must add up to 1 | The proportions for ‹variable› add up to ‹total›. | Adjust the ‹variable› rows so their proportions add up to 1, for example 0.48 and 0.52. Percentages that add up to 100 are also accepted. Rounding differences of up to 0.02 are corrected automatically. | User action |
+| `invalid_age_band` | An age band needs correcting | Row ‹row› of ‹label›: ‹reason› | Give each age band whole-number ages in the lower and upper columns, from ‹minimum› to ‹maximum›. Each band needs lower at or below upper, and bands must stay separate. | User action |
 
 ## Sensitive content
 
@@ -97,6 +109,8 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 
 | Code | Title | Message | Advice |
 | --- | --- | --- | --- |
+| `percentages_converted` | Percentages converted to proportions | ‹label› used percentages (totals of 100), so every value was divided by 100. | No action needed. |
+| `proportions_rescaled` | Rounded proportions adjusted | The proportions for ‹variables› were scaled slightly so each set adds up to exactly 1. | No action needed if the difference came from rounding. |
 | `duplicate_rows` | Some participants are repeated | ‹label› has ‹count› row(s) that exactly repeat another participant. | Check whether rows were copied by mistake. Repeated people give their responses extra weight. |
 | `constant_column` | A variable has no variation | ‹column› has the same value (‹value›) for every participant in ‹label›. | Correlations involving this variable will be blank. Check the column was filled correctly. |
 | `empty_column` | A variable is completely blank | ‹column› is blank for every participant in ‹label›. | The AI will receive only blanks for this variable. Fill it if you have the values. |

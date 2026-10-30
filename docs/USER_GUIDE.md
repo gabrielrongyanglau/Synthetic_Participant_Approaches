@@ -20,12 +20,12 @@ Choose AI generation to use your own participant inputs and reviewed evidence. T
 
 ## Upload the right information
 
-Every upload has **one row per participant and one column per variable**. Choose *Download the template to revise*, replace the fictional example values with your own data, keep the header row and the number of rows, and upload it. The instructions ZIP adds a blank template, the variable guide and a READ_ME. Remove direct identifiers. Use UTF-8 comma-separated CSV, numeric codes and allowed ranges.
+SPA5 to SPA8 uploads have **one row per participant and one column per variable**. The SPA4 upload has one row per demographic category. Choose *Download the template to revise*, replace the fictional example values with your own, keep the header row, and upload it. The instructions ZIP adds a blank template, the variable guide and a READ_ME. Remove direct identifiers. Use UTF-8 comma-separated CSV, numeric codes and allowed ranges.
 
 | Public approach | Participant input |
 | --- | --- |
 | SPA1–SPA3 | No participant CSV. SPA3 uses a population description. |
-| SPA4 | A demographic sample of exactly 50 participants. The toolkit matches its proportions when building 100 profiles. |
+| SPA4 | Target proportions for each demographic category, adding up to 1 within each demographic. No participant data. The toolkit builds 100 profiles that match them. |
 | SPA5–SPA6 | A pilot sample of exactly 50 participants with demographics, psychological measures and outcomes. All 50 are used. |
 | SPA7 | At least 100 demographic profiles. |
 | SPA8 | At least 100 demographic and observed psychological predictor profiles. Outcomes are generated. |

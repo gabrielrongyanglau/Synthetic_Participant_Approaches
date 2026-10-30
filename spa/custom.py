@@ -9,7 +9,7 @@ from .study import json_records
 from .metrics import safe_cor,relationship,mean_ci,welch,DIST,REL
 from .quotas import apportion
 from .numbering import run_name,run_spa,SPA_TO_ORIGINAL
-SAMPLE_N=50  # custom pilot and demographic samples have exactly 50 participants
+SAMPLE_N=50  # custom pilot samples have exactly 50 participants
 
 
 def definition(raw):
@@ -131,7 +131,9 @@ def guide(s):
 def template(s,kind):
     f=fake(s,1000)
     if kind=='pilot':return f[demographics(s)+all_items(s)].head(SAMPLE_N)
-    if kind=='sample':return f[demographics(s)].head(SAMPLE_N)
+    if kind=='proportions':
+        from .proportions import example_table,custom_spec
+        return example_table(f,custom_spec(s))
     if kind=='demographics':return f[demographics(s)].head(100)
     if kind=='psychology':return f[demographics(s)+predictor_fields(s)].head(100)
     if kind=='reference':return f
@@ -169,15 +171,20 @@ def contexts(req,assets):
                 idx=np.arange(req.n) if len(f)==req.n else rng.choice(len(f),req.n,replace=False);f=f.iloc[idx]
                 ctx['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(f))];ctx['provenance']['input_rows_in_output_order']=(idx+1).tolist()
             if m==4:
-                sample=template(s,'sample') if req.examples else assets.get('sample_SPA4');data={}
-                if sample is None:raise ValueError('SPA4 needs a demographic sample: one row per participant, one column per demographic.')
-                if len(sample)!=SAMPLE_N:raise ValueError(f'SPA4 needs a demographic sample of exactly {SAMPLE_N} participants, one row each. This file has {len(sample)} rows.')
-                sample=numeric(sample,s,demographics(s))
-                if sample.isna().any().any():raise ValueError('Every participant in the SPA4 demographic sample needs a value for every demographic.')
+                table=template(s,'proportions') if req.examples else assets.get('proportions_SPA4');data={}
+                if table is None:raise ValueError('SPA4 needs a target proportions file: one row per demographic category.')
+                table=table.rename(columns={'field':'variable'})
                 for v in s['demographics']:
-                    share=sample[v['code']].astype(int).value_counts(normalize=True)
-                    counts=apportion({str(c):float(p) for c,p in share.items()},req.n);x=[int(c) for c,k in counts.items() for _ in range(k)];rng.shuffle(x);data[v['code']]=x
-                ctx['provenance']['proportions_source']=f'Observed proportions in the {SAMPLE_N}-person demographic sample'
+                    g=table[table.variable.astype(str)==v['code']]
+                    if g.empty:raise ValueError(f"Add target proportions for {v['code']}.")
+                    share={}
+                    for c,p in zip(g.category.astype(str),pd.to_numeric(g.proportion,errors='raise')):
+                        key='missing' if c.lower()=='missing' else str(int(float(c)))
+                        if key!='missing' and key not in {str(k) for k in v['categories']}:raise ValueError(f"Unknown category {c} for {v['code']}.")
+                        share[key]=float(p)
+                    if not np.isclose(sum(share.values()),1,atol=1e-6,rtol=0) or min(share.values())<0:raise ValueError(f"The proportions for {v['code']} must add up to 1.")
+                    counts=apportion(share,req.n);x=[None if c=='missing' else int(c) for c,k in counts.items() for _ in range(k)];rng.shuffle(x);data[v['code']]=x
+                ctx['provenance']['proportions_source']='Target proportions supplied for each demographic category'
                 ctx['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(pd.DataFrame(data))) ]
             bank[run_name(m,rep)]=ctx
     return bank

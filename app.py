@@ -95,7 +95,7 @@ async def missing(request,exc):return JSONResponse({'detail':str(exc)},status_co
 
 def assets(req,collect=None):
     if len(set(req.methods))!=len(req.methods) or any(m not in range(1,9) for m in req.methods):raise ValueError('Select one approach, SPA1–SPA8.')
-    allowed={'sample_SPA4','pilot_SPA5','pilot_SPA6','profiles_SPA7','profiles_SPA8'}
+    allowed={'proportions_SPA4','pilot_SPA5','pilot_SPA6','profiles_SPA7','profiles_SPA8'}
     if set(req.assets)-allowed:raise ValueError('Unknown upload type.')
     from spa import checks
     custom=None
@@ -289,8 +289,9 @@ async def recommend(request:Request):
 async def custom_tools(request:Request):
     from spa.custom import definition,guide,template
     d=await request.json();s=definition(d.get('study'))
-    tables={k:template(s,k) for k in ['pilot','sample','demographics','psychology','reference']}
-    return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:f.iloc[:0].to_csv(index=False) for k,f in tables.items()})
+    tables={k:template(s,k) for k in ['pilot','proportions','demographics','psychology','reference']}
+    blank={k:(f.assign(proportion=None) if k=='proportions' else f.iloc[:0]) for k,f in tables.items()}
+    return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:f.to_csv(index=False) for k,f in blank.items()})
 
 def compare_custom(data):
     import re
@@ -347,6 +348,9 @@ def blank_template(method:int):
     from spa.study import predictors
     if method not in (4,5,6,7,8):raise ValueError('This approach uses the study definitions only.')
     s=load_study()
+    if method==4:
+        from spa.proportions import blank_table,midus_spec
+        return download(blank_table(midus_spec(s)).to_csv(index=False),'input_template.csv','text/csv')
     # One row per participant, one column per variable.
     frame=pd.DataFrame(columns=selected_fields(s) if method in (5,6) else predictors(s) if method==8 else s['demographic_covariates'])
     return download(frame.to_csv(index=False),'input_template.csv','text/csv')

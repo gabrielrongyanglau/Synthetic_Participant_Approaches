@@ -15,7 +15,7 @@ CATALOGUE={
  # ---------------- Uploaded files
  'file_empty':dict(title='The file is empty',status=400,auto='none',
    message='{label} has no rows of data.',
-   advice='Download the template, fill one row per participant, keep the header row and upload it again.'),
+   advice='Download the template for your approach, fill it in, keep the header row and upload it again.'),
  'not_csv':dict(title='Upload a CSV file',status=400,auto='none',
    message='{label} looks like {kind}. The toolkit reads comma-separated (CSV) files.',
    advice='Open the file in Excel or another spreadsheet program and use Save As › CSV UTF-8 (comma delimited). Then upload the .csv file.'),
@@ -61,6 +61,27 @@ CATALOGUE={
  'duplicate_participants':dict(title='The same participant appears many times',status=400,auto='none',
    message='{label} contains {unique} distinct participant(s) across {rows} rows. {duplicates} row(s) are exact copies of another row.',
    advice='Check for rows copied or filled down by mistake. Each row must be a different participant, because repeated people distort the averages and relationships the AI learns from.'),
+ 'missing_demographic':dict(title='Demographic variables are missing',status=400,auto='none',
+   message='{label} has no proportions for {count} demographic variable(s): {columns}.',
+   advice='Add rows for each listed variable, with proportions that add up to 1. The template lists every variable and category.'),
+ 'unknown_variable':dict(title='Unknown demographic variable',status=400,auto='none',
+   message='Row {row} of {label} names "{value}" in the variable column.',
+   advice='Use one of these variable names: {allowed}. Copy them from the template.'),
+ 'unknown_category':dict(title='Unknown category code',status=400,auto='none',
+   message='Row {row} of {label} gives category "{value}" for {variable}.',
+   advice='Use one of the codes for {variable}: {allowed}. The category_label column in the template shows what each code means. Use "missing" for the share of participants with no recorded value.'),
+ 'duplicate_category':dict(title='A category appears twice',status=400,auto='none',
+   message='Row {row} of {label} repeats category "{value}" for {variable}.',
+   advice='Keep one row per category and combine their proportions.'),
+ 'invalid_proportion':dict(title='A proportion is outside 0 to 1',status=400,auto='none',
+   message='Row {row} of {label} gives "{value}" as the proportion for {variable}, category {category}.',
+   advice='Use a number from 0 to 1, for example 0.25 for 25%. Write decimals with a full stop. Use 0 for a category with no participants.'),
+ 'proportions_sum':dict(title='Proportions must add up to 1',status=400,auto='none',
+   message='The proportions for {variable} add up to {total}.',
+   advice='Adjust the {variable} rows so their proportions add up to 1, for example 0.48 and 0.52. Percentages that add up to 100 are also accepted. Rounding differences of up to 0.02 are corrected automatically.'),
+ 'invalid_age_band':dict(title='An age band needs correcting',status=400,auto='none',
+   message='Row {row} of {label}: {reason}',
+   advice='Give each age band whole-number ages in the lower and upper columns, from {minimum} to {maximum}. Each band needs lower at or below upper, and bands must stay separate.'),
  'invalid_input':dict(title='Check your inputs',status=400,auto='none',
    message='{detail}',advice='Correct the file or setting named above, then choose Check inputs again.'),
  # ---------------- Content
@@ -170,6 +191,10 @@ CATALOGUE={
 
 # Dataset and upload warnings: shown with the result, never block the user.
 WARNINGS={
+ 'percentages_converted':dict(title='Percentages converted to proportions',advice='No action needed.',
+   message='{label} used percentages (totals of 100), so every value was divided by 100.'),
+ 'proportions_rescaled':dict(title='Rounded proportions adjusted',advice='No action needed if the difference came from rounding.',
+   message='The proportions for {variables} were scaled slightly so each set adds up to exactly 1.'),
  'duplicate_rows':dict(title='Some participants are repeated',advice='Check whether rows were copied by mistake. Repeated people give their responses extra weight.',
    message='{label} has {count} row(s) that exactly repeat another participant.'),
  'constant_column':dict(title='A variable has no variation',advice='Correlations involving this variable will be blank. Check the column was filled correctly.',
@@ -211,6 +236,7 @@ def warning(code,**params):
 
 AUTO_TEXT={'none':'User action','retry':'Server retries immediately (no charge), then the browser retries twice more after a pause','resubmit':'Browser resubmits the batch once automatically (paid)','repoll':'Browser keeps checking progress (free)'}
 GROUPS=[('Uploaded files',['file_empty','not_csv','wrong_delimiter','ragged_rows','duplicate_columns','missing_columns','identifier_columns','identifier_values','non_numeric_value','decimal_comma','value_out_of_range','not_whole_number','missing_required_value','wrong_row_count','too_few_profiles','duplicate_participants','invalid_input']),
+ ('SPA4 target proportions',['missing_demographic','unknown_variable','unknown_category','duplicate_category','invalid_proportion','proportions_sum','invalid_age_band']),
  ('Sensitive content',['sensitive_content','prohibited_content']),
  ('Supporting papers',['pdf_too_large','not_pdf','pdf_encrypted','pdf_too_many_pages','pdf_no_text','pdf_too_much_text','pdf_unreadable']),
  ('Starting a run',['not_configured','consent_missing','run_limits','inputs_changed','handle_invalid','request_too_large','blocked_request']),

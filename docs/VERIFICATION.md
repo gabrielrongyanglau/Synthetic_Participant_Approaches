@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 4.6.2: SPA4 target proportions
+
+SPA4 again takes target proportions, one row per demographic category, as in version 4.2.0. No participant data are needed. The quota construction and the SPA4 prompt are unchanged. New tests cover each proportions error (missing demographic, unknown variable or category, repeated category, invalid proportion, totals other than 1, invalid or overlapping age bands, missing columns), automatic conversion of percentages and rescaling of rounding differences, custom-study templates built from declared categories, and plan signatures after browser number serialisation. Browser QA confirmed the SPA4 template download, a valid upload through to a completed dataset, the error card for proportions that add up to 0.798 and the note for percentages. The example proportions are fictional. SPA5 and SPA6 text now states exactly 50 pilot participants throughout. All 213 tests pass.
+
 ## Version 4.6.1: wording
 
 Interface text, error messages, the variable guide and the codebook were reworded into plain statements without em dashes or semicolons. A browser scan of every visible page and a scan of the generated variable guide and codebooks found none of the listed patterns. Two preserved files, `spa/study.py` and `spa/workflow.py`, changed in message strings only, and their hashes are updated. The study configuration, prompt bank and model-facing prompt text are unchanged, so the evaluated protocol is the same. All 202 tests pass.

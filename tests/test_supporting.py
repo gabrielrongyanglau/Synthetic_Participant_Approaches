@@ -1,6 +1,7 @@
 import base64,copy,hashlib,io,json
 from pathlib import Path
 from types import SimpleNamespace
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 from pypdf import PdfWriter
@@ -84,7 +85,8 @@ def test_preflight_templates_and_pdf_routes_make_zero_provider_calls(study,monke
     for m in range(4,9):assert c.get('/api/template/'+str(m)).status_code==200
     tools=c.post('/api/custom-tools',json=dict(study=study),headers=H).json()
     assert tools['blank_templates']['pilot'].count('\n')==1
-    assert tools['blank_templates']['sample'].count('\n')==1 and len(tools['templates']['sample'].strip().split('\n'))==51
+    filled=pd.read_csv(io.StringIO(tools['templates']['proportions']));blank=pd.read_csv(io.StringIO(tools['blank_templates']['proportions']))
+    assert list(filled)==['variable','category','category_label','proportion'] and len(blank)==len(filled) and blank.proportion.isna().all()
     r=c.post('/api/check-inputs',json=dict(methods=[6],examples=False,assets={'pilot_SPA6':''}),headers=H)
     assert r.status_code==400 and r.json()['code']=='file_empty' and r.json()['advice']
 

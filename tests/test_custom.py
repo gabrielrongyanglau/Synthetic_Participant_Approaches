@@ -155,10 +155,13 @@ def test_custom_pilot_accepts_items_or_construct_scores_and_needs_fifty(study):
         assert len(ctx['pilot'])==50 and all(v['code'] in ctx['pilot'][0] for v in s['variables'])
     with pytest.raises(ValueError,match='exactly 50'):public_jobs.prepare(Run(study=study,methods=[5],examples=False),{'pilot_SPA5':custom.fake(s,49)})
     with pytest.raises(ValueError,match='Missing columns'):public_jobs.prepare(Run(study=study,methods=[6],examples=False),{'pilot_SPA6':full[custom.demographics(s)]})
-    sample=full[custom.demographics(s)]
-    ctx=public_jobs.prepare(Run(study=study,methods=[4],examples=False),{'sample_SPA4':sample})['SPA4_R0001']
+    table=custom.template(s,'proportions')
+    assert set(table.variable)==set(custom.demographics(s)) and 'lower' not in table
+    ctx=public_jobs.prepare(Run(study=study,methods=[4],examples=False),{'proportions_SPA4':table})['SPA4_R0001']
     assert len(ctx['fixed'])==100
-    with pytest.raises(ValueError,match='exactly 50'):public_jobs.prepare(Run(study=study,methods=[4],examples=False),{'sample_SPA4':custom.fake(s,60)[custom.demographics(s)]})
+    code=custom.demographics(s)[0];built=pd.Series([r[code] for r in ctx['fixed']]).value_counts(normalize=True)
+    for c,p in zip(table[table.variable==code].category,table[table.variable==code].proportion):assert abs(built.get(int(c),0)-p)<=.011
+    with pytest.raises(ValueError,match='add up to 1'):public_jobs.prepare(Run(study=study,methods=[4],examples=False),{'proportions_SPA4':table.assign(proportion=0.4)})
     profiles=custom.fake(s,100)[custom.demographics(s)+custom.item_fields(s['variables'][0])]
     pred=[v for v in s['variables'] if v['role']=='predictor']
     profiles=custom.fake(s,100)[custom.demographics(s)+[f for v in pred for f in custom.item_fields(v)]]

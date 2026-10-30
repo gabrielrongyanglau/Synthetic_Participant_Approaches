@@ -17,8 +17,8 @@ PURPOSES={
 INFORMATION={
  'definitions':'Study definitions only',
  'population':'A written description of the people I want to simulate',
- 'proportions':'Population percentages for demographics, such as age or sex',
- 'pilot':'A small existing participant dataset with at least 50 people',
+ 'proportions':'Target proportions for demographics, such as age or sex',
+ 'pilot':'A small existing participant dataset with exactly 50 people',
  'demographics':'One row per person with demographic values only',
  'psychology':'One row per person with demographics and psychological scores'}
 METHODS_BY_INFORMATION={'definitions':[1,2],'population':[1,2,3],'proportions':[4],
@@ -26,7 +26,7 @@ METHODS_BY_INFORMATION={'definitions':[1,2],'population':[1,2,3],'proportions':[
 REQUIREMENTS={1:'Study definitions only. Every study value is generated.',
  2:'Study definitions only. Every study value is generated.',
  3:'Study definitions and a qualitative population description. Every study value is generated.',
- 4:'A demographic sample of exactly 50 people. The tool constructs fixed profiles matching its proportions, then generates psychology and outcomes.',
+ 4:'Target proportions for each demographic category. The tool constructs fixed profiles matching them, then generates psychology and outcomes.',
  5:'Exactly 50 pilot rows with demographics, psychology and both outcomes. The tool computes summaries before sending records and summaries to the model.',
  6:'Exactly 50 pilot rows with demographics, psychology and both outcomes. The model receives the records and is instructed to analyse them.',
  7:'At least the requested number of demographic profiles. Psychology and outcomes are generated.',
@@ -105,9 +105,9 @@ def profiles_from_proportions(table,study,n,rng):
         audit[field]={'categories':g.category.astype(str).tolist(),'proportions':weights.tolist(),'allocated_counts':list(allocations.values())}
     return pd.DataFrame(result),audit
 
-PILOT_N=50  # SPA4 demographic samples and SPA5/SPA6 pilot samples always have exactly 50 participants
-ASSET_KEYS={4:'sample_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}
-EXAMPLE_FILES={4:'SPA4_demographic_sample_example.csv',5:'SPA5_pilot_example.csv',6:'SPA6_pilot_example.csv',
+PILOT_N=50  # SPA5/SPA6 pilot samples always have exactly 50 participants
+ASSET_KEYS={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}
+EXAMPLE_FILES={4:'SPA4_proportions_example.csv',5:'SPA5_pilot_example.csv',6:'SPA6_pilot_example.csv',
                7:'SPA7_profiles_example.csv',8:'SPA8_profiles_example.csv'}
 
 def example_assets(method):
@@ -125,13 +125,14 @@ def prepare_context(study,method,n,seed=1,replication=1,assets=None,examples=Fal
     if method==3 and not population.strip():raise ValueError('SPA3 needs a population description.')
     if examples and method>=4:assets=example_assets(method)
     if method==4:
-        sample=assets.get('sample_SPA4')
-        if sample is None:raise ValueError('SPA4 needs a demographic sample: one row per participant, one column per demographic.')
-        if len(sample)!=PILOT_N:raise ValueError(f'SPA4 needs a demographic sample of exactly {PILOT_N} participants, one row each. This file has {len(sample)} rows.')
-        sample=_clean_fields(sample,study,study['demographic_covariates'])
-        profiles,audit=profiles_from_proportions(quota_template(sample,study),study,n,rng)
+        table=assets.get('proportions_SPA4')
+        if table is None:raise ValueError('SPA4 needs a target proportions file: one row per demographic category.')
+        table=table.rename(columns={'variable':'field'}).drop(columns=['category_label'],errors='ignore')
+        for c in ('lower','upper'):
+            if c not in table:table[c]=None
+        profiles,audit=profiles_from_proportions(table,study,n,rng)
         ctx.update(fixed=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(profiles))],quota_audit=audit)
-        details.update(source_pool_n=PILOT_N,proportions_source=f'Observed proportions in the {PILOT_N}-person demographic sample')
+        details.update(proportions_source='Target proportions supplied for each demographic category')
     elif method in (5,6):
         pilot=assets.get(f'pilot_SPA{method}')
         if pilot is None:raise ValueError(f'SPA{method} needs a pilot sample: one row per participant, one column per variable.')

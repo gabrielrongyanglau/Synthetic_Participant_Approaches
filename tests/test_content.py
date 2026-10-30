@@ -35,8 +35,11 @@ def test_guides_and_filled_templates_match_study(study):
         assert len(frame)==100 and not set(study['outcomes'])&set(frame)
     assert list(pd.read_csv(PROJECT_ROOT/'data/examples/SPA7_profiles_example.csv'))==study['demographic_covariates']
     assert set(study['psychological_predictors'])<=set(pd.read_csv(PROJECT_ROOT/'data/examples/SPA8_profiles_example.csv'))
-    sample=pd.read_csv(PROJECT_ROOT/'data/examples/SPA4_demographic_sample_example.csv')
-    assert len(sample)==50 and list(sample)==study['demographic_covariates']
+    table=pd.read_csv(PROJECT_ROOT/'data/examples/SPA4_proportions_example.csv',dtype={'category':str})
+    assert list(table)==['variable','category','category_label','lower','upper','proportion']
+    assert list(dict.fromkeys(table.variable))==study['demographic_covariates']
+    assert all(abs(t-1)<1e-9 for t in table.groupby('variable').proportion.sum())
+    age=table[table.variable=='B1PRAGE_2019'];assert [list(r) for r in age[['lower','upper']].astype(int).values]==study['age_quota_bins']
 
 def test_method_and_measure_explanations():
     assert 'synthetic participant approach (SPA)' in INTRO
