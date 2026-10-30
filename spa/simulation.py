@@ -22,7 +22,7 @@ def invent_reference(study,n=2709,seed=20261029):
     return pd.DataFrame(data)
 
 def prepare_inputs(reference,study,method,n,seed=1,replication=1,pilot_override=None,profiles_override=None):
-    if method not in range(1,9) or n not in range(100,1001,100):raise ValueError('Choose M1–M8 and 100–1,000 participants in steps of 100.')
+    if method not in range(1,9) or n not in range(100,1001,100):raise ValueError('Choose SPA1–SPA8 and 100–1,000 participants in steps of 100.')
     if len(reference)<50:raise ValueError('Reference needs at least 50 rows for sampling.')
     rng=np.random.default_rng(np.random.SeedSequence([seed,method,replication]))
     context=dict(fixed=None,pilot=None,summary=None,quota_audit=None)
@@ -42,7 +42,7 @@ def prepare_inputs(reference,study,method,n,seed=1,replication=1,pilot_override=
         context['pilot']=json_records(chosen[selected_fields(study)])
         if method==5:context['summary']=summarise_pilot(chosen,study)
     if method in (7,8):
-        fields=predictors(study) if method==7 else study['demographic_covariates']
+        fields=predictors(study) if method==8 else study['demographic_covariates']
         if profiles_override is not None:
             chosen=profiles_override
             if len(chosen)!=n or not set(fields)<=set(chosen):raise ValueError('Profile file has incorrect rows or missing fixed fields.')
@@ -67,7 +67,7 @@ def local_demo(reference,study,method,n=100,seed=1,replication=1):
     if method not in (5,6,7):
         for f in selected_fields(study):frame[f]=rng.permutation(frame[f].to_numpy())
     for f in study['psychological_predictors']:
-        if method==7:continue
+        if method==8:continue
         spec=study['variables'][f];span=spec['maximum']-spec['minimum']
         frame[f]=(frame[f]+rng.normal(0,span*(.025 if method in (5,6) else .1),n)).clip(spec['minimum'],spec['maximum']).round(4)
         if spec['kind']=='integer':frame[f]=frame[f].round()

@@ -7,7 +7,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 OUTCOMES = ('life_satisfaction_MIDUS2', 'life_satisfaction_MIDUS3')
 NAMES = {1:'Persona prompted',2:'Ungrounded random',3:'Population guided',4:'Quota matched',
-         5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographic and psychological profiles',8:'Demographic only profiles'}
+         5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographic-only profiles',8:'Demographic and psychological profiles'}
 DESCRIPTIONS = {
  1:'Imagine a distinct person for each generated record. All study values are generated.',
  2:'Generate records directly. All study values are generated; this is not a probability sample of humans.',
@@ -15,8 +15,8 @@ DESCRIPTIONS = {
  4:'Construct demographic profiles matching marginal proportions. Generate psychology and outcomes.',
  5:'Use 50 pilot records with precomputed descriptive statistics, correlations and covariances.',
  6:'Analyse 50 pilot records, then generate using that analysis. No precomputed summaries are supplied.',
- 7:'Retain supplied demographics and psychology. Generate only life-satisfaction outcomes.',
- 8:'Retain supplied demographics. Generate psychology and life-satisfaction outcomes.'}
+ 7:'Retain supplied demographics. Generate psychology and life-satisfaction outcomes.',
+ 8:'Retain supplied demographics and psychology. Generate only life-satisfaction outcomes.'}
 
 def load_study():
     return yaml.safe_load((PROJECT_ROOT/'config/study.yaml').read_text())

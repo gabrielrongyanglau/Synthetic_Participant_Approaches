@@ -64,7 +64,7 @@
       <label for="studyMode" class="sr-only">Study setup</label>
       <select id="studyMode"></select>
       <div id="midusSetup" class="hint">
-        <p><strong>New here? Keep the MIDUS demonstration.</strong> It comes with fictional inputs, so you can try every approach without uploading data. MIDUS is the Midlife in the United States study used in the original evaluation.</p>
+        <p><strong>New here? Keep the MIDUS study.</strong> It comes with fictional example inputs, so you can try every approach without uploading data. MIDUS is the Midlife in the United States study used in the original evaluation.</p>
         <p id="scope"></p>
         <p>This mode generates existing score variables, not original questionnaire items.</p>
       </div>
@@ -114,7 +114,7 @@
       <h2>What information can you provide?</h2>
       <p class="help">Select all that apply, or none if you have no participant information.</p>
       <div id="informationChoices" class="choice-grid"></div>
-      <p id="informationModeHelp" class="help">In the MIDUS demonstration, each input type also has a fictional example.</p>
+      <p id="informationModeHelp" class="help">In the MIDUS study, each input type also has a fictional example you can use instead of your own data.</p>
     </div>
 
     <div class="block">
@@ -135,14 +135,16 @@
   <header class="page-head">
     <p class="kicker">Step 2 of 4</p>
     <h1>Prepare and generate</h1>
-    <p class="lead">Choose how to run the simulation, supply any inputs, then check and confirm before anything is generated.</p>
+    <p class="lead">Choose the inputs, check them, then confirm before anything is generated.</p>
   </header>
 
   <div class="facts" aria-label="Trial limits">
     <div><span class="fact-label">Each simulation</span><span class="fact-value">1 approach, 1 dataset, 100 participants</span></div>
-    <div><span class="fact-label">AI generation time</span><span class="fact-value">Up to one hour</span></div>
+    <div><span class="fact-label">Generation time</span><span class="fact-value">A few minutes to an hour</span></div>
     <div><span class="fact-label">Paid by</span><span class="fact-value">Research team’s API budget</span></div>
   </div>
+  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes; runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
+  <div id="notConnected" class="banner warn" hidden><strong>AI generation is not connected yet.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs and preview the AI instructions.</div>
   <details class="note">
     <summary>About the research-funded trial</summary>
     <p>To conserve a limited API budget, repetitions and larger datasets are unavailable.</p>
@@ -151,34 +153,23 @@
 
   <div class="sheet">
     <div class="block">
-      <h2>How would you like to run it?</h2>
-      <div class="segmented" role="radiogroup" aria-label="Simulation type">
-        <label class="seg"><input type="radio" name="modeChoice" value="demo" checked><span class="seg-title">Free demonstration</span><span class="seg-note">Fictional numbers, no AI calls. Shows the workflow and files.</span></label>
-        <label class="seg"><input type="radio" name="modeChoice" value="ai"><span class="seg-title">AI generation</span><span class="seg-note">GPT-5.6 Luna creates 100 participants from your inputs.</span></label>
-      </div>
-      <select id="mode" class="sr-only" aria-hidden="true" tabindex="-1"><option value="demo">Free demonstration</option><option value="ai">AI generation</option></select>
-      <p id="modeHelp" class="help"></p>
-    </div>
-
-    <div class="block">
       <h2>Inputs</h2>
-      <label>Which inputs should this simulation use?<select id="source"><option value="examples">Supplied fictional examples</option><option value="own">My own participant data or proportions</option></select></label>
+      <label>Which inputs should this simulation use?<select id="source"><option value="examples">Supplied fictional examples</option><option value="own">My own participant data</option></select></label>
       <label id="populationLabel">Population description for SPA3<textarea id="population" rows="2">Middle-aged and older adults in the specified US longitudinal cohort.</textarea></label>
       <div id="uploads" class="uploads"></div>
       <div class="sr-only"><select id="n" aria-hidden="true" tabindex="-1"></select><select id="repetitions" aria-hidden="true" tabindex="-1"><option>1</option></select></div>
       <p id="total" class="help"></p>
 
       <details class="note">
-        <summary>How to prepare a participant CSV</summary>
-        <ol>
-          <li>Download the blank template and the filled fictional example for your approach.</li>
-          <li>Keep the header row. Enter one participant per row using the numeric codes in the variable guide, with no names, emails or other direct identifiers.</li>
-          <li>Pilot approaches need at least 50 records; 50 are drawn without replacement. Custom studies need every raw item and demographic. MIDUS pilots need the listed scores, demographics and both life-satisfaction outcomes.</li>
-          <li>Profile approaches need at least 100 rows. Profiles with psychology also need observed predictor scores. Outcomes are generated, so do not upload them.</li>
-          <li>Save as UTF-8 comma-separated CSV. Leave cells blank only where missing values are allowed. Custom pilot items and demographics must be complete.</li>
-          <li>Upload the file and choose <em>Check inputs</em>. Any errors are listed before a paid request is made.</li>
-        </ol>
-        <p>If you change your measures, download fresh templates. Fictional examples show the format; they are not human evidence.</p>
+        <summary>How to prepare your CSV</summary>
+        <p>Every upload uses the same layout: <strong>one row per participant and one column per variable</strong>. Download the template for your approach, replace the example values with your own, and upload it.</p>
+        <ul>
+          <li><strong>SPA4:</strong> a demographic sample of exactly 50 participants. The toolkit matches the proportions in this sample when it builds 100 demographic profiles.</li>
+          <li><strong>SPA5 and SPA6:</strong> a pilot sample of exactly 50 participants with every variable, including both outcomes. All 50 are used.</li>
+          <li><strong>SPA7:</strong> 100 participant profiles with demographics. Each row becomes one synthetic participant.</li>
+          <li><strong>SPA8:</strong> 100 participant profiles with demographics and psychological scores. Each row becomes one synthetic participant, and only outcomes are generated.</li>
+        </ul>
+        <p>In the MIDUS study each psychological column is a construct score. In your own study, each construct can be supplied either as its individual item columns or as one construct-score column. Keep the header row unchanged, use the numeric codes in the variable guide, remove names and other direct identifiers, and save as UTF-8 CSV. Choose <em>Check inputs</em> to see any problems before a paid request is made.</p>
       </details>
       <details class="note">
         <summary>Variable guide</summary>
@@ -195,9 +186,13 @@
 
     <div class="block">
       <h2>Check and confirm</h2>
-      <div id="paidConsent" class="consent" hidden>
-        <label class="check confirm"><input id="consent" type="checkbox"><span>These inputs may be sent to OpenAI, and this simulation uses the research team’s limited API budget.</span></label>
+      <div id="paidConsent" class="consent">
+        <label class="check confirm"><input id="consent" type="checkbox"><span>These inputs may be sent to OpenAI, and this simulation uses the research team’s limited API budget. If a batch fails or returns unusable data, it is requested once more automatically.</span></label>
         <p class="help">Uploaded records and generated datasets are not saved to a database or server files; they stay in this browser tab for download. OpenAI temporarily retains background responses for progress checks, and its own retention policies apply. Use fictional data unless you are authorised to share real records.</p>
+      </div>
+      <div id="sensitiveBox" class="sensitive" hidden>
+        <p id="sensitiveTopics"></p>
+        <label class="check confirm"><input id="sensitiveAck" type="checkbox"><span>This study has ethics approval for these topics, all data are de-identified, and I may send these materials to OpenAI.</span></label>
       </div>
       <div class="actions">
         <button id="reviewInputs" class="primary" type="button">Check inputs</button>
@@ -208,8 +203,9 @@
       <div id="runReview" class="review" hidden>
         <h3>Review before starting</h3>
         <div id="reviewTable"></div>
+        <div id="reviewWarnings" class="review-warnings"></div>
         <label class="check confirm"><input id="inputsConfirmed" type="checkbox"><span>I have reviewed these settings and inputs.</span></label>
-        <div class="actions"><button id="generate" class="primary" type="button">Generate demonstration dataset</button></div>
+        <div class="actions"><button id="generate" class="primary" type="button">Generate 100 participants with AI</button></div>
       </div>
 
       <details id="promptPanel" class="note" hidden>
@@ -229,11 +225,12 @@
     <h1>Your datasets</h1>
     <p class="lead">Follow progress and download results. Nothing is saved after you close this tab.</p>
   </header>
-  <div class="banner warn"><strong>Download before leaving.</strong> Refreshing or closing this tab loses inputs, results and progress. An AI request that was already submitted may still finish and incur charges.</div>
+  <div class="banner warn"><strong>Keep this tab open and download before leaving.</strong> Generation usually takes a few minutes and can take up to an hour for complex data. Refreshing or closing this tab loses inputs, results and progress, while requests already submitted may still finish and incur charges.</div>
   <div class="actions session-actions">
     <button id="downloadAll" class="primary" type="button" hidden>Download dataset and codebook (ZIP)</button>
     <button id="checkAgain" type="button" hidden>Check progress again</button>
-    <button id="stopRun" type="button" hidden>Stop after the current batch</button>
+    <button id="retryRun" type="button" hidden>Retry failed batches (new paid request)</button>
+    <button id="stopRun" type="button" hidden>Cancel generation</button>
     <button id="clearResults" class="btn-quiet" type="button" hidden>Clear this session</button>
   </div>
   <div id="emptyResults" class="empty">
@@ -268,7 +265,6 @@
         <p>All eligible human records form the reference; rows are not matched one-to-one with generated participants. Each dataset is scored separately. One dataset cannot give a confidence interval.</p>
         <p>The original MIDUS analysis excludes anxiety; custom analyses use all defined predictors. Pattern correlation needs at least three varying paired coefficients. Undefined values appear blank, never as zero.</p>
         <p>An independent human benchmark is a stronger check when it was not used to guide generation. The original MIDUS results used the full eligible reference, including people who could supply input records, so the two answer different questions.</p>
-        <p>Fictional demonstration comparisons only show how the measures work; they do not evaluate an AI approach.</p>
       </details>
     </div>
   </div>
@@ -351,7 +347,7 @@
       <tr><td>Effect sizes and statistical power</td><td>No evaluated approach is validated for this</td><td>Use human evidence or explicitly specified effect-size scenarios.</td></tr>
     </tbody>
   </table></div>
-  <p class="help">Labels follow the revised proposal: SPA7 is original analysis M8 and SPA8 is original M7. Original IDs are preserved internally and in the source files. The findings do not establish accurate individual predictions, valid replacement of missing responses or intervention effects.</p>
+  <p class="help">Approach numbers follow the revised proposal: SPA7 uses demographic-only profiles and SPA8 uses demographic and psychological profiles. The findings do not establish accurate individual predictions, valid replacement of missing responses or intervention effects.</p>
 
   <h2 class="section-title">Detailed statistical results</h2>
   <p class="help">Means, confidence intervals, variable-level results and adjusted pairwise comparisons.</p>

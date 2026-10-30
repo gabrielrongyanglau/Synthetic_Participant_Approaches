@@ -7,6 +7,8 @@ from app import app,Run
 from spa import service,public_jobs,codebook
 from spa.study import load_study,selected_fields
 from spa.simulation import invent_reference
+from spa.public import PUBLIC
+from conftest import local_rows
 
 H={'X-SPA-Request':'1'}
 
@@ -15,14 +17,14 @@ def test_public_limit_before_any_provider_call(settings,monkeypatch):
     def prohibited():raise AssertionError('A disallowed run reached the provider')
     monkeypatch.setattr(public_jobs,'provider',prohibited)
     c=TestClient(app)
-    for path in ['/api/preview','/api/demo','/api/prepare']:
+    for path in ['/api/preview','/api/prepare']:
         r=c.post(path,json=dict(methods=[2],consent=True,**{k:v for k,v in settings.items() if k!='methods'}) if 'methods' not in settings else dict(methods=settings['methods'],consent=True),headers=H)
         assert r.status_code==422
 
 
 def test_original_columns_have_complete_codebook():
     s=load_study();columns=['participant_id']+selected_fields(s)
-    book=codebook.build(columns,7)
+    book=codebook.build(columns,8)
     assert [r['column'] for r in book]==columns
     for r in book:assert all(r[k] for k in ['name','definition','role','allowed_values','scoring','missing_values','source','provenance'])
     lookup={r['column']:r for r in book}
@@ -37,14 +39,14 @@ def test_original_columns_have_complete_codebook():
 
 def test_dataset_response_includes_codebook_and_requested_fields():
     c=TestClient(app)
-    demo=c.post('/api/demo',json=dict(methods=[2]),headers=H).json()
-    rows=demo['datasets']['M2_R0001']
-    r=c.post('/api/dataset',json=dict(name='M2_R0001',records=rows),headers=H)
+    rows=local_rows(2)['SPA2_R0001']
+    r=c.post('/api/dataset',json=dict(name='SPA2_R0001',records=rows),headers=H)
     assert r.status_code==200
     f=pd.read_csv(io.StringIO(r.json()['csv']));book=pd.read_csv(io.StringIO(r.json()['codebook_csv']))
     assert list(f)==book.column.tolist()
     s=load_study()
-    assert set(s['demographic_covariates'])<=set(f) and set(s['psychological_predictors'])<=set(f)
+    assert {PUBLIC[c] for c in s['demographic_covariates']}<=set(f) and {PUBLIC[c] for c in s['psychological_predictors']}<=set(f)
+    assert 'age' in f and 'optimism_overall' in f
 
 
 def test_contact_and_estimate_have_safe_defaults_and_optional_email(monkeypatch):
@@ -55,7 +57,7 @@ def test_contact_and_estimate_have_safe_defaults_and_optional_email(monkeypatch)
     monkeypatch.setenv('SPA_ESTIMATED_MINUTES','7–25')
     info=service.service_info()
     assert info['contact']['email']=='team@example.org' and info['estimated_minutes']=='7–25'
-    assert 'planning estimate' in info['estimate_note'].lower() and 'one hour' in info['estimate_note']
+    assert 'planning estimate' in info['estimate_note'].lower() and 'few minutes' in info['estimate_note'] and 'up to an hour' in info['estimate_note']
     monkeypatch.setenv('SPA_CONTACT_EMAIL','<script>alert(1)</script>')
     assert service.contact()['email'] is None
     monkeypatch.setenv('SPA_ESTIMATED_MINUTES','untrusted text')
@@ -70,14 +72,39 @@ def test_budget_error_gives_contact_without_exposing_provider_details(monkeypatc
         def __init__(self):self.responses=self;self.calls=0
         def create(self,**kwargs):
             self.calls+=1
-            error=RuntimeError('Private provider error');error.status_code=429;raise error
+            error=RuntimeError('Private provider error');error.status_code=429;error.code='insufficient_quota';raise error
     client=Provider();req=Run(methods=[2]);p=public_jobs.plan(req,{})
-    with pytest.raises(RuntimeError) as e:public_jobs.submit(p['ticket'],'M2_R0001',0,p['contexts']['M2_R0001'],client)
+    with pytest.raises(RuntimeError) as e:public_jobs.submit(p['ticket'],'SPA2_R0001',0,p['contexts']['SPA2_R0001'],client)
     assert 'team@example.org' in str(e.value) and 'Private provider' not in str(e.value) and client.calls==1
 
 
 def test_old_larger_signed_plans_cannot_generate_new_batches(monkeypatch):
     monkeypatch.setenv('OPENAI_API_KEY','fake-test-key')
-    ctx=public_jobs.prepare(Run(methods=[2]),{})['M2_R0001']
-    ticket=public_jobs.issue(dict(kind='plan',runs={'M2_R0001':public_jobs.digest(ctx)},settings=dict(methods=[2],n=200,repetitions=1)))
-    with pytest.raises(ValueError):public_jobs.submit(ticket,'M2_R0001',0,ctx)
+    ctx=public_jobs.prepare(Run(methods=[2]),{})['SPA2_R0001']
+    ticket=public_jobs.issue(dict(kind='plan',runs={'SPA2_R0001':public_jobs.digest(ctx)},settings=dict(methods=[2],n=200,repetitions=1)))
+    with pytest.raises(ValueError):public_jobs.submit(ticket,'SPA2_R0001',0,ctx)
+
+
+def test_rate_limits_are_retried_without_charge_then_explained(monkeypatch):
+    monkeypatch.setenv('OPENAI_API_KEY','fake-test-key');monkeypatch.setattr(public_jobs,'_sleep',lambda s:None)
+    class Busy:
+        def __init__(self,fail):self.responses=self;self.calls=0;self.fail=fail
+        def create(self,**kwargs):
+            self.calls+=1
+            if self.calls<=self.fail:
+                e=RuntimeError('Private rate limit text');e.status_code=429;e.code='rate_limit_exceeded';raise e
+            from types import SimpleNamespace
+            return SimpleNamespace(model_dump=lambda **k:dict(id='resp_ok',status='queued'))
+    p=public_jobs.plan(Run(methods=[2]),{})
+    ok=Busy(2);assert public_jobs.submit(p['ticket'],'SPA2_R0001',0,p['contexts']['SPA2_R0001'],ok)['status']=='queued' and ok.calls==3
+    busy=Busy(9)
+    with pytest.raises(RuntimeError) as e:public_jobs.submit(p['ticket'],'SPA2_R0001',0,p['contexts']['SPA2_R0001'],busy)
+    assert e.value.code=='service_busy' and busy.calls==3 and 'Private' not in str(e.value)
+    for status,code in [(401,'service_key_invalid'),(403,'service_access_denied'),(500,'service_unavailable'),(400,'request_rejected')]:
+        class P:
+            responses=None
+            def __init__(s):s.responses=s
+            def create(s,**k):
+                e=RuntimeError('x');e.status_code=status;raise e
+        with pytest.raises(RuntimeError) as e:public_jobs.submit(p['ticket'],'SPA2_R0001',0,p['contexts']['SPA2_R0001'],P())
+        assert e.value.code==code

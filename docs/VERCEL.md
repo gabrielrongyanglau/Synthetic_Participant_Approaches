@@ -2,7 +2,7 @@
 
 ## Required setup
 
-Import the repository into Vercel with **FastAPI**, Root Directory `./`, default Build and Output settings, and `OPENAI_API_KEY` in server-side Environment Variables. Deploy. No other variable is required. Optional `SPA_CONTACT_EMAIL` supplies a public contact address; optional `SPA_ESTIMATED_MINUTES` overrides the planning estimate (default 60 minutes). No contact address is invented when this is blank. It does not read a database URL or invitation configuration. Remove old variables if copying settings from the earlier repository.
+Import the repository into Vercel with **FastAPI**, Root Directory `./`, default Build and Output settings, and `OPENAI_API_KEY` in server-side Environment Variables. Deploy. No other variable is required. Optional `SPA_CONTACT_EMAIL` supplies a public contact address; optional `SPA_ESTIMATED_MINUTES` overrides the planning estimate (default 60 minutes); optional `SPA_BATCH_SIZE` sets participants per parallel AI request (25 by default; 50 or 100 allowed, where 100 matches the original MIDUS protocol). No contact address is invented when this is blank. It does not read a database URL or invitation configuration. Remove old variables if copying settings from the earlier repository.
 
 The root `app.py` exports the FastAPI application. `.python-version` selects Python 3.13. `vercel.json` allows a 120-second function duration. OpenAI submission/retrieval calls have a 35-second network timeout and no automatic SDK retries. Model, reasoning and output allowance are fixed to `gpt-5.6-luna`, medium and 128,000.
 

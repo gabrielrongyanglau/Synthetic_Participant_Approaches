@@ -7,7 +7,7 @@ from spa.study import PROJECT_ROOT,selected_fields
 from spa.analysis import load_bundle
 
 def test_readable_record_display_preserves_raw_export(study):
-    raw=pd.read_csv(PROJECT_ROOT/'data/examples/M1_R0001.csv',float_precision='round_trip')
+    raw=pd.read_csv(PROJECT_ROOT/'data/examples/SPA1_R0001.csv',float_precision='round_trip')
     before=raw.copy(deep=True);display=readable_records(raw,study)
     pd.testing.assert_frame_equal(raw,before)
     assert len(display)==100 and display.shape==raw.shape
@@ -28,11 +28,15 @@ def test_guides_and_filled_templates_match_study(study):
     guide=variable_guide(study)
     assert set(guide['CSV column name'])==set(selected_fields(study))
     for m in (5,6):
-        frame=pd.read_csv(PROJECT_ROOT/f'data/examples/M{m}_pilot_example.csv')
+        frame=pd.read_csv(PROJECT_ROOT/f'data/examples/SPA{m}_pilot_example.csv')
         assert len(frame)==50 and set(frame)==set(selected_fields(study))
     for m in (7,8):
-        frame=pd.read_csv(PROJECT_ROOT/f'data/examples/M{m}_profiles_example.csv')
+        frame=pd.read_csv(PROJECT_ROOT/f'data/examples/SPA{m}_profiles_example.csv')
         assert len(frame)==100 and not set(study['outcomes'])&set(frame)
+    assert list(pd.read_csv(PROJECT_ROOT/'data/examples/SPA7_profiles_example.csv'))==study['demographic_covariates']
+    assert set(study['psychological_predictors'])<=set(pd.read_csv(PROJECT_ROOT/'data/examples/SPA8_profiles_example.csv'))
+    sample=pd.read_csv(PROJECT_ROOT/'data/examples/SPA4_demographic_sample_example.csv')
+    assert len(sample)==50 and list(sample)==study['demographic_covariates']
 
 def test_method_and_measure_explanations():
     assert 'synthetic participant approach (SPA)' in INTRO

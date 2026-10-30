@@ -31,26 +31,30 @@ def clean(raw):
 
 def extract_pdf(encoded,filename):
     from pypdf import PdfReader
-    if not isinstance(encoded,str) or len(encoded)>2_000_004:raise ValueError('Upload a PDF smaller than 1.5 MB, or paste selected text.')
+    from .errors import AppError
+    name='"'+(str(filename).replace('\\','/').split('/')[-1][:120] or 'The PDF')+'"'
+    if not isinstance(encoded,str) or len(encoded)>2_000_004:raise AppError('pdf_too_large',name=name,size='over 1.5 MB')
     try:data=base64.b64decode(encoded,validate=True)
-    except Exception:raise ValueError('The PDF upload could not be read. Select the file again.') from None
-    if len(data)>MAX_PDF_BYTES or not data.startswith(b'%PDF-'):raise ValueError('Select a valid PDF smaller than 1.5 MB.')
+    except Exception:raise AppError('pdf_unreadable',name=name) from None
+    if len(data)>MAX_PDF_BYTES:raise AppError('pdf_too_large',name=name,size=f'{len(data)/1e6:.1f} MB')
+    if not data.startswith(b'%PDF-'):raise AppError('not_pdf',name=name)
     try:
         reader=PdfReader(io.BytesIO(data),strict=False)
-        if reader.is_encrypted:raise ValueError('Password-protected PDFs are unsupported. Upload an unlocked copy or paste the relevant findings.')
+        if reader.is_encrypted:raise AppError('pdf_encrypted',name=name)
         count=len(reader.pages)
-        if not 1<=count<=40:raise ValueError('Use a PDF of up to 40 pages, or paste the relevant excerpts.')
+        if count<1:raise AppError('pdf_unreadable',name=name)
+        if count>40:raise AppError('pdf_too_many_pages',name=name,pages=count)
         chunks=[];empty=[];total=0
         for i,page in enumerate(reader.pages,1):
             text=page.extract_text() or ''
             if not text.strip():empty.append(i)
             chunk=f'[PDF page {i}]\n'+text.strip();total+=len(chunk)
-            if total>MAX_TEXT:raise ValueError('This PDF exceeds 60,000 extracted characters. Paste the relevant excerpts instead.')
+            if total>MAX_TEXT:raise AppError('pdf_too_much_text',name=name)
             chunks.append(chunk)
         text='\n\n'.join(chunks)
-        if count==len(empty):raise ValueError('No readable text was found. Scanned PDFs need OCR first, or you can paste the relevant findings.')
-    except ValueError:raise
-    except Exception:raise ValueError('Text extraction failed. Try another PDF or paste the relevant findings.') from None
+        if count==len(empty):raise AppError('pdf_no_text',name=name)
+    except AppError:raise
+    except Exception:raise AppError('pdf_unreadable',name=name) from None
     return dict(title=str(filename).replace('\\','/').split('/')[-1][:300] or 'Uploaded paper',text=text,kind='pdf',pages=count,sha256=hashlib.sha256(data).hexdigest(),
                 warnings=['No text found on PDF pages '+', '.join(map(str,empty))+'. These pages will not inform generation.'] if empty else [])
 

@@ -35,7 +35,8 @@ def build_prompt(study,method,ids,fixed=None,pilot=None,summary=None,variant=Non
         'Wave_1_predictor_profiles':compact(to_model(fixed or [],study)),
         'pilot_data':compact(to_model(pilot or [],study)),'calibration_summary':compact(to_model(summary or {},study))}
     bank=json.loads((PROJECT_ROOT/'prompts/methods.json').read_text(encoding='utf-8'))
-    matches=[p for p in bank['prompts'] if p['method']==method]
+    from .numbering import SPA_TO_ORIGINAL
+    matches=[p for p in bank['prompts'] if p['method']==SPA_TO_ORIGINAL[method]]
     if len(matches)!=1:raise ValueError('Expected exactly one prompt per method.')
     user=matches[0]['user']
     for k,v in replacements.items():user=user.replace('{'+k+'}',v)

@@ -7,14 +7,14 @@ from spa.study import predictors,selected_fields
 
 @pytest.mark.parametrize('information,methods',[
  ('definitions',[1,2]),('population',[1,2,3]),('proportions',[4]),('pilot',[5,6]),
- ('demographics',[8]),('psychology',[7,8])])
+ ('demographics',[7]),('psychology',[7,8])])
 def test_compatibility(information,methods):assert compatible_methods(information)==methods
 
 @pytest.mark.parametrize('method',range(1,9))
 def test_own_inputs_need_no_benchmark(method,study,reference):
-    assets={'proportions':quota_template(reference,study),'pilot_M5':reference.iloc[:75],
-      'pilot_M6':reference.iloc[75:150],'profiles_M7':reference[predictors(study)].iloc[:100],
-      'profiles_M8':reference[study['demographic_covariates']].iloc[:100]}
+    assets={'sample_SPA4':reference[study['demographic_covariates']].iloc[200:250],'pilot_SPA5':reference.iloc[:50],
+      'pilot_SPA6':reference.iloc[50:100],'profiles_SPA8':reference[predictors(study)].iloc[:100],
+      'profiles_SPA7':reference[study['demographic_covariates']].iloc[:100]}
     context=prepare_context(study,method,100,assets=assets,population='Middle-aged and older adults.')
     assert context['provenance']['reference_required'] is False
     assert (context['summary'] is not None)==(method==5)
@@ -45,20 +45,30 @@ def test_quota_marginals_and_errors(study,reference):
     invalid=pd.concat([table,table.iloc[[6]]],ignore_index=True)
     with pytest.raises(ValueError):profiles_from_proportions(invalid,study,100,np.random.default_rng(1))
 
-def test_profile_pool_and_pilot_drawing(study,reference):
-    assets={'pilot_M5':reference.iloc[:100],'pilot_M6':reference.iloc[:100]}
-    bank=context_bank(study,[5,6],100,2,7,assets)
-    assert bank['M5_R0001']['pilot']!=bank['M5_R0002']['pilot']
-    assert bank['M5_R0001']['pilot']!=bank['M6_R0001']['pilot']
+def test_pilot_and_samples_are_exactly_fifty_and_profiles_fixed(study,reference):
+    from spa.study import json_records
+    assets={'pilot_SPA5':reference.iloc[:50],'pilot_SPA6':reference.iloc[:50]}
+    bank=context_bank(study,[5,6],100,1,7,assets)
+    expected=json_records(reference.iloc[:50][selected_fields(study)])
+    assert bank['SPA5_R0001']['pilot']==expected and bank['SPA6_R0001']['pilot']==expected
     assert input_digest(bank)==input_digest(bank)
-    assets={'profiles_M8':reference[study['demographic_covariates']].iloc[:100]}
-    a=prepare_context(study,8,100,assets=assets)
+    for rows in (49,51,100):
+        for m in (5,6):
+            with pytest.raises(ValueError,match='exactly 50'):prepare_context(study,m,100,assets={f'pilot_SPA{m}':reference.iloc[:rows]})
+        with pytest.raises(ValueError,match='exactly 50'):prepare_context(study,4,100,assets={'sample_SPA4':reference[study['demographic_covariates']].iloc[:rows]})
+    sample=reference[study['demographic_covariates']].iloc[:50]
+    ctx=prepare_context(study,4,100,assets={'sample_SPA4':sample})
+    sex=study['demographic_covariates'][1];share=sample[sex].value_counts(normalize=True)
+    built=pd.DataFrame(ctx['fixed'])[sex].value_counts(normalize=True)
+    assert all(abs(built.get(k,0)-v)<=.011 for k,v in share.items())
+    assets={'profiles_SPA7':reference[study['demographic_covariates']].iloc[:100]}
+    a=prepare_context(study,7,100,assets=assets)
     for f in study['demographic_covariates']:assert a['fixed'][0][f]==reference.iloc[0][f]
 
 def test_purpose_is_not_a_ranking():
     assert 'hypothetical' not in purpose_guidance('workflow',[1]).lower()
     assert 'overstated' in purpose_guidance('relationships',[5,6])
-    assert 'individual' in purpose_guidance('outcomes',[7])
+    assert 'individual' in purpose_guidance('outcomes',[8])
 
 def test_optional_validation_uses_only_required_scores(study,reference):
     from spa.workflow import evaluation_reference

@@ -9,6 +9,7 @@ from spa import public_jobs as jobs
 from spa.study import load_study,json_records
 from spa.simulation import invent_reference
 from spa.labels import field_map
+from conftest import local_rows
 H={'X-SPA-Request':'1'}
 
 @pytest.fixture
@@ -35,16 +36,16 @@ class FakeProvider:
 
 def test_no_accounts_database_or_secret_exposure(client):
     assert client.get('/api/config').json()['configured'] is True
-    for path in ['/','/app.js','/zip.js','/style.css','/api/config','/api/evidence','/api/guide.csv','/api/example/M5_inputs.csv']:
+    for path in ['/','/app.js','/zip.js','/style.css','/api/config','/api/evidence','/api/guide.csv','/api/example/SPA5_template.csv']:
         r=client.get(path);assert r.status_code==200;assert 'fake-key-for-tests-only' not in r.text;assert 'set-cookie' not in r.headers
     for path in ['/api/jobs','/api/me','/.env','/db/schema.sql']:assert client.get(path).status_code==404
     assert client.post('/api/login',json={},headers=H).status_code==404
 
-def test_no_key_needed_for_demo_or_preview(client,monkeypatch):
+def test_no_key_needed_for_preview_and_free_demo_removed(client,monkeypatch):
     monkeypatch.delenv('OPENAI_API_KEY')
     assert client.get('/api/config').json()['configured'] is False
     assert client.post('/api/preview',json={'methods':[5]},headers=H).status_code==200
-    assert client.post('/api/demo',json={'methods':[1]},headers=H).status_code==200
+    assert client.post('/api/demo',json={'methods':[1]},headers=H).status_code==404
     assert client.post('/api/prepare',json={'methods':[1],'consent':True},headers=H).status_code==503
 
 def test_guard_and_validation(client):
@@ -60,7 +61,7 @@ def test_guard_and_validation(client):
 def test_public_generation_and_fixed_values(client,monkeypatch,method):
     fake=FakeProvider();monkeypatch.setattr(jobs,'provider',lambda:fake)
     plan=client.post('/api/prepare',json={'methods':[method],'n':100,'consent':True},headers=H).json()
-    run=f'M{method}_R0001';ctx=plan['contexts'][run];rows=[]
+    run=f'SPA{method}_R0001';ctx=plan['contexts'][run];rows=[]
     for offset in [0]:
         r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run=run,offset=offset,context=ctx),headers=H)
         assert r.status_code==200,r.text
@@ -86,16 +87,10 @@ def test_thousand_person_plan_and_bounds(client,method):
     p=client.post('/api/prepare',json={'methods':[method],'n':1000,'consent':True},headers=H)
     assert p.status_code==422
 
-@pytest.mark.parametrize('method',range(1,9))
-def test_each_demo_in_memory(client,method):
-    r=client.post('/api/demo',json={'methods':[method],'n':100},headers=H);assert r.status_code==200
-    assert len(r.json()['datasets'][f'M{method}_R0001'])==100
-    assert 'no AI calls' in r.json()['metadata']['source']
-
 def test_signed_handles_reject_tampering_other_response_and_expiry(client,monkeypatch):
     fake=FakeProvider();monkeypatch.setattr(jobs,'provider',lambda:fake)
-    plan=client.post('/api/prepare',json={'methods':[7],'consent':True},headers=H).json();ctx=plan['contexts']['M7_R0001']
-    r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run='M7_R0001',offset=0,context=ctx),headers=H).json();handle=r['handle']
+    plan=client.post('/api/prepare',json={'methods':[8],'consent':True},headers=H).json();ctx=plan['contexts']['SPA8_R0001']
+    r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run='SPA8_R0001',offset=0,context=ctx),headers=H).json();handle=r['handle']
     bad=copy.deepcopy(ctx);bad['fixed'][0]['participant_id']=999
     assert client.post('/api/poll',json={'handle':handle,'context':bad},headers=H).status_code==400
     assert client.post('/api/poll',json={'handle':'resp_unrelated','context':ctx},headers=H).status_code==400
@@ -106,9 +101,9 @@ def test_signed_handles_reject_tampering_other_response_and_expiry(client,monkey
 def test_failed_submit_never_retries(client,monkeypatch):
     f=FakeProvider(fail_submit=True);monkeypatch.setattr(jobs,'provider',lambda:f)
     plan=client.post('/api/prepare',json={'methods':[1],'consent':True},headers=H).json()
-    r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run='M1_R0001',offset=0,context=plan['contexts']['M1_R0001']),headers=H)
+    r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run='SPA1_R0001',offset=0,context=plan['contexts']['SPA1_R0001']),headers=H)
     assert r.status_code==503;assert len(f.created)==1
-    assert 'may have been accepted and charged' in r.text;assert 'private provider message' not in r.text
+    assert 'may or may not have been accepted' in r.text and r.json()['code']=='submission_uncertain';assert 'private provider message' not in r.text
 
 def test_read_failure_retains_handle_without_resubmission(client,monkeypatch):
     class FailReadOnce(FakeProvider):
@@ -118,8 +113,8 @@ def test_read_failure_retains_handle_without_resubmission(client,monkeypatch):
             if self.reads==1:raise ConnectionError('temporary')
             return super().retrieve(rid)
     f=FailReadOnce();monkeypatch.setattr(jobs,'provider',lambda:f)
-    p=client.post('/api/prepare',json={'methods':[1],'consent':True},headers=H).json();ctx=p['contexts']['M1_R0001']
-    h=client.post('/api/submit',json=dict(ticket=p['ticket'],run='M1_R0001',offset=0,context=ctx),headers=H).json()['handle']
+    p=client.post('/api/prepare',json={'methods':[1],'consent':True},headers=H).json();ctx=p['contexts']['SPA1_R0001']
+    h=client.post('/api/submit',json=dict(ticket=p['ticket'],run='SPA1_R0001',offset=0,context=ctx),headers=H).json()['handle']
     assert client.post('/api/poll',json={'handle':h,'context':ctx},headers=H).status_code==503
     assert client.post('/api/poll',json={'handle':h,'context':ctx},headers=H).json()['status']=='completed'
     assert len(f.created)==1
@@ -133,13 +128,13 @@ def test_no_writes_during_request(client,monkeypatch):
         return original(file,mode,*a,**k)
     with monkeypatch.context() as m:
         m.setattr(builtins,'open',safe_open);m.setattr(Path,'write_text',reject);m.setattr(Path,'write_bytes',reject);m.setattr(Path,'mkdir',reject)
-        p=client.post('/api/prepare',json={'methods':[6],'consent':True},headers=H).json();ctx=p['contexts']['M6_R0001']
-        h=client.post('/api/submit',json=dict(ticket=p['ticket'],run='M6_R0001',offset=0,context=ctx),headers=H).json()['handle']
+        p=client.post('/api/prepare',json={'methods':[6],'consent':True},headers=H).json();ctx=p['contexts']['SPA6_R0001']
+        h=client.post('/api/submit',json=dict(ticket=p['ticket'],run='SPA6_R0001',offset=0,context=ctx),headers=H).json()['handle']
         r=client.post('/api/poll',json={'handle':h,'context':ctx},headers=H);assert r.json()['status']=='completed'
-        assert client.post('/api/dataset',json={'name':'M6_R0001','records':r.json()['records'],'pilot':ctx['pilot']},headers=H).status_code==200
+        assert client.post('/api/dataset',json={'name':'SPA6_R0001','records':r.json()['records'],'pilot':ctx['pilot']},headers=H).status_code==200
 
 def test_comparison_uses_browser_rows_not_database(client,reference):
-    rows=client.post('/api/demo',json={'methods':[1]},headers=H).json()['datasets']
+    rows=local_rows(1)
     result=client.post('/api/compare',json={'csv':reference.to_csv(index=False),'datasets':rows},headers=H)
     assert result.status_code==200,result.text
     assert result.json()['metadata']['human_n']==2709 and result.json()['metadata']['datasets']==1

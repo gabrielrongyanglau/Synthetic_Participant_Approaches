@@ -2,7 +2,7 @@
 
 The original scientific engine was independently compared with all 8,000 final datasets and the full eligible human reference of 2,709 participants. All 6,374 mapped workbook cells passed, including 5,935 numerical values and 439 p-value display strings or significance decisions. The maximum absolute numerical difference was approximately 3.35 × 10⁻¹³. The historical per-tab checks are retained in `verification/validation_summary.csv`.
 
-The original MIDUS study definition, representative prompt bank, sampling helpers, statistical formulas and source aggregate files are unchanged. Public labels now follow the revised proposal: SPA7 is original M8 and SPA8 is original M7. Display mapping changes no source values or generation procedures.
+The original MIDUS study definition, representative prompt bank, sampling helpers, statistical formulas and source aggregate files are unchanged. Approaches are numbered SPA1–SPA8 as in the revised proposal. The source prompt bank and result files keep the original numbering and are byte-identical; `spa/numbering.py` relabels them on load, and a test confirms that SPA8 carries the proposal's reported values (SMD 0.0802; correlation MAE .1927 and .2445) and SPA7 its own (0.5822; .6574 and .7114).
 
 ## Current checks
 
@@ -26,7 +26,15 @@ The public interface and request schema now limit simulations to one approach, o
 
 Dataset responses provide a column-matched codebook for MIDUS and custom studies. Checks cover all exported columns, the four example MIDUS codes raised during review, generated-versus-fixed provenance, custom items and composite scoring, demographic inclusion and UTF-8 codebook CSV parsing. New tests cover optional contact/estimate settings and sanitized budget-related provider errors without automatic retries. Browser QA checks the visible planning estimate, funding notice, disabled larger samples/repetitions, single approach selection, dataset/codebook download controls and demographic fields.
 
-The interface states that generation may take up to one hour depending on variables, complexity and service availability. This is a planning estimate, not a measured performance result. Only an owner-configured public email is displayed; no contact address is fabricated.
+The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
+
+## Version 4.6: error handling
+
+`spa/errors.py` holds one catalogue of error codes, each with a title, message, advice and automatic-handling rule; `docs/ERRORS.md` is generated from it and a test checks that they match. `tests/test_error_scenarios.py` (44 tests) covers every upload error (wrong file type, separators, ragged rows, duplicate or missing columns, identifying columns and values, text or out-of-range values, decimal commas, non-whole codes, blanks, wrong row counts, one participant repeated), quality warnings, the sensitive-topic confirmation and prohibited-content block, every provider outcome (budget exhausted, rate limit with retry, invalid key, access denied, context too long, rejected request, outage, uncertain submission), expired, failed, refused, empty, malformed, repetitive and copied batches, tampered handles, oversized requests and unusable comparison references. A fuzz script sent 42 malformed inputs to the API; each returned a specific code rather than a generic error. Browser QA with scripted fake providers confirmed: budget exhaustion stops all batches with the contact advice; rate limits are retried and complete; repetitive, empty and expired batches are resubmitted once and complete; a refusal is explained; wrong file types, bad cells and sensitive material show specific cards. The main template flow and the scan for source codes and M-style labels still pass. No paid provider call was made.
+
+## Version 4.3: readable names, parallel batches, AI-only generation
+
+Tests confirm that no MIDUS source code appears in any page, script, API response or download (templates, examples, variable guide, prompt preview, input check, prepared contexts, datasets, codebooks, comparisons and study findings), that prepared contexts translate back exactly so their signatures still verify, and that uploads using the readable names are accepted. Parallel-batch tests confirm four 25-person requests per dataset, correct participant ranges, preserved fixed values, rejection of off-boundary batch positions and assembly into one 100-person dataset. The free numerical demonstration endpoint is removed. Legacy tests run with `SPA_BATCH_SIZE=100` so they continue to check the original single-request protocol. Browser QA with a simulated provider covered a failed batch, retry, partial download and a scan of all visible text and downloaded files for source codes. The scientific core files are unchanged (hashes in `verification/build_checks.json`). Only an owner-configured public email is displayed; no contact address is fabricated.
 
 ## Version 4.2 additions
 

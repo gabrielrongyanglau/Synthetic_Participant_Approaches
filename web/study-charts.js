@@ -1,10 +1,10 @@
 /* Original-study visualisations only. Uses verified aggregates, never session data. */
 'use strict';
 const StudyCharts=(()=>{
-  const display=text=>String(text).replace(/\bM([1-8])\b/g,(_,m)=>'SPA'+({7:8,8:7}[m]||m));
-  const order=[1,2,3,4,5,6,8,7];
+  const display=text=>String(text);
+  const order=[1,2,3,4,5,6,7,8];
   const NS='http://www.w3.org/2000/svg';
-  const short={1:'Persona prompted',2:'Direct generation',3:'Population guided',4:'Quota matched',5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographics + psychology *',8:'Demographic only profiles'};
+  const short={1:'Persona prompted',2:'Direct generation',3:'Population guided',4:'Quota matched',5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographic-only profiles',8:'Demographics + psychology *'};
   const definitions={
     wasserstein:{axis:'Normalized Wasserstein distance · lower is closer',meaning:'Wasserstein distance compares the full score distributions, expressed in human standard deviations. Zero means identical distributions. Values are averaged across the 38 psychological predictors.'},
     smd:{axis:'Absolute standardized mean difference · lower is closer',meaning:'Standardized mean error measures gaps between simulated and human average scores relative to their pooled score variability. Zero means equal averages. Absolute errors are averaged across 38 predictors.'},
@@ -20,7 +20,7 @@ const StudyCharts=(()=>{
   }
   function scatterFor(data,method,wave){
     const humans=new Map(data.human.map(h=>[h.code,h]));
-    const rows=data.variables.filter(r=>r.method===Number(method)&&r.code!=='B1PANXIE').map(r=>{
+    const rows=data.variables.filter(r=>r.method===Number(method)&&r.code!=='anxiety_symptoms').map(r=>{
       const h=humans.get(r.code);
       return {code:r.code,label:data.variable_labels[r.code]||r.code,human:h?.[`midus${wave}_r`],generated:r[`midus${wave}_mean_r`],mae:r[`midus${wave}_mae`],n:r[`midus${wave}_runs`]};
     });
@@ -42,7 +42,7 @@ const StudyCharts=(()=>{
     element.setAttribute('tabindex','0');element.setAttribute('role','img');element.setAttribute('aria-label',display(description));element.append(node('title',{},description));
     for(const event of ['pointerenter','focus'])element.addEventListener(event,()=>{document.getElementById(target).textContent=display(description)});
   }
-  function rowColor(m){return m===5?'#257e73':m===6?'#4267a9':m===7?'#a5672a':'#6f8793'}
+  function rowColor(m){return m===5?'#257e73':m===6?'#4267a9':m===8?'#a5672a':'#6f8793'}
   function whisker(svg,x,low,high,y,color){
     svg.append(node('line',{x1:x(low),x2:x(high),y1:y,y2:y,stroke:color,'stroke-width':2.5}),node('line',{x1:x(low),x2:x(low),y1:y-5,y2:y+5,stroke:color,'stroke-width':1.5}),node('line',{x1:x(high),x2:x(high),y1:y-5,y2:y+5,stroke:color,'stroke-width':1.5}));
   }
@@ -57,16 +57,16 @@ const StudyCharts=(()=>{
     text(svg,(spec.left+spec.width-spec.right)/2,spec.bottom+59,label,{'text-anchor':'middle','font-size':14});
     return x;
   }
-  function pointDescription(r,label){return `M${r.method} ${source.method_names[r.method]}. ${label}: ${fmt(r.mean)}. 95% CI ${fmt(r.lower)} to ${fmt(r.upper)}. ${r.n} scored repetitions.${r.method===7?' Actual psychological predictors are retained.':''}`}
+  function pointDescription(r,label){return `SPA${r.method} ${source.method_names[r.method]}. ${label}: ${fmt(r.mean)}. 95% CI ${fmt(r.lower)} to ${fmt(r.upper)}. ${r.n} scored repetitions.${r.method===8?' Actual psychological predictors are retained.':''}`}
   function intervalChart(target,rows,axisLabel,readout,highlight){
-    const spec=intervalSpec(rows),svg=base(target,axisLabel,'Eight methods, each shown by a mean point and a 95% confidence interval. Lower error means closer reproduction of human data. M7 retains actual psychological predictors.');
+    const spec=intervalSpec(rows),svg=base(target,axisLabel,'Eight methods, each shown by a mean point and a 95% confidence interval. Lower error means closer reproduction of human data. SPA8 retains actual psychological predictors.');
     const x=axis(svg,spec,axisLabel);text(svg,990,8,'Mean / 95% CI',{'text-anchor':'end','font-size':11});
     rows.slice().sort((a,b)=>order.indexOf(a.method)-order.indexOf(b.method)).forEach((r,i)=>{
       const y=spec.top+i*spec.row;
-      if(r.method===highlight||r.method===7)svg.append(node('rect',{x:3,y:y-18,width:990,height:36,rx:5,fill:r.method===7?'#f8f1e7':'#edf4f1'}));
-      text(svg,12,y+5,`M${r.method}  ${short[r.method]}`,{'font-weight':r.method===highlight||r.method===7?650:400});
+      if(r.method===highlight||r.method===8)svg.append(node('rect',{x:3,y:y-18,width:990,height:36,rx:5,fill:r.method===8?'#f8f1e7':'#edf4f1'}));
+      text(svg,12,y+5,`SPA${r.method}  ${short[r.method]}`,{'font-weight':r.method===highlight||r.method===8?650:400});
       const color=rowColor(r.method);whisker(svg,x,r.lower,r.upper,y,color);
-      const dot=node('circle',{cx:x(r.mean),cy:y,r:5,fill:r.method===7?'white':color,stroke:color,'stroke-width':2.5});
+      const dot=node('circle',{cx:x(r.mean),cy:y,r:5,fill:r.method===8?'white':color,stroke:color,'stroke-width':2.5});
       interactive(dot,pointDescription(r,axisLabel),readout);svg.append(dot);
       text(svg,990,y+1,fmt(r.mean),{'text-anchor':'end','font-weight':600});
       text(svg,990,y+15,`${fmt(r.lower)}–${fmt(r.upper)}`,{'text-anchor':'end','font-size':10,fill:'#60757c'});
@@ -80,20 +80,20 @@ const StudyCharts=(()=>{
     const legend=document.getElementById('agreementLegend');legend.replaceChildren();
     for(const s of series){const item=html('span',undefined,'study-series');const swatch=html('span',undefined,`study-swatch metric-${s.metric}`);item.append(swatch,document.createTextNode(s.name));legend.append(item)}
     for(const m of order){
-      const y=spec.top+order.indexOf(m)*spec.row;text(svg,12,y+5,`M${m}  ${short[m]}`,{'font-weight':m===7?650:400});
+      const y=spec.top+order.indexOf(m)*spec.row;text(svg,12,y+5,`SPA${m}  ${short[m]}`,{'font-weight':m===8?650:400});
       for(const s of series){
         const r=dataFor(source,s.metric,wave).find(r=>r.method===m);whisker(svg,x,r.lower,r.upper,y+s.dy,s.color);
-        const dot=node('circle',{cx:x(r.mean),cy:y+s.dy,r:4.6,fill:m===7?'white':s.color,stroke:s.color,'stroke-width':2});
+        const dot=node('circle',{cx:x(r.mean),cy:y+s.dy,r:4.6,fill:m===8?'white':s.color,stroke:s.color,'stroke-width':2});
         interactive(dot,pointDescription(r,s.name),'agreementReadout');svg.append(dot);
       }
     }
     const sample=dataFor(source,'pattern_r',wave).find(r=>r.method===5),icc=dataFor(source,'icc',wave).find(r=>r.method===5);
-    document.getElementById('agreementReadout').textContent=`For M5, Pearson pattern r is ${fmt(sample.mean)}, while ICC(A,1) is ${fmt(icc.mean)} at MIDUS ${wave}. High pattern similarity coexists with lower numerical agreement.`;
+    document.getElementById('agreementReadout').textContent=`For SPA5, Pearson pattern r is ${fmt(sample.mean)}, while ICC(A,1) is ${fmt(icc.mean)} at MIDUS ${wave}. High pattern similarity coexists with lower numerical agreement.`;
   }
   function scatterChart(wave){
     const method=Number(document.getElementById('studyScatterMethod').value),rows=scatterFor(source,method,wave);
     const W=800,H=610,L=91,R=38,T=25,B=88,plot=Math.min(W-L-R,H-T-B),x=v=>L+(v+1)/2*plot,y=v=>T+(1-v)/2*plot;
-    const svg=base('correlationChart',`M${method} psychological correlations at MIDUS ${wave}`,'One point per psychological predictor. Horizontal: observed human correlation. Vertical: average generated correlation. The diagonal represents exact numerical agreement.',W,H);
+    const svg=base('correlationChart',`SPA${method} psychological correlations at MIDUS ${wave}`,'One point per psychological predictor. Horizontal: observed human correlation. Vertical: average generated correlation. The diagonal represents exact numerical agreement.',W,H);
     for(const t of [-1,-.5,0,.5,1]){
       svg.append(node('line',{x1:x(t),x2:x(t),y1:y(1),y2:y(-1),stroke:t===0?'#aebfc3':'#e1e8e7'}),node('line',{x1:x(-1),x2:x(1),y1:y(t),y2:y(t),stroke:t===0?'#aebfc3':'#e1e8e7'}));
       text(svg,x(t),y(-1)+25,t.toFixed(1),{'text-anchor':'middle'});text(svg,L-15,y(t)+5,t.toFixed(1),{'text-anchor':'end'});
@@ -103,36 +103,36 @@ const StudyCharts=(()=>{
     text(svg,L+plot/2,y(-1)+62,'Human correlation with life satisfaction',{'text-anchor':'middle','font-size':16});
     svg.append(node('text',{x:23,y:T+plot/2,transform:`rotate(-90 23 ${T+plot/2})`,'text-anchor':'middle',fill:'#344e58','font-size':16},'Average simulated correlation with life satisfaction'));
     for(const r of rows){
-      const dot=node('circle',{cx:x(r.human),cy:y(r.generated),r:5.6,fill:method===7?'white':rowColor(method),stroke:rowColor(method),'stroke-width':2,opacity:.85});
+      const dot=node('circle',{cx:x(r.human),cy:y(r.generated),r:5.6,fill:method===8?'white':rowColor(method),stroke:rowColor(method),'stroke-width':2,opacity:.85});
       interactive(dot,`${r.label}. Human correlation ${fmt(r.human)}; average simulated correlation ${fmt(r.generated)}; mean absolute correlation error ${fmt(r.mae)}; ${r.n} available repetitions.`,'correlationReadout');svg.append(dot);
     }
-    document.getElementById('correlationReadout').textContent=display(`M${method} ${source.method_names[method]} at MIDUS ${wave}. Inspect a point to see the psychological variable and its values. Points closer to the diagonal have closer average correlation values.`);
+    document.getElementById('correlationReadout').textContent=display(`SPA${method} ${source.method_names[method]} at MIDUS ${wave}. Inspect a point to see the psychological variable and its values. Points closer to the diagonal have closer average correlation values.`);
   }
   function takeaway(title,value,measure,explanation,cls){const card=html('div',undefined,'study-takeaway '+cls);card.append(html('h2',title),html('div',value,'study-big-value'),html('p',measure,'study-measure'),html('p',explanation));return card}
   function update(){
     const wave=Number(document.getElementById('studyWave').value),metric=document.getElementById('studyDistribution').value;
     const distributions=dataFor(source,metric,0),water=dataFor(source,'wasserstein',0),relationships=dataFor(source,'correlation_mae',wave);
-    const get=(rows,m)=>rows.find(r=>r.method===m),m5=get(water,5),m6=get(relationships,6),m7=get(relationships,7);
+    const get=(rows,m)=>rows.find(r=>r.method===m),m5=get(water,5),m6=get(relationships,6),m8=get(relationships,8);
     document.getElementById('studyTakeaways').replaceChildren(
-      takeaway('M5 · Closest generated score distributions',fmt(m5.mean),'Normalized Wasserstein distance','The lowest distribution error among approaches that generate psychological scores.','takeaway-m5'),
-      takeaway('M6 · Closest relationships from generated scores',fmt(m6.mean),`Correlation error · MIDUS ${wave}`,'The lowest relationship error among approaches that generate psychological scores.','takeaway-m6'),
-      takeaway('M7 · Closest relationships overall',fmt(m7.mean),`Correlation error · MIDUS ${wave}`,'Actual demographics and psychological predictors are supplied; the model generates only outcomes.','takeaway-m7'));
+      takeaway('SPA5 · Closest generated score distributions',fmt(m5.mean),'Normalized Wasserstein distance','The lowest distribution error among approaches that generate psychological scores.','takeaway-m5'),
+      takeaway('SPA6 · Closest relationships from generated scores',fmt(m6.mean),`Correlation error · MIDUS ${wave}`,'The lowest relationship error among approaches that generate psychological scores.','takeaway-m6'),
+      takeaway('SPA8 · Closest relationships overall',fmt(m8.mean),`Correlation error · MIDUS ${wave}`,'Actual demographics and psychological predictors are supplied; the model generates only outcomes.','takeaway-spa8'));
     document.getElementById('distributionMeaning').textContent=definitions[metric].meaning;
     intervalChart('distributionChart',distributions,definitions[metric].axis,'distributionReadout',5);
-    const worst=distributions.filter(r=>r.method!==7).reduce((a,b)=>a.mean>b.mean?a:b);
-    document.getElementById('distributionFinding').textContent=`M5 has the smallest error among methods that generate psychological scores (${fmt(get(distributions,5).mean)}). M${worst.method} has the largest error for this measure (${fmt(worst.mean)}). M7’s low error (${fmt(get(distributions,7).mean)}) reflects its use of actual psychological scores.`;
+    const worst=distributions.filter(r=>r.method!==8).reduce((a,b)=>a.mean>b.mean?a:b);
+    document.getElementById('distributionFinding').textContent=`SPA5 has the smallest error among methods that generate psychological scores (${fmt(get(distributions,5).mean)}). SPA${worst.method} has the largest error for this measure (${fmt(worst.mean)}). SPA8’s low error (${fmt(get(distributions,8).mean)}) reflects its use of actual psychological scores.`;
     intervalChart('relationshipChart',relationships,`Correlation mean absolute error at MIDUS ${wave} · lower is closer`,'relationshipReadout',6);
-    document.getElementById('relationshipFinding').textContent=`M6 has lower relationship error (${fmt(m6.mean)}) than M5 (${fmt(get(relationships,5).mean)}) among methods generating psychological scores. M7 is closest overall (${fmt(m7.mean)}) while retaining actual predictors. M8’s error remains ${fmt(get(relationships,8).mean)} despite using actual demographic profiles.`;
+    document.getElementById('relationshipFinding').textContent=`SPA6 has lower relationship error (${fmt(m6.mean)}) than SPA5 (${fmt(get(relationships,5).mean)}) among methods generating psychological scores. SPA8 is closest overall (${fmt(m8.mean)}) while retaining actual predictors. SPA7’s error remains ${fmt(get(relationships,7).mean)} despite using actual demographic profiles.`;
     agreementChart(wave);scatterChart(wave);for(const id of ['distributionReadout','distributionFinding','relationshipReadout','relationshipFinding','agreementReadout','correlationReadout']){const e=document.getElementById(id);e.textContent=display(e.textContent)}
   }
   function render(data){
     source=data;const select=document.getElementById('studyScatterMethod');select.replaceChildren();
-    for(const m of order){const option=html('option',`M${m} · ${data.method_names[m]}`);option.value=m;select.append(option)}select.value='5';
+    for(const m of order){const option=html('option',`SPA${m} · ${data.method_names[m]}`);option.value=m;select.append(option)}select.value='5';
     for(const id of ['studyWave','studyDistribution','studyScatterMethod'])document.getElementById(id).onchange=update;
     const guide=document.getElementById('studyMethodGuide');guide.replaceChildren();
     const table=html('table'),head=html('tr');['Method','Information supplied'].forEach(t=>head.append(html('th',t)));const thead=html('thead');thead.append(head);table.append(thead);const tbody=html('tbody');
-    const inputs={1:'Definitions and an instruction to imagine a different person for each row.',2:'Definitions and an instruction to generate records directly.',3:'Definitions plus qualitative population guidance.',4:'Constructed demographic profiles matching marginal proportions.',5:'50 pilot records plus precomputed statistical summaries.',6:'50 pilot records; the model is instructed to analyse them itself.',7:'Actual demographic and psychological profiles; these values are fixed.',8:'Actual demographic profiles; these values are fixed.'};
-    for(const m of order){const row=html('tr');row.append(html('td',`M${m} · ${data.method_names[m]}`),html('td',inputs[m]));tbody.append(row)}table.append(tbody);guide.append(table);update();
+    const inputs={1:'Definitions and an instruction to imagine a different person for each row.',2:'Definitions and an instruction to generate records directly.',3:'Definitions plus qualitative population guidance.',4:'Constructed demographic profiles matching marginal proportions.',5:'50 pilot records plus precomputed statistical summaries.',6:'50 pilot records; the model is instructed to analyse them itself.',7:'Actual demographic profiles; these values are fixed.',8:'Actual demographic and psychological profiles; these values are fixed.'};
+    for(const m of order){const row=html('tr');row.append(html('td',`SPA${m} · ${data.method_names[m]}`),html('td',inputs[m]));tbody.append(row)}table.append(tbody);guide.append(table);update();
   }
   return {render,dataFor,scatterFor,intervalSpec};
 })();

@@ -10,7 +10,7 @@ When updating the earlier prototype, replace the repository contents with this c
 
 AI generation uses **GPT-5.6 Luna**, **medium** reasoning and a 128,000-token output allowance. The research-funded trial currently permits **one approach, one dataset and 100 participants per simulation**. The interface and server both enforce this limit. Larger or repeated runs are unavailable. Using a visitor’s own API key and paying their own costs is planned for a future update, not currently implemented.
 
-Before generation, the interface displays a planning estimate of **up to one hour**, depending on variables, complexity and service availability. It explains that the research team’s API budget or provider limits may interrupt service. This is not a measured runtime guarantee. Optionally set `SPA_CONTACT_EMAIL` to the team's public support email and `SPA_ESTIMATED_MINUTES` to an updated planning range, such as `60`. Without a configured email, users are directed to contact the person who shared the prototype. Only `OPENAI_API_KEY` is required.
+Generation time varies with the complexity of the data being generated: simple runs can finish in a few minutes, while runs with many variables or large pilot inputs can take up to an hour. To keep this short, each 100-person dataset is generated as **four parallel requests of 25 participants**. Set `SPA_BATCH_SIZE` to `50` or `100` to change this; `100` reproduces the single-request protocol used in the original MIDUS evaluation. It explains that the research team’s API budget or provider limits may interrupt service. This is not a measured runtime guarantee. Optionally set `SPA_CONTACT_EMAIL` to the team's public support email and `SPA_ESTIMATED_MINUTES` to an updated planning range, such as `60`. Without a configured email, users are directed to contact the person who shared the prototype. Only `OPENAI_API_KEY` is required.
 
 ## Repository layout
 
@@ -18,51 +18,68 @@ Before generation, the interface displays a planning estimate of **up to one hou
 | --- | --- |
 | `app.py`, `vercel.json`, `requirements.txt` | FastAPI server and Vercel configuration |
 | `web/` | The interface: one HTML page, one stylesheet and five scripts |
-| `spa/` | Study definitions, prompt assembly, generation, scoring and statistics |
+| `spa/` | Study definitions, prompt assembly, generation, scoring and statistics; `public.py` (readable names) and `numbering.py` (SPA numbering) |
 | `config/study.yaml`, `prompts/methods.json` | MIDUS variable definitions and the original method prompts (unchanged) |
 | `data/original_study/` | Verified aggregate results shown under Study findings |
-| `data/examples/`, `data/templates/` | Fictional input examples and blank upload templates served to visitors |
+| `data/examples/` | Fictional example files (one row per participant) served as upload templates |
 | `tests/`, `pytest.ini`, `requirements-dev.txt` | Automated tests (no paid API calls) |
 | `analyse.py`, `import_r.py` | Offline reproduction of the original study results |
 | `verification/` | Build record, core-file hashes and the original workbook verification summary |
-| `docs/` | User guide, custom studies, data, prompt policy, Vercel operation and verification notes |
+| `docs/` | User guide, custom studies, data, errors and advice, prompt policy, Vercel operation and verification notes |
 | `run.py`, `.env.example` | One-command local preview and the environment-variable template |
 
 ## Five pages
 
 1. **Choose an approach.** Select a purpose, use the MIDUS setup or define your own questionnaire, and select all available input types. Suggestions explain the empirical evidence and limitations; alternatives remain selectable.
-2. **Prepare and generate.** Use fictional examples or upload matching CSVs. Download blank input templates with instructions and filled fictional examples. Check inputs, review the summary and confirm before generating. Prompts are read-only. The free numerical demonstration makes no AI calls.
+2. **Prepare and generate.** Use fictional examples or upload matching CSVs. Download blank input templates with instructions and filled fictional examples. Check inputs, review the summary and confirm before generating. Prompts are read-only. Every simulation uses AI generation.
 3. **Your datasets.** Inspect progress, previews and duplication flags. Download a ZIP containing the dataset, a separate codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance. Dataset-only and codebook-only CSVs are also available. Repeated profiles are retained and flagged.
 4. **Compare with human data.** Optionally upload observed human data using the same measures. Distributions, relationship patterns and relationship strengths are evaluated separately. This reference is not sent to OpenAI.
 5. **Study findings.** Explore verified MIDUS charts and practical applications based on the proposal. The original findings are separate from your current simulation.
 
 ## Study modes
 
-**MIDUS demonstration** preserves the original representative prompts, score definitions and statistical engine. It uses 38 psychological scores, six demographics and life satisfaction at MIDUS 2 and MIDUS 3. The original study benchmark contains 2,709 eligible people. Only invented example records and aggregate study results are distributed.
+**MIDUS study** preserves the original representative prompts, score definitions and statistical engine. It uses 38 psychological scores, six demographics and life satisfaction at MIDUS 2 and MIDUS 3. The original study benchmark contains 2,709 eligible people. Only invented example records and aggregate study results are distributed.
 
 **My own study** accepts construct definitions, source citations, exact items, response ranges and anchors, reverse coding, predictor/outcome roles and mean, sum or item-only scoring. Define up to 30 constructs and 60 item/demographic fields. Custom studies must define demographic fields; they use numeric category codes. The filled example includes age group and employment arrangement. Generated raw items are scored locally; mean/sum scores require all items. Custom studies are a functional extension, not an empirically validated result of the MIDUS study. Optional research context, pasted findings and PDFs can inform generation after explicit review. PDFs are extracted in request memory; only reviewed text is sent to the model. Sources and measurement validity are not automatically verified. See [Custom studies](docs/CUSTOM_STUDIES.md).
 
 Visitors cannot edit prompts. `prompts/methods.json` is unchanged from the original study. MIDUS runs use the established templates. Custom runs fill those templates with declared data and apply a server-controlled system layer to map historical wave/outcome wording to the custom measures. Reviewed literature is included only in that system layer as untrusted reference evidence. These custom adaptations do not reproduce the evaluated MIDUS protocol. See [Prompt policy](docs/PROMPT_POLICY.md).
 
-## Method numbering
+## Approach numbering
 
-Public labels follow the revised proposal: **SPA7 retains actual demographics only; SPA8 retains actual demographics and psychological scores**. Original engine IDs, prompt-bank IDs and source aggregate files are unchanged: public SPA7 = original M8; public SPA8 = original M7. Displayed charts, result tables and dataset download names use the public labels. Downloaded metadata records the mapping. See `spa/recommendations.py`.
+The toolkit uses SPA1–SPA8 throughout, numbered as in the revised proposal (Table 3): **SPA7 retains actual demographics only; SPA8 retains actual demographics and psychological scores**. Code, run names (`SPA8_R0001`), upload templates, charts, tables and downloads all use this numbering. The original study's prompt bank and verified result files are kept byte-identical; they number the last two approaches the other way round, and `spa/numbering.py` is the single place that relabels them when they are loaded.
+
+## Upload templates
+
+Every upload has one row per participant and one column per variable. Each approach offers a template to revise (pre-filled with fictional example participants) plus a ZIP with a blank template, variable guide and instructions:
+
+| Approach | Upload | Rows |
+| --- | --- | --- |
+| SPA4 | Demographic sample; the toolkit matches its proportions | exactly 50 |
+| SPA5, SPA6 | Pilot sample with every variable and both outcomes | exactly 50 |
+| SPA7 | Demographic profiles, one per synthetic participant | 100 |
+| SPA8 | Demographic and psychological profiles, one per synthetic participant | 100 |
+
+In a custom study, each construct may be supplied as its item columns or as one construct-score column. The supplied fictional examples are the same files offered as templates.
+
+## Variable names
+
+The website and every download use readable variable names such as `optimism_overall`, `age` and `education`. MIDUS source codes are used only inside the preserved scientific engine and never leave the server. `spa/public.py` holds the one mapping between the two; uploads may use the readable names shown in the templates.
 
 ## Data handling
 
 No accounts, database, saved run history, browser local storage or application dataset files are used. Inputs and results are processed temporarily and held in the open browser tab. **Download results before refreshing or closing the tab.** The application cannot recover a lost session.
 
-The server uses the owner's key. OpenAI background responses are temporarily retained for polling; the application requests deletion after receipt on a best-effort basis. Provider retention policies still apply. Known-response retrieval can be checked again without another generation. Unknown submissions and invalid responses are not automatically regenerated. The public interface permits one 100-person dataset per run.
+The server uses the owner's key. OpenAI background responses are temporarily retained for polling; the application requests deletion after receipt on a best-effort basis. Provider retention policies still apply. Known-response retrieval can be checked again without another generation. A batch that fails or returns unusable data is requested once more automatically; a submission with an uncertain outcome is not resent, to avoid double charges. Every error message gives a specific cause and advice; see [Errors and advice](docs/ERRORS.md). The public interface permits one 100-person dataset per run.
 
 Public access incurs charges for the owner. Input bounds and same-origin checks do not provide durable account-wide usage limits or protection against determined automated use. Configure hosting/provider usage controls appropriate for the test.
 
 ## Local use and tests
 
-With Python 3.12 or 3.13, run `py -3.13 run.py` from the extracted folder and open http://127.0.0.1:8000. Keep PowerShell open. Free demonstrations work without a key. For local AI generation, copy `.env.example` to `.env`, add the key and restart.
+With Python 3.12 or 3.13, run `py -3.13 run.py` from the extracted folder and open http://127.0.0.1:8000. Keep PowerShell open. The interface and input checks work without a key; generation needs one. For local AI generation, copy `.env.example` to `.env`, add the key and restart.
 
 ```powershell
 py -3.13 -m pip install -r requirements-dev.txt
 py -3.13 -m pytest -q
 ```
 
-Tests mock provider requests and make no paid calls (127 tests). See [Verification](docs/VERIFICATION.md), [User guide](docs/USER_GUIDE.md) and [Vercel operation](docs/VERCEL.md). Optional `analyse.py` and `import_r.py` retain the original offline reproduction workflow and historical method IDs. They are not the website's storage mechanism.
+Tests mock provider requests and make no paid calls (202 tests). See [Verification](docs/VERIFICATION.md), [User guide](docs/USER_GUIDE.md) and [Vercel operation](docs/VERCEL.md). Optional `analyse.py` and `import_r.py` retain the original offline reproduction workflow and historical method IDs. They are not the website's storage mechanism.

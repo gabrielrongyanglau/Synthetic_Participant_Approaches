@@ -227,7 +227,7 @@ progress::-moz-progress-bar{background:var(--accent);border-radius:99px}
 .study-takeaway p{font-size:13.5px;margin:0;color:var(--muted)}
 .study-big-value{font:600 34px/1.1 var(--serif);font-variant-numeric:tabular-nums;margin-bottom:6px}
 .study-measure{font-weight:600;color:var(--ink-2)!important;margin-bottom:8px!important}
-.takeaway-m5{border-top-color:#257e73}.takeaway-m6{border-top-color:#4267a9}.takeaway-m7{border-top-color:#a5672a}
+.takeaway-m5{border-top-color:#257e73}.takeaway-m6{border-top-color:#4267a9}.takeaway-spa8{border-top-color:#a5672a}
 .chart-card{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:24px 26px;margin:16px 0}
 .chart-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px}
 .chart-head h2{margin:0 0 2px}
@@ -292,3 +292,35 @@ progress::-moz-progress-bar{background:var(--accent);border-radius:99px}
   .study-takeaway{display:block}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Parallel batch status list */
+.batches{list-style:none;margin:14px 0 6px;padding:0;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+.batch{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;padding:9px 14px;border-top:1px solid var(--line);font-size:14px}
+.batch:first-child{border-top:0}
+.batch-range{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.batch-state{font-size:12px;font-weight:600;padding:4px 8px;border-radius:999px;background:var(--tint);border:1px solid var(--line);color:var(--ink-2)}
+.batch-done .batch-state{background:#ecf6f0;border-color:#cfe6d8;color:var(--ok)}
+.batch-queued .batch-state,.batch-in_progress .batch-state,.batch-submitted .batch-state{background:var(--accent-soft);border-color:#d3daf3;color:var(--accent-ink)}
+.batch-failed .batch-state,.batch-cancelled .batch-state{background:var(--error-soft);border-color:#efcfc8;color:var(--error)}
+.batch-error{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.timing{margin-top:8px}
+
+/* Error cards, warnings and sensitive-topic confirmation */
+.notice-title{display:block;font-size:15px;margin-bottom:4px}
+.notice-body,.notice-advice{margin:0 0 4px;color:inherit}
+.notice-label{font-weight:700}
+.notice.error .notice-advice{color:var(--ink)}
+.notice.error{color:var(--error)}
+.warnings{margin:6px 0 0;padding-left:18px;font-size:14px}
+.warnings li{margin-bottom:8px}
+.warning-advice{color:var(--muted)}
+.review-warnings:empty{display:none}
+.review-warnings{border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:var(--r-sm);padding:10px 14px;margin:12px 0}
+.review-warnings h4{margin:0 0 4px;color:var(--warn)}
+.dataset-warnings{border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:var(--r-sm);padding:10px 14px;margin:12px 0}
+.dataset-warnings h3{margin:0 0 4px;color:var(--warn);font-size:15px}
+.sensitive{border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:var(--r-sm);padding:12px 14px;margin:12px 0}
+.sensitive p{margin:0 0 8px;font-size:14px}
+.batch-note{grid-column:1/-1;font-size:13px;color:var(--accent-ink)}
+.batch-error{grid-column:1/-1;font-size:13px;color:var(--ink-2)}
+.batch-error em{display:block;font-style:normal;color:var(--muted);margin-top:2px}

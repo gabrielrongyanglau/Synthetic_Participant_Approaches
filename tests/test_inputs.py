@@ -27,7 +27,7 @@ def test_independent_pilots_and_summary(study,reference):
     assert a['pilot']!=prepare_inputs(reference,study,5,100,2,2)['pilot']
 
 def test_fixed_null_and_precision(study,reference):
-    ctx=prepare_inputs(reference,study,7,100,3);ids=list(range(1,101));mapping=field_map(study)
+    ctx=prepare_inputs(reference,study,8,100,3);ids=list(range(1,101));mapping=field_map(study)
     ctx['fixed'][0][study['psychological_predictors'][0]]=None
     rows=[dict(participant_id=i,life_satisfaction_wave1=6.123456,life_satisfaction_wave2=7.543219) for i in ids]
     parsed=parse_records({'participants':rows},study,ids,ctx['fixed'])
@@ -35,7 +35,7 @@ def test_fixed_null_and_precision(study,reference):
     assert parsed.life_satisfaction_MIDUS2.iloc[0]==6.1235
     props=output_schema(study,ids,ctx['fixed'])['properties']['participants']['items']['properties']
     assert len(props)==3
-    system,user=build_prompt(study,7,ids,ctx['fixed'],generated_only=True)
+    system,user=build_prompt(study,8,ids,ctx['fixed'],generated_only=True)
     assert 'Return only the generated fields' in user and 'participant_id' in user
 
 def test_duplicates_are_flags(study,reference):

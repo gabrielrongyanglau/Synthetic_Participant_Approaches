@@ -14,10 +14,10 @@ Define demographic information for every custom study so the delivered dataset c
 
 Use **Check definition and prepare templates** to validate the structure and create examples matching the declared columns. Download examples on Prepare and generate. These records are invented numerical examples, not human observations.
 
-- **Pilot input:** at least 50 complete records containing all raw items and demographics. Scores are recomputed from items. SPA5 receives the records plus descriptive statistics, correlations and covariances calculated by the toolkit. SPA6 receives only records and is instructed to analyze them itself.
+- **Pilot input:** exactly 50 participants, one row each, with every demographic and, for each construct, either all of its item columns or one construct-score column. Scores are computed from items when items are supplied. SPA5 receives the records plus descriptive statistics, correlations and covariances calculated by the toolkit. SPA6 receives only records and is instructed to analyze them itself.
 - **SPA7 profiles:** at least n demographic rows. Items and scores are generated.
-- **SPA8 profiles:** at least n rows with demographics and observed predictor score columns. For item-only predictors, supply their item columns. Outcomes are withheld. No predictor items are invented when only a composite was supplied.
-- **Quota input:** `field,category,proportion`, with proportions summing to one for every declared demographic. The toolkit matches marginal proportions separately; it does not reconstruct observed joint demographic combinations.
+- **SPA8 profiles:** at least n rows with demographics and observed predictor scores. Predictor scores may be supplied directly or as their item columns (scored by the toolkit). For item-only predictors, supply their item columns. Outcomes are withheld. No predictor items are invented when only a composite was supplied.
+- **SPA4 demographic sample:** exactly 50 participants, one row each, with every declared demographic. The toolkit matches the sample's marginal proportions separately; it does not reconstruct observed joint demographic combinations.
 - **Human reference:** predictor/outcome scores or the raw items needed to calculate them. Demographics are not needed. Use all intended reference records and report whether this reference overlaps generation inputs.
 
 CSV headers must match the guide. Missing fixed predictor values remain missing; nulls are not imputed. Generated items are required to be observed. Repeated generated profiles and pilot matches are flagged and retained.

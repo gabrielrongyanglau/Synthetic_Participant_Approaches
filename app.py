@@ -10,9 +10,13 @@ from pydantic import BaseModel,ConfigDict,Field
 from dotenv import load_dotenv
 from spa.study import load_study,NAMES,json_records,selected_fields,clean_frame
 from spa.content import INTRO,SCOPE,METHODS,TERMS,METRICS,variable_guide,readable_results,readable_records
-from spa.workflow import PURPOSES,INFORMATION,METHODS_BY_INFORMATION,purpose_guidance,evaluation_reference,illustrative_generation,generated_metadata
+from spa.workflow import PURPOSES,INFORMATION,METHODS_BY_INFORMATION,purpose_guidance,evaluation_reference
 from spa.io import read_csv
 from spa import public_jobs as jobs
+from spa import public as names
+from spa.numbering import RUN_PATTERN,run_spa,run_parts,original_frame
+from spa.errors import AppError,CATALOGUE
+import json
 ROOT=Path(__file__).parent;load_dotenv(ROOT/'.env',override=False)
 app=FastAPI(title='Synthetic Participant Research Toolkit',docs_url=None,redoc_url=None,openapi_url=None)
 
@@ -29,6 +33,7 @@ class Run(BaseModel):
     study:dict|None=None
     goal:str="workflow"
     supporting:dict=Field(default_factory=dict)
+    sensitive_ack:bool=False
 
 @app.middleware('http')
 async def guard(request,call_next):
@@ -36,17 +41,19 @@ async def guard(request,call_next):
         origin=request.headers.get('origin')
         same=not origin or urlsplit(origin).netloc==request.headers.get('host')
         if request.headers.get('x-spa-request')!='1' or not same or request.headers.get('sec-fetch-site')=='cross-site':
-            return JSONResponse({'detail':'Open the toolkit directly to make this request.'},status_code=403)
+            return error_response(AppError('blocked_request'))
         # Bound JSON bodies before parsing. Uploads travel inside this JSON, never as local files.
         body=bytearray()
         async for part in request.stream():
             body.extend(part)
-            if len(body)>3_000_000:return JSONResponse({'detail':'Inputs exceed 3 MB. Supply a smaller CSV pool.'},status_code=413)
+            if len(body)>3_000_000:return error_response(AppError('request_too_large'))
         request._body=bytes(body)
     try:response=await call_next(request)
     except Exception:
         # Do not expose the API key or provider error bodies.
-        return JSONResponse({'detail':'The service could not complete this request. Keep this page open and download any completed datasets. Ask the owner to check the service configuration.'},status_code=503)
+        return JSONResponse(dict(detail='The toolkit hit an unexpected problem while handling this request.',code='server_error',title='Something went wrong on the server',
+          advice='Your inputs and any datasets are still in this tab. Try again in a moment; if it happens again, download completed datasets and contact the research team with the time of the error.',auto='none'),status_code=503)
+    if request.url.path.startswith('/api/') and not custom_request(request):response=await publicise(response)
     response.headers['X-Content-Type-Options']='nosniff'
     response.headers['Referrer-Policy']='same-origin'
     response.headers['X-Frame-Options']='DENY'
@@ -54,23 +61,55 @@ async def guard(request,call_next):
     if request.url.path.startswith('/api/'):response.headers['Cache-Control']='no-store'
     return response
 
+def custom_request(request):
+    """Custom studies contain only researcher-defined names, so they are never translated."""
+    try:data=json.loads(getattr(request,'_body',b'') or b'{}')
+    except ValueError:return False
+    return isinstance(data,dict) and bool(data.get('study') or (isinstance(data.get('context'),dict) and data['context'].get('custom')))
+
+async def publicise(response):
+    """Translate MIDUS source codes to public variable names in every API response and download."""
+    kind=response.headers.get('content-type','')
+    if not (kind.startswith('application/json') or kind.startswith('text/csv')):return response
+    body=b''.join([chunk async for chunk in response.body_iterator])
+    if kind.startswith('application/json'):content=json.dumps(names.outbound(json.loads(body)),ensure_ascii=False,allow_nan=False).encode()
+    else:content=names.text(body.decode('utf-8')).encode('utf-8')
+    headers={k:v for k,v in response.headers.items() if k.lower()!='content-length'}
+    return Response(content,status_code=response.status_code,headers=headers,media_type=kind)
+
+def error_response(exc):return JSONResponse(exc.payload(),status_code=exc.status)
+
+@app.exception_handler(AppError)
+async def app_error(request,exc):return error_response(exc)
+
 @app.exception_handler(RequestValidationError)
 async def invalid_request(request,exc):
-    return JSONResponse({'detail':'Check the simulation settings and required fields. Select one approach and 100 participants. Use the supplied input templates; prompt editing and model changes are unavailable.'},status_code=422)
+    return error_response(AppError('run_limits'))
 
 @app.exception_handler(ValueError)
-async def bad_value(request,exc):return JSONResponse({'detail':str(exc)},status_code=400)
+async def bad_value(request,exc):return error_response(AppError('invalid_input',detail=str(exc)))
 @app.exception_handler(PermissionError)
 async def denied(request,exc):return JSONResponse({'detail':str(exc)},status_code=403)
 @app.exception_handler(LookupError)
 async def missing(request,exc):return JSONResponse({'detail':str(exc)},status_code=404)
 
-def assets(req):
-    if len(set(req.methods))!=len(req.methods) or any(m not in range(1,9) for m in req.methods):raise ValueError('Select distinct approaches M1–M8.')
-    allowed={'proportions','pilot_M5','pilot_M6','profiles_M7','profiles_M8'}
+def assets(req,collect=None):
+    if len(set(req.methods))!=len(req.methods) or any(m not in range(1,9) for m in req.methods):raise ValueError('Select one approach, SPA1–SPA8.')
+    allowed={'sample_SPA4','pilot_SPA5','pilot_SPA6','profiles_SPA7','profiles_SPA8'}
     if set(req.assets)-allowed:raise ValueError('Unknown upload type.')
-    try:return {k:read_csv(v.encode('utf-8')) for k,v in req.assets.items()}
-    except (ValueError,TypeError,StopIteration,UnicodeError):raise ValueError('A CSV could not be read. Save it as UTF-8 comma-separated CSV, use the template headers once, and check that all data values are numeric or blank.') from None
+    from spa import checks
+    custom=None
+    if req.study:
+        from spa.custom import definition
+        custom=definition(req.study)
+    out={};warnings=[]
+    for k,v in req.assets.items():
+        text=v if req.study else names.inbound_csv(v)
+        warn,text=checks.check_upload(k,text,custom);warnings+=warn
+        try:out[k]=read_csv(text.lstrip('\ufeff').encode('utf-8'))
+        except (ValueError,TypeError,StopIteration,UnicodeError):raise AppError('not_csv',label=checks.LABELS.get(k,'The file'),kind='a file that cannot be read as CSV') from None
+    if collect is not None:collect.extend(warnings)
+    return out
 
 def display_results(frame,key):
     d=readable_results(frame)
@@ -106,7 +145,7 @@ def config():
     from spa.service import service_info
     return dict(service=service_info(),public_ids=PUBLIC_ID,public_names=PUBLIC_NAMES,intro=INTRO,scope=SCOPE,methods={m:dict(name=NAMES[m],**METHODS[m]) for m in NAMES},
       purpose_help={k:purpose_guidance(k,list(NAMES)) for k in PURPOSES},purposes=PURPOSES,information=INFORMATION,compatible=METHODS_BY_INFORMATION,terms=TERMS,metrics=METRICS,
-      variable_guide=json_records(variable_guide(study)),model=jobs.MODEL,reasoning='medium',
+      variable_guide=json_records(variable_guide(study)),model=jobs.MODEL,reasoning='medium',batch_size=jobs.batch_size(),
       configured=bool(os.environ.get('OPENAI_API_KEY','').strip()))
 
 @app.get('/api/guide.csv')
@@ -114,37 +153,24 @@ def guide():return download(variable_guide(load_study()).to_csv(index=False),'va
 
 @app.get('/api/example/{name}')
 def example(name:str):
-    allowed={'pilot.csv':'templates/pilot.csv','M7_profiles.csv':'templates/M7_profiles.csv','M8_profiles.csv':'templates/M8_profiles.csv',
-      'demographic_proportions.csv':'templates/demographic_proportions.csv',**{f'M{m}_inputs.csv':f'examples/M{m}_{"pilot" if m in (5,6) else "profiles"}_example.csv' for m in (5,6,7,8)}}
+    from spa.workflow import EXAMPLE_FILES
+    allowed={f'SPA{m}_template.csv':'examples/'+f for m,f in EXAMPLE_FILES.items()}
     if name not in allowed:raise HTTPException(404,'Example not found.')
     return download((ROOT/'data'/allowed[name]).read_bytes(),name,'text/csv')
 
 @app.post('/api/preview')
 def preview(req:Run):
-    bank=jobs.prepare(req,assets(req));run=next(iter(bank));ctx=bank[run]
-    body,_,_=jobs.batch(ctx,int(run[1]),0,req.n)
+    from spa.checks import content
+    content(req);bank=jobs.prepare(req,assets(req));run=next(iter(bank));ctx=bank[run]
+    body,_,_=jobs.batch(ctx,run_spa(run),0,req.n)
     return dict(run=run,system=body['instructions'],user=body['input'],provenance={k:c['provenance'] for k,c in bank.items()},
-                note='This preview is the first batch of the first selected approach. Each later batch receives its own participant IDs and fixed profiles.')
-
-@app.post('/api/demo')
-def demo(req:Run):
-    if not req.examples:raise ValueError('The free demonstration uses fictional examples. Choose AI generation to use your own data.')
-    if req.repetitions!=1 or len(req.methods)!=1:raise ValueError('Request one approach and one repetition at a time for the demonstration.')
-    bank=jobs.prepare(req,assets(req));study=load_study();frames={}
-    if req.study:
-        from spa.custom import demo,quality
-        for run,ctx in bank.items():frames[run]=demo(ctx,int(run[1]),req.n,req.seed)
-        return dict(datasets={run:json_records(f) for run,f in frames.items()},metadata=dict(input_provenance={run:c['provenance'] for run,c in bank.items()},quality_flags={run:quality(f,ctx['study'],bank[run]['pilot']) for run,f in frames.items()}))
-    for run,ctx in bank.items():
-        m=int(run[1]);r=int(run.split('_R')[1]);frames[(m,r)]=illustrative_generation(study,m,req.n,req.seed,r,ctx)
-    meta=generated_metadata(frames,bank,study,jobs.settings(req),'Invented numerical demonstration — no AI calls','workflow')
-    return dict(datasets={f'M{m}_R{r:04d}':json_records(f) for (m,r),f in frames.items()},metadata=meta)
+                note=f'This preview is the first of {req.n//jobs.batch_size()} requests that run at the same time. Each request receives its own participant IDs and fixed profiles.')
 
 class Submit(BaseModel):
     model_config=ConfigDict(extra='forbid')
     ticket:str=Field(max_length=64000)
-    run:str=Field(pattern=r'^M[1-8]_R[0-9]{4}$')
-    offset:int=Field(ge=0,le=900,multiple_of=100)
+    run:str=Field(pattern='^'+RUN_PATTERN+'$')
+    offset:int=Field(ge=0,le=99)
     context:dict
 
 class Poll(BaseModel):
@@ -158,19 +184,25 @@ class Release(BaseModel):
     cancel:bool=False
 
 @app.exception_handler(RuntimeError)
-async def service_error(request,exc):return JSONResponse({'detail':str(exc)},status_code=503)
+async def service_error(request,exc):
+    return JSONResponse(dict(detail=str(exc),code='service_error',title='The AI service could not complete this step',advice='Download any completed datasets. Try again in a few minutes, or contact the research team if it continues.',auto='none'),status_code=503)
 
 @app.post('/api/prepare')
 def prepare_ai(req:Run):
-    if not os.environ.get('OPENAI_API_KEY','').strip():raise RuntimeError('The owner must configure OPENAI_API_KEY in Vercel before AI generation is available.')
-    if not req.consent:raise ValueError('Confirm that inputs may be sent to OpenAI and that generation incurs charges for the owner.')
-    return jobs.plan(req,assets(req))
+    from spa.checks import content
+    if not os.environ.get('OPENAI_API_KEY','').strip():raise AppError('not_configured')
+    if not req.consent:raise AppError('consent_missing')
+    content(req);warnings=[]
+    plan=jobs.plan(req,assets(req,warnings));plan['warnings']=warnings
+    return plan
 
 @app.post('/api/submit')
-def submit(req:Submit):return jobs.submit(req.ticket,req.run,req.offset,req.context)
+def submit(req:Submit):return jobs.submit(req.ticket,req.run,req.offset,midus_context(req.context))
 
 @app.post('/api/poll')
-def poll(req:Poll):return jobs.poll(req.handle,req.context)
+def poll(req:Poll):return jobs.poll(req.handle,midus_context(req.context))
+
+def midus_context(ctx):return ctx if ctx.get('custom') else names.inbound(ctx)
 
 @app.post('/api/release')
 def release(req:Release):return jobs.release(req.handle,req.cancel)
@@ -179,30 +211,36 @@ def release(req:Release):return jobs.release(req.handle,req.cancel)
 async def dataset_details(request:Request):
     data=await request.json();name=str(data.get('name',''))
     import re
-    if not re.fullmatch(r'M[1-8]_R[0-9]{4}',name):raise ValueError('Invalid dataset name.')
+    run_parts(name)
     if data.get('study'):
         from spa.custom import definition,clean_dataset as custom_clean,quality
-        s=definition(data['study']);frame=custom_clean(data.get('records'),s,int(name[1]))
+        s=definition(data['study']);frame=custom_clean(data.get('records'),s,run_spa(name))
         from spa.codebook import build,csv
-        book=build(list(frame.columns),int(name[1]),s)
-        return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(frame.head(10).rename(columns={r['column']:r['name']+' ['+r['column']+']' for r in book})),quality=quality(frame,s,data.get('pilot')))
-    frame=clean_dataset(data.get('records'))
-    pilot=data.get('pilot')
+        book=build(list(frame.columns),run_spa(name),s)
+        q=quality(frame,s,data.get('pilot'));from spa import checks
+        generated=[r['column'] for r in book if r['provenance'] not in ('Retained from supplied profiles','Assigned locally','Constructed locally to match demographic proportions')]
+        return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(frame.head(10).rename(columns={r['column']:r['name']+' ['+r['column']+']' for r in book})),quality=q,
+          warnings=checks.dataset_warnings(frame,q,generated,checks.custom_specs(s)))
+    frame=clean_dataset(names.inbound(data.get('records')))
+    pilot=names.inbound(data.get('pilot'))
     if pilot is not None:
         if not isinstance(pilot,list) or len(pilot)!=50:raise ValueError('Expected 50 pilot records.')
         pilot=json_records(clean_frame(pd.DataFrame(pilot),load_study(),expected_n=50))
     from spa.simulation import quality_flags
     from spa.codebook import build,csv
-    book=build(list(frame.columns),int(name[1]))
+    book=build(list(frame.columns),run_spa(name))
+    q=quality_flags(frame,load_study(),pilot);from spa import checks
+    generated=[r['column'] for r in book if r['provenance']=='Generated']
     return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(readable_records(frame.head(10),load_study())),
-                quality=quality_flags(frame,load_study(),pilot))
+                quality=q,warnings=checks.dataset_warnings(frame,q,generated,checks.midus_specs(load_study())))
 
 def clean_dataset(rows):
     from spa.study import clean_frame
     if not isinstance(rows,list) or len(rows) not in range(100,1001,100):raise ValueError('Provide 100–1,000 records in steps of 100.')
     frame=clean_frame(pd.DataFrame(rows),load_study(),expected_n=len(rows))
     if frame.participant_id.tolist()!=list(range(1,len(rows)+1)):raise ValueError('Participant identifiers must run from 1 to the dataset size, in order.')
-    return frame
+    order=['participant_id']+[f for f in selected_fields(load_study()) if f in frame]
+    return frame[order+[c for c in frame.columns if c not in order]]
 
 @app.post('/api/compare')
 async def compare(request:Request):
@@ -210,24 +248,32 @@ async def compare(request:Request):
     import re
     data=await request.json()
     if data.get('study'):return compare_custom(data)
-    human=evaluation_reference(read_csv(str(data.get('csv','')).encode()),load_study())
-    raw=data.get('datasets',{})
+    text=names.inbound_csv(str(data.get('csv','')))
+    from spa import checks
+    _,text=checks.check_upload('reference',text)
+    try:human=evaluation_reference(read_csv(text.lstrip('\ufeff').encode()),load_study())
+    except AppError:raise
+    except (ValueError,KeyError,TypeError) as exc:raise AppError('reference_unusable',detail=names.text(str(exc))) from None
+    raw=names.inbound(data.get('datasets',{}))
+    if not raw:raise AppError('no_dataset')
     if not isinstance(raw,dict) or not 1<=len(raw)<=40:raise ValueError('Provide 1–40 completed datasets.')
     entries=[]
     for run,rows in raw.items():
-        if not re.fullmatch(r'M[1-8]_R[0-9]{4}',run):raise ValueError('Invalid dataset name.')
-        frame=clean_dataset(rows);entries.append((int(run[1]),int(run.split('_R')[1]),lambda f=frame:f))
-    b=analyse(entries,human,load_study())
+        m,r=run_parts(run);frame=clean_dataset(rows);entries.append((m,r,lambda f=frame:f))
+    try:b=analyse(entries,human,load_study())
+    except AppError:raise
+    except ValueError as exc:raise AppError('reference_unusable',detail=names.text(str(exc))) from None
     return {**{k:json_records(display_results(b[k],k)) for k in ['summary','comparisons','variables','human']},
       'metadata':b['metadata'],'csv_exports':{k:b[k].to_csv(index=False) for k in ['summary','comparisons','variables','human','runs']}}
 
 @app.get('/api/evidence')
 def evidence():
-    raw={k:read_csv(ROOT/'data/original_study'/f'{k}.csv') for k in ['summary','comparisons','variables','human']}
+    # Source files use the original study's numbering; relabel to SPA numbering (SPA7 demographic-only, SPA8 with psychology).
+    raw={k:original_frame(read_csv(ROOT/'data/original_study'/f'{k}.csv')) for k in ['summary','comparisons','variables','human']}
     study=load_study()
     return {**{k:json_records(display_results(frame,k)) for k,frame in raw.items()},
       'charts':{'summary':json_records(raw['summary']),'variables':json_records(raw['variables']),
-        'human':json_records(raw['human']),'method_names':{m:__import__('spa.recommendations',fromlist=['PUBLIC_ID','PUBLIC_NAMES']).PUBLIC_NAMES[__import__('spa.recommendations',fromlist=['PUBLIC_ID']).PUBLIC_ID[m]] for m in NAMES},
+        'human':json_records(raw['human']),'method_names':__import__('spa.recommendations',fromlist=['PUBLIC_NAMES']).PUBLIC_NAMES,
         'variable_labels':{code:study['variables'][code]['label'] for code in study['psychological_predictors']},
         'reference_n':2709,'planned_repetitions':1000,'participants_per_dataset':100}}
 
@@ -243,17 +289,21 @@ async def recommend(request:Request):
 async def custom_tools(request:Request):
     from spa.custom import definition,guide,template
     d=await request.json();s=definition(d.get('study'))
-    tables={k:template(s,k) for k in ['pilot','demographics','psychology','proportions','reference']}
-    return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:(f.assign(proportion='') if k=='proportions' else f.iloc[:0]).to_csv(index=False) for k,f in tables.items()})
+    tables={k:template(s,k) for k in ['pilot','sample','demographics','psychology','reference']}
+    return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:f.iloc[:0].to_csv(index=False) for k,f in tables.items()})
 
 def compare_custom(data):
     import re
     from spa.custom import definition,comparison
     from spa.recommendations import public_label,public_run
     s=definition(data['study']);datasets=data.get('datasets',{})
-    if not isinstance(datasets,dict) or not 1<=len(datasets)<=40 or any(not re.fullmatch(r'M[1-8]_R[0-9]{4}',r) for r in datasets):raise ValueError('Provide 1–40 completed datasets with valid names.')
-    human=read_csv(str(data.get('csv','')).encode());methods=sorted({int(r[1]) for r in datasets})
-    summary,pairs,variables=comparison(datasets,human,s,methods)
+    if not isinstance(datasets,dict) or not 1<=len(datasets)<=40 or any(not re.fullmatch(RUN_PATTERN,r) for r in datasets):raise ValueError('Provide 1–40 completed datasets with valid names.')
+    from spa import checks
+    _,text=checks.check_upload('reference',str(data.get('csv','')),s)
+    human=read_csv(text.encode());methods=sorted({run_spa(r) for r in datasets})
+    try:summary,pairs,variables=comparison(datasets,human,s,methods)
+    except AppError:raise
+    except (ValueError,KeyError) as exc:raise AppError('reference_unusable',detail=str(exc)) from None
     if 'run' in variables:variables['run']=variables['run'].map(public_run)
     for frame in (summary,pairs):
         if 'metric' in frame:frame['metric']=frame['metric'].map(lambda m:METRICS[m][0] if m in METRICS else 'Proportion of matching correlation signs')
@@ -276,27 +326,27 @@ def extract_paper(req:Paper):
 
 @app.post('/api/check-inputs')
 def check_inputs(req:Run):
-    bank=jobs.prepare(req,assets(req))
+    from spa.checks import content
+    topics=content(req);warnings=[]
+    bank=jobs.prepare(req,assets(req,warnings))
     run=next(iter(bank));ctx=bank[run]
-    body,_,_=jobs.batch(ctx,int(run[1]),0,req.n)
+    body,_,_=jobs.batch(ctx,run_spa(run),0,req.n)
+    jobs.check_size(body)
     # Schema/prompt construction is checked here without calling any provider.
     from spa.recommendations import public_label
-    return dict(api_calls=0,approach=public_label(int(run[1])),participants=req.n,
+    return dict(api_calls=0,approach=public_label(run_spa(run)),participants=req.n,
       input_source='Supplied fictional examples' if req.examples else 'Your supplied study information',
       mode=ctx['provenance']['prompt_mode'],supporting_sources=len(ctx.get('supporting',{}).get('sources',[])),
       prompt_policy='Fixed research-team method template; server-controlled study/evidence layer; no visitor prompt editing.',
       generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,
-      note='Structural checks passed. This does not verify source quality or scientific validity. Review the read-only instructions if needed.')
+      note='Structural checks passed. This does not verify source quality or scientific validity. Review the read-only instructions if needed.',
+      warnings=warnings,sensitive_topics=topics)
 
 @app.get('/api/template/{method}')
 def blank_template(method:int):
     from spa.study import predictors
-    from spa.workflow import quota_template
     if method not in (4,5,6,7,8):raise ValueError('This approach does not need a participant-data upload.')
     s=load_study()
-    if method==4:
-        # Category rows and ranges are supplied; users fill in proportions.
-        from spa.simulation import invent_reference
-        frame=quota_template(invent_reference(s),s);frame['proportion']=''
-    else:frame=pd.DataFrame(columns=selected_fields(s) if method in (5,6) else predictors(s) if method==7 else s['demographic_covariates'])
+    # One row per participant, one column per variable.
+    frame=pd.DataFrame(columns=selected_fields(s) if method in (5,6) else predictors(s) if method==8 else s['demographic_covariates'])
     return download(frame.to_csv(index=False),'input_template.csv','text/csv')

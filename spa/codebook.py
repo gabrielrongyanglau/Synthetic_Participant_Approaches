@@ -61,7 +61,7 @@ def build(columns,method,study=None):
         for code in columns:
             if code=='participant_id':result.append(identifier);continue
             g=guides[code];v=next((v for v in study['variables'] if code in item_fields(v) or code==v['code']),None)
-            fixed=method in (4,7,8) and code in ds or method==7 and code in ps
+            fixed=method in (4,7,8) and code in ds or method==8 and code in ps
             if v:
                 is_item=code in item_fields(v);name=v['name']+(f' item {item_fields(v).index(code)+1}' if is_item else ' score')
                 definition=v['definition']+(' Item wording: '+v['items'][item_fields(v).index(code)] if is_item else '')
@@ -75,7 +75,7 @@ def build(columns,method,study=None):
         for code in columns:
             if code=='participant_id':result.append(identifier);continue
             v=s['variables'][s['outcomes'].get(code,code)];ds=code in s['demographic_covariates'];out=code in OUTCOMES
-            fixed=method in (4,7,8) and ds or method==7 and not out
+            fixed=method in (4,7,8) and ds or method==8 and not out
             name=v['label'] if not out else 'Life satisfaction at MIDUS '+('2' if code==OUTCOMES[0] else '3')
             result.append(dict(column=code,name=name,definition=DEFINITIONS[code],role='demographic' if ds else 'outcome' if out else 'psychological predictor',assessment='MIDUS 3' if code==OUTCOMES[1] else 'MIDUS 2',allowed_values=json.dumps(v['categories'],ensure_ascii=False) if v['kind']=='category' else f"{v['minimum']} to {v['maximum']}",scoring=v['scoring'],missing_values='Blank means missing or not applicable; zero is a score when within the valid range. Source missing codes: '+json.dumps(v['missing_codes']),source='MIDUS source score; codebook page '+str(v.get('source_codebook_page','not specified')),provenance='Constructed locally to match demographic proportions' if method==4 and fixed else 'Retained from supplied profiles' if fixed else 'Generated'))
     return result

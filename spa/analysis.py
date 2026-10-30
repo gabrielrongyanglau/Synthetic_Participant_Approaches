@@ -111,7 +111,7 @@ def validate_bundle(b):
     for name,fields in required.items():
         if not fields<=set(b[name]):raise ValueError('Invalid analysis bundle: '+name)
     if b['summary'].duplicated(['method','domain','wave','metric']).any():raise ValueError('Repeated summary keys.')
-    if not set(b['summary'].method.unique())<=set(range(1,9)):raise ValueError('Methods must be M1–M8.')
+    if not set(b['summary'].method.unique())<=set(range(1,9)):raise ValueError('Methods must be numbered 1–8.')
     if b['variables'].duplicated(['method','code']).any() or b['human'].code.duplicated().any():raise ValueError('Repeated variable keys.')
     for name in ['summary','comparisons','variables','human']:
         values=b[name].select_dtypes(include='number').to_numpy()
