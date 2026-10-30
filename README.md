@@ -12,6 +12,22 @@ AI generation uses **GPT-5.6 Luna**, **medium** reasoning and a 128,000-token ou
 
 Before generation, the interface displays a planning estimate of **up to one hour**, depending on variables, complexity and service availability. It explains that the research team’s API budget or provider limits may interrupt service. This is not a measured runtime guarantee. Optionally set `SPA_CONTACT_EMAIL` to the team's public support email and `SPA_ESTIMATED_MINUTES` to an updated planning range, such as `60`. Without a configured email, users are directed to contact the person who shared the prototype. Only `OPENAI_API_KEY` is required.
 
+## Repository layout
+
+| Path | Purpose |
+| --- | --- |
+| `app.py`, `vercel.json`, `requirements.txt` | FastAPI server and Vercel configuration |
+| `web/` | The interface: one HTML page, one stylesheet and five scripts |
+| `spa/` | Study definitions, prompt assembly, generation, scoring and statistics |
+| `config/study.yaml`, `prompts/methods.json` | MIDUS variable definitions and the original method prompts (unchanged) |
+| `data/original_study/` | Verified aggregate results shown under Study findings |
+| `data/examples/`, `data/templates/` | Fictional input examples and blank upload templates served to visitors |
+| `tests/`, `pytest.ini`, `requirements-dev.txt` | Automated tests (no paid API calls) |
+| `analyse.py`, `import_r.py` | Offline reproduction of the original study results |
+| `verification/` | Build record, core-file hashes and the original workbook verification summary |
+| `docs/` | User guide, custom studies, data, prompt policy, Vercel operation and verification notes |
+| `run.py`, `.env.example` | One-command local preview and the environment-variable template |
+
 ## Five pages
 
 1. **Choose an approach.** Select a purpose, use the MIDUS setup or define your own questionnaire, and select all available input types. Suggestions explain the empirical evidence and limitations; alternatives remain selectable.
@@ -49,4 +65,4 @@ py -3.13 -m pip install -r requirements-dev.txt
 py -3.13 -m pytest -q
 ```
 
-Tests mock provider requests and make no paid calls. See [Verification](docs/VERIFICATION.md), [User guide](docs/USER_GUIDE.md) and [Vercel operation](docs/VERCEL.md). Optional `analyse.py` and `import_r.py` retain the original offline reproduction workflow and historical method IDs. They are not the website's storage mechanism.
+Tests mock provider requests and make no paid calls (127 tests). See [Verification](docs/VERIFICATION.md), [User guide](docs/USER_GUIDE.md) and [Vercel operation](docs/VERCEL.md). Optional `analyse.py` and `import_r.py` retain the original offline reproduction workflow and historical method IDs. They are not the website's storage mechanism.

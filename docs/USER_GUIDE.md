@@ -4,11 +4,11 @@ A synthetic participant approach (SPA) asks an AI to produce hypothetical partic
 
 ## First visit
 
-1. Keep **Try our MIDUS demonstration** selected. MIDUS is the Midlife in the United States study used in the original evaluation.
-2. Choose your purpose. Select available information to see suitable approaches; one approach can be selected per simulation.
-3. Continue to **Prepare and generate**. The free numerical demonstration uses invented records, makes no AI call and shows how the workflow and downloads work.
-4. Choose **Check inputs and review simulation**, review the summary and tick its confirmation.
-5. Generate and download the dataset ZIP. It contains the CSV, variable codebook, metadata and supporting-information record. A numerical demonstration is not an AI performance result.
+1. Keep **MIDUS demonstration (recommended)** selected under *Which study?*. MIDUS is the Midlife in the United States study used in the original evaluation.
+2. Choose what you want to explore and tick the information you have. The suggested approach is pre-selected; click any other card to choose it instead. One approach is used per simulation. The left-hand panel shows your choice and progress through the four steps.
+3. Choose **Continue to inputs**. Keep **Free demonstration** selected; it uses invented records, makes no AI call and shows how the workflow and downloads work.
+4. Choose **Check inputs**, review the summary that appears and tick its confirmation.
+5. Choose **Generate demonstration dataset**, then **Download dataset and codebook (ZIP)** on *Your datasets*. It contains the CSV, variable codebook, metadata and supporting-information record. A numerical demonstration is not an AI performance result.
 
 ## Your own study
 
@@ -46,4 +46,4 @@ Keep the tab open and your device awake. If a progress check fails, choose **Che
 
 Download before refreshing or leaving. The prototype has no saved history. The codebook explains every exported column. Metadata records settings, provenance, quality flags and whether evidence was used. The supporting-information JSON records the reviewed text, not the original PDFs.
 
-Optional human comparison uses observed records with the same measures. It is separate from generation and is not sent to OpenAI. Original MIDUS findings on page 5 are separate from visitor simulations. One visitor run cannot estimate a Monte Carlo confidence interval.
+Optional human comparison uses observed records with the same measures. It is separate from generation and is not sent to OpenAI. Original MIDUS findings under *Study findings* are separate from visitor simulations. One visitor run cannot estimate a Monte Carlo confidence interval.

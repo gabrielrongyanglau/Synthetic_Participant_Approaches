@@ -1,5 +1,5 @@
 {
-  "app_version": "4.2.0",
+  "app_version": "4.3.0",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",
@@ -14,8 +14,8 @@
   "provider_store_parameter": false,
   "provider_background_mode": true,
   "provider_cleanup": "Best effort after browser receipt; provider retention still applies",
-  "tests_passed": 129,
-  "test_seconds": 66.0,
+  "tests_passed": 127,
+  "test_seconds": 102.6,
   "live_api_calls": 0,
   "live_vercel_deployment_tested": false,
   "independent_security_audit": false,
@@ -35,7 +35,7 @@
     "text_flags": 439,
     "max_absolute_difference": 3.35231842285566e-13
   },
-  "browser_checks": "Private fictional API fixtures: MIDUS default; one approach selection; one-hour/funding notices; pilot template controls; reviewed pasted evidence; checked-input summary; completed 100-person numerical demo and download controls",
+  "browser_checks": "Headless Chromium at 1440 px and 390 px: approach selection by card, rail progress states, input check and review, 100-person numerical demo, ZIP download, human-reference comparison, custom-study editor; no console errors",
   "study_findings_charts": [
     "Distribution errors with mean and 95% CI",
     "Correlation MAE at MIDUS 2 or MIDUS 3",
@@ -43,7 +43,6 @@
     "Human versus mean simulated correlations for 37 predictors"
   ],
   "chart_source_verification": "All raw chart aggregates match the original source rows exactly; Node selectors checked for all display metrics and all 16 method/wave scatter combinations",
-  "focused_tests_after_final_display_change": 46,
   "public_method_mapping": {
     "SPA7": "original M8",
     "SPA8": "original M7"
@@ -69,5 +68,6 @@
     "ocr": false,
     "storage": "Request memory only"
   },
-  "free_numerical_demo_uses_paper_findings": false
+  "free_numerical_demo_uses_paper_findings": false,
+  "interface_revision": "4.3.0: redesigned interface (progress rail, approach cards, review-gated generation); unused files removed; matplotlib dependency dropped. Scientific core files unchanged (hashes above)."
 }

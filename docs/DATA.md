@@ -2,9 +2,7 @@
 
 # Data and files
 
-`data/examples/reference.csv` is an invented 2,709-row reference generated deterministically from measurement ranges and latent normal variables. It contains no actual MIDUS participants or empirical MIDUS coefficients. Its size illustrates the original workflow.
-
-`data/examples/M1_R0001.csv` through `M8_R0001.csv` contain 100 illustrative records each. `M*_inputs.json` records the supporting invented pilots, summaries and fixed profiles. `make_examples.py` regenerates them. M5 has all 780 pairwise relationships among 38 predictors and two outcomes; M6 receives only pilot records. These files illustrate information flow, not the empirical performance of those prompts.
+`data/examples/` holds invented files only. `M5_pilot_example.csv`, `M6_pilot_example.csv`, `M7_profiles_example.csv` and `M8_profiles_example.csv` are the filled fictional examples the website offers for download. `M1_R0001.csv` is a 100-record illustrative dataset used by the test suite. None contain actual MIDUS participants or empirical MIDUS coefficients. The invented 2,709-row reference used by the demonstration and tests is generated in memory by `spa.simulation.invent_reference`, so it is not stored.
 
 `data/original_study/` contains aggregate statistics recalculated from the original study and verified against the supplied workbook. It contains no participant records, original pilot records, private prompt audits or API credentials. The human reference statistics describe the full 2,709-person cohort. The old 542/2,167 split is used only in the legacy benchmark-reproduction/input helpers; it never restricts a comparison reference. The guided generation workflow uses supplied method-specific pools directly and needs no benchmark split.
 

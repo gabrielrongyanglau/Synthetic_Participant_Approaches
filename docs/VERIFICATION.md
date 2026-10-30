@@ -10,7 +10,7 @@ The suite covers all original input methods, sample sizes, fixed-value preservat
 
 Additional tests cover custom questionnaire validation, reverse coding, complete-item mean/sum scoring, all eight custom generation procedures, matching templates, fixed predictor precision, pilot summary separation, server routes, score-only and mixed item/score human references, zero errors for identical references, suppression of uninformative two-coefficient pattern r, public method mapping and signed custom background responses. Altered context data are rejected before retrieval.
 
-Python compilation and JavaScript syntax are checked. The browser ZIP writer is independently checked with Python's ZIP reader. Archive checks exclude credentials, caches, virtual environments and private participant data. The test log and environment details are recorded in `verification/`.
+Python compilation and JavaScript syntax are checked. The browser ZIP writer is independently checked with Python's ZIP reader. Archive checks exclude credentials, caches, virtual environments and private participant data. `verification/build_checks.json` records the build settings and the SHA-256 hashes of the preserved scientific core files; run `python -m pytest -q` to reproduce the current test result.
 
 Browser QA uses private static fixtures produced by the real API test client. It checks custom study setup, complete pilot recommendations, progression to generation, a 100-person fictional dataset, updated study chart labels and the SPA8 relationship advantage. This is frontend QA, not a live provider or Vercel deployment test. Preview fixtures are not distributed.
 

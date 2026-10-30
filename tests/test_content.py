@@ -5,7 +5,6 @@ import pandas as pd
 from spa.content import INTRO,METHODS,METRICS,variable_guide,readable_records,readable_results
 from spa.study import PROJECT_ROOT,selected_fields
 from spa.analysis import load_bundle
-from spa.export import dataset_zip
 
 def test_readable_record_display_preserves_raw_export(study):
     raw=pd.read_csv(PROJECT_ROOT/'data/examples/M1_R0001.csv',float_precision='round_trip')
@@ -16,11 +15,6 @@ def test_readable_record_display_preserves_raw_export(study):
     for f in study['psychological_predictors']:
         from spa.study import label
         pd.testing.assert_series_equal(display[label(study,f)],raw[f],check_names=False)
-    from zipfile import ZipFile
-    import io
-    with ZipFile(io.BytesIO(dataset_zip({(1,1):raw},{'source':'test'}))) as z:
-        output=pd.read_csv(io.BytesIO(z.read('M1_R0001.csv')),float_precision='round_trip')
-        pd.testing.assert_frame_equal(output,raw)
 
 def test_result_display_keeps_values():
     bundle=load_bundle(PROJECT_ROOT/'data/original_study');raw=bundle['summary'];copy=raw.copy(deep=True)
