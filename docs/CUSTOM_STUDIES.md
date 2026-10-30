@@ -12,7 +12,7 @@ Define demographic information for every custom study so the delivered dataset c
 
 ## Inputs
 
-Use **Check definition and prepare templates** to validate the structure and create examples matching the declared columns. Download examples on Prepare and generate. These records are invented numerical examples, not human observations.
+Use **Check definition and prepare templates** to validate the structure and create examples matching the declared columns. Download examples on Study and data. These records are invented numerical examples, not human observations.
 
 - **Pilot input:** exactly 50 participants, one row each, with every demographic and, for each construct, either all of its item columns or one construct-score column. Scores are computed from items when items are supplied. SPA5 receives the records plus descriptive statistics, correlations and covariances calculated by the toolkit. SPA6 receives only records and is instructed to analyze them itself.
 - **SPA7 profiles:** at least n demographic rows. Items and scores are generated.

@@ -15,9 +15,10 @@ SAMPLE_N=50  # custom pilot samples have exactly 50 participants
 def definition(raw):
     if not isinstance(raw,dict):raise ValueError('Define your custom study first.')
     s={k:raw.get(k) for k in ('title','population','variables','demographics')}
-    if any(not isinstance(s[k],str) or not s[k].strip() or len(s[k])>4000 for k in ('title','population')):raise ValueError('Enter a study title and target population.')
+    if not isinstance(s['population'],str) or not s['population'].strip():s['population']='Adult participants in the study named in the title.'
+    if any(not isinstance(s[k],str) or not s[k].strip() or len(s[k])>4000 for k in ('title','population')):raise ValueError('Enter a study title of up to 4,000 characters.')
     if not isinstance(s['variables'],list) or not 1<=len(s['variables'])<=30:raise ValueError('Define 1–30 constructs.')
-    if not isinstance(s['demographics'],list) or not 1<=len(s['demographics'])<=8:raise ValueError('Define at least one and at most eight demographics so the output includes demographic information.')
+    if not isinstance(s['demographics'],list) or len(s['demographics'])>8:raise ValueError('Define up to eight demographics.')
     codes=set();total=0
     for v in s['variables']+s['demographics']:
         if not isinstance(v,dict):raise ValueError('Invalid variable definition.')
@@ -143,9 +144,9 @@ def contexts(req,assets):
     s=definition(req.study);bank={}
     if getattr(req,'goal','workflow') in ('patterns','strengths','outcomes') and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('Relationship exploration requires at least one predictor and one outcome. Pattern r needs at least three varying coefficients.')
     if 8 in req.methods and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('SPA8 generates outcomes only, so it needs at least one predictor and one outcome.')
-    if req.examples and not req.study.get('fictionalExample',False):raise ValueError('The fictional example data only match the unedited fictional study. Because the study definition was changed, choose “My own participant data” and upload CSVs that match your measures, or load the fictional example study again.')
+    if req.examples and not req.study.get('fictionalExample',False):raise ValueError('The fictional example data only match the unedited fictional study. Because the study definition was changed, upload CSVs that match your measures, or load the fictional example study again.')
     for m in req.methods:
-        if m in (4,7,8) and not demographics(s):raise ValueError('Define demographic variables before using profiles or quotas.')
+        if m in (4,7,8) and not demographics(s):raise ValueError('SPA4, SPA7 and SPA8 keep demographic information fixed, so they need demographic categories. Add them under Demographic categories in Study and data.')
         if m==3 and not req.population.strip():raise ValueError('Population guidance is required.')
         for rep in range(1,req.repetitions+1):
             rng=np.random.default_rng(np.random.SeedSequence([req.seed,m,rep]));ctx=dict(custom=True,study=s,fixed=None,pilot=None,summary=None,provenance=dict(method=m,repetition=rep,population_guidance=req.population if m==3 else '',source='Fictional examples' if req.examples else 'Researcher-supplied inputs'))

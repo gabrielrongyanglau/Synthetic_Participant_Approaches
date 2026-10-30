@@ -130,27 +130,42 @@ async function reviewInputs(){
 }
 
 const uploadMap={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'};
+const EXAMPLE_TEXT={4:'the example target proportions',5:'the example pilot sample of 50 participants',6:'the example pilot sample of 50 participants',7:'100 example demographic profiles',8:'100 example demographic and psychological profiles'};
+function uploadCard(m,old){
+  const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'target proportions (one row per category)':(m<7?'pilot sample':'participant profiles')+` (${ROWS[m]} rows)`}`),f=old[key]||el('input');
+  f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=()=>{invalidateReview();notice('');if(f.files[0])try{checkFile(f.files[0])}catch(e){notice(e,true)}};label.append(f);
+  d.append(label,el('p',inputRule(m),'help'));
+  const links=el('div',undefined,'link-row');let a;
+  const what=m===4?'example proportions':`${ROWS[m]} example rows`;if(Research.custom()){a=el('button',`Download the template to revise (CSV, ${what})`);a.type='button';a.className='link';a.addEventListener('click',action(()=>Research.downloadTemplate(m)))}
+  else{a=el('a',`Download the template to revise (CSV, ${what})`);a.href=`/api/example/SPA${m}_template.csv`;a.download=`SPA${m}_template.csv`}
+  const blank=el('button','Instructions and variable guide (ZIP)');blank.type='button';blank.className='link';
+  blank.onclick=action(async()=>{if(Research.custom())await Research.blankTemplate(m);else{const [t,e]=await Promise.all([fetch('/api/template/'+m,{cache:'no-store'}),fetch(`/api/example/SPA${m}_template.csv`,{cache:'no-store'})]);if(!t.ok||!e.ok)throw Error('The template could not be downloaded. Try again.');saveBlob(makeZip({'template.csv':await e.text(),'blank_template.csv':await t.text(),'input_variable_guide.csv':csvText(cfg.variable_guide),'READ_ME.txt':inputInstructions(m,false)}),`SPA${m}_template_and_instructions.zip`)}});
+  links.append(a,blank);d.append(links);return d;
+}
+function chosenFiles(){return [...$('uploads').querySelectorAll('input')].filter(x=>x.files&&x.files[0])}
+function usesExamples(){
+  const m=[...selected][0];if(!uploadMap[m])return Research.custom()?Research.fictionalStudy():true;
+  if(!Research.custom())return !chosenFiles().length;
+  return Research.fictionalStudy()&&!chosenFiles().length;
+}
 function inputs(){
   invalidateReview();
   $('n').value='100';$('repetitions').value='1';
-  const own=$('source').value==='own';
+  const m=[...selected][0],custom=Research.custom(),needs=!!uploadMap[m];
   $('populationLabel').hidden=!selected.has(3);
-  $('customReference').hidden=!session?.settings.study;
-  $('variableGuideLink').hidden=Research.custom();
-  const old={};$('uploads').querySelectorAll('input').forEach(x=>old[x.dataset.asset]=x);$('uploads').replaceChildren();
-  if(own)for(const m of [...selected].sort()){
-    if(!uploadMap[m])continue;
-    const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'target proportions (one row per category)':(m<7?'pilot sample':'participant profiles')+` (${ROWS[m]} rows)`}`),f=old[key]||el('input');
-    f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=()=>{invalidateReview();notice('');if(f.files[0])try{checkFile(f.files[0])}catch(e){notice(e,true)}};label.append(f);
-    d.append(label,el('p',inputRule(m),'help'));
-    const links=el('div',undefined,'link-row');let a;
-    const what=m===4?'example proportions':`${ROWS[m]} example rows`;if(Research.custom()){a=el('button',`Download the template to revise (CSV, ${what})`);a.type='button';a.className='link';a.addEventListener('click',action(()=>Research.downloadTemplate(m)))}
-    else{a=el('a',`Download the template to revise (CSV, ${what})`);a.href=`/api/example/SPA${m}_template.csv`;a.download=`SPA${m}_template.csv`}
-    const blank=el('button','Instructions and variable guide (ZIP)');blank.type='button';blank.className='link';
-    blank.onclick=action(async()=>{if(Research.custom())await Research.blankTemplate(m);else{const [t,e]=await Promise.all([fetch('/api/template/'+m,{cache:'no-store'}),fetch(`/api/example/SPA${m}_template.csv`,{cache:'no-store'})]);if(!t.ok||!e.ok)throw Error('The template could not be downloaded. Try again.');saveBlob(makeZip({'template.csv':await e.text(),'blank_template.csv':await t.text(),'input_variable_guide.csv':csvText(cfg.variable_guide),'READ_ME.txt':inputInstructions(m,false)}),`SPA${m}_template_and_instructions.zip`)}});
-    links.append(a,blank);d.append(links);$('uploads').append(d);
-  }
-  $('total').textContent=own?'':'Using the supplied fictional examples. Choose “My own participant data” to upload files.';
+  $('csvHelp').hidden=!custom||!needs;
+  $('variableGuideLink').hidden=custom;
+  Research.demographicState(m);
+  const own={};$('uploads').querySelectorAll('input').forEach(x=>own[x.dataset.asset]=x);
+  $('uploads').replaceChildren();
+  $('dataHeading').textContent=m?`Data for ${Research.methodLabel(m)}`:'Data for this approach';
+  const name=m?`SPA${m}`:'This approach';let summary;
+  if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description':''}.`;
+  else if(!custom){summary=`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
+  else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`+(Research.fictionalStudy()?' The fictional example study includes example data, so the upload is optional for it.':'');$('uploads').append(uploadCard(m,own))}
+  $('dataSummary').textContent=summary;
+  $('exampleLink').hidden=custom||!needs;
+  $('total').textContent='';
   updateRail();
 }
 
@@ -166,15 +181,16 @@ function updateRail(){
 
 async function request(){
   if(Research.custom())await Research.refreshTools();
-  if(!selected.size)throw new AppError({title:'Choose an approach',detail:'No approach is selected.',advice:'Go back to Choose an approach and select one approach card.'});
+  if(!selected.size)throw new AppError({title:'Choose an approach',detail:'No approach is selected.',advice:'Go back to Goal and approach and select one approach card.'});
   const assets={};
+  const examples=usesExamples();
   for(const input of $('uploads').querySelectorAll('input')){
     const f=input.files[0],label=input.parentElement.firstChild.textContent.trim();
-    if(!f)throw clientError('upload_missing',{label});
+    if(!f){if(examples)continue;throw clientError('upload_missing',{label})}
     checkFile(f);
     assets[input.dataset.asset]=await f.text();
   }
-  return {sensitive_ack:$('sensitiveAck').checked,supporting:Supporting.value(),goal:Research.goal(),study:Research.study(),methods:[...selected].sort(),n:Number($('n').value),repetitions:Number($('repetitions').value),seed:Number($('seed').value),examples:$('source').value==='examples',population:(Research.custom()?Research.study().population:$('population').value),assets,consent:$('consent').checked};
+  return {sensitive_ack:$('sensitiveAck').checked,supporting:Supporting.value(),goal:Research.goal(),study:Research.study(),methods:[...selected].sort(),n:Number($('n').value),repetitions:Number($('repetitions').value),seed:Number($('seed').value),examples,population:$('population').value,assets,consent:$('consent').checked};
 }
 
 function metadata(){
@@ -346,6 +362,7 @@ function render(){
   $('checkAgain').hidden=!s||s.active||!anyPending;
   $('generate').disabled=!!s?.active||!cfg?.configured;
   $('jobDetail').replaceChildren();$('datasetList').replaceChildren();
+  $('compareMidusNote').hidden=!!(s&&s.settings.study);
   options($('comparisonData'),{all:'All complete datasets from this session',...Object.fromEntries(Object.keys(s?.details||{}).map(run=>[run,Research.runLabel(run)]))});
   updateRail();
   if(!s)return;
@@ -410,8 +427,7 @@ async function init(){
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.goto)));
   $('reviewInputs').addEventListener('click',action(reviewInputs));
   ['seed','population','consent','sensitiveAck'].forEach(id=>$(id).addEventListener('input',invalidateReview));
-  $('source').addEventListener('change',inputs);
-  $('continue').addEventListener('click',action(async()=>{if(Research.custom())await Research.refreshTools();page('prepare')}));
+  $('continue').addEventListener('click',()=>{if(!selected.size){notice(new AppError({title:'Answer the questions first',detail:'The recommended approach appears once the questions in part 2 are answered.',advice:'Answer each question, then continue.'}),true);return}page('prepare')});
   $('preview').addEventListener('click',action(async()=>{notice('Preparing the instruction preview…');const d=await api('/api/preview',await request());$('systemPrompt').textContent=d.system;$('userPrompt').textContent=d.user;$('promptPanel').hidden=false;$('promptPanel').open=true;notice(d.note)}));
   $('generate').addEventListener('click',action(start));
   $('checkAgain').addEventListener('click',action(drive));

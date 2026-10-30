@@ -163,7 +163,7 @@ def input_digest(bank):
     return hashlib.sha256(json.dumps(bank,sort_keys=True,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 
 def evaluation_reference(frame,study):
-    """Only scores and outcomes are used by fidelity metrics. Demographics are optional."""
+    """Only scores and outcomes are used by the comparison measures. Demographics are optional."""
     frame=frame.copy()
     for field in study['demographic_covariates']:
         if field not in frame:frame[field]=np.nan

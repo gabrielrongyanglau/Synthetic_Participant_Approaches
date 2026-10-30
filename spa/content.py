@@ -9,8 +9,8 @@ def plain(text):
     return re.sub(r';\s+(\w)',lambda m:'. '+m.group(1).upper(),text)
 
 INTRO='A synthetic participant approach (SPA) is a way of asking an artificial intelligence (AI) model to create participant records intended to resemble human responses. This toolkit lets you choose among eight approaches, prepare their inputs and create datasets.'
-SCOPE='The MIDUS study setup uses 38 psychological scores, six demographic characteristics, and life satisfaction at a baseline and a later assessment. The variable names, scales and eligible population are already defined. Use the custom-study editor for other questionnaires. Recommendations outside MIDUS require separate validation.'
-NAVIGATION={'Start here':'1. Choose an approach','Prepare inputs and run':'2. Prepare and generate',
+SCOPE='The MIDUS study setup uses 38 psychological scores, six demographic characteristics, and life satisfaction at a baseline and a later assessment. The variable names, scales and eligible population are already defined. Recommendations outside MIDUS need their own check against human data.'
+NAVIGATION={'Start here':'1. Choose your goal and approach','Prepare inputs and run':'2. Choose the study and add data',
  'Your datasets':'3. View and download datasets','Optional validation':'4. Compare with human data (optional)',
  'Evidence from our study':'5. Read the study findings'}
 METHODS={
@@ -53,7 +53,7 @@ TERMS={
  'Dataset / record':'A dataset is a table. One row is one participant record and each column is a variable.',
  'Repetition / run':'A separate generation of a dataset. The current research-funded trial permits one dataset per simulation. The original study used 1,000 repetitions per method.',
  'Human reference / benchmark':'Observed human data used as the comparison when assessing generated data. It is optional for generation.',
- 'Fidelity / validation':'Fidelity means how closely generated data reproduce specified features of human data. Here validation means comparing scores and relationships against supplied human data.',
+ 'Goals 1 and 2':'Goal 1 is reproducing psychological scores: whether generated averages, spread and distributions resemble human data. Goal 2 is reproducing relationships among variables: their direction and pattern, and their strength. An approach can do well on one goal and poorly on the other.',
  'CSV file':'A comma-separated values file containing a table. It can be opened in Excel. Preserve the template’s column names and save uploads as CSV.',
  'API key':'A secret credential used by the app to connect to a paid AI service. It is needed for AI generation.',
  'Confidence interval (CI)':'Here, an interval describing the precision of average performance across generated datasets. It describes average performance, so individual participants or datasets can fall outside it.'}

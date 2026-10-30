@@ -155,6 +155,10 @@ def guide():return download(variable_guide(load_study()).to_csv(index=False),'va
 def example(name:str):
     from spa.workflow import EXAMPLE_FILES
     allowed={f'SPA{m}_template.csv':'examples/'+f for m,f in EXAMPLE_FILES.items()}
+    if name=='reference.csv':
+        from spa.simulation import invent_reference
+        study=load_study();cols=selected_fields(study)
+        return download(invent_reference(study)[cols].to_csv(index=False),'fictional_MIDUS_reference.csv','text/csv')
     if name not in allowed:raise HTTPException(404,'Example not found.')
     return download((ROOT/'data'/allowed[name]).read_bytes(),name,'text/csv')
 

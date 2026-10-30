@@ -147,3 +147,10 @@ def test_uploaded_inputs_survive_browser_number_serialisation(client,monkeypatch
     r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run=run,offset=0,context=ctx),headers=H)
     assert r.status_code==200,r.text
     assert client.post('/api/poll',json={'handle':r.json()['handle'],'context':ctx},headers=H).json()['status']=='completed'
+
+def test_fictional_midus_reference_supports_the_comparison_step(client):
+    ref=client.get('/api/example/reference.csv')
+    assert ref.status_code==200 and not contains_code(ref.text) and len(ref.content)<2_200_000
+    from conftest import local_rows
+    r=client.post('/api/compare',json={'csv':ref.text,'datasets':local_rows(5)},headers=H)
+    assert r.status_code==200,r.text

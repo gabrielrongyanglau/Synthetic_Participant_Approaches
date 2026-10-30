@@ -63,12 +63,14 @@ def test_templates_and_routes(study):
 
 def test_recommendations_mapping():
     assert all(PUBLIC_ID[m]==m for m in range(1,9))
-    assert suggest('distributions',['pilot','psychology'])['primary']==5
-    assert suggest('strengths',['pilot'])['primary']==6
-    assert suggest('patterns',['psychology'])['primary']==8
-    assert suggest('workflow',['demographics'])['primary']==7
-    assert {5,6,7,8}<=set(suggest('patterns',['pilot','psychology'])['feasible'])
-    assert not suggest('outcomes',[])['task_supported']
+    # Table 6: no data -> SPA2; pilot -> SPA5 (SPA6 alternative); baseline demographic and psychological scores -> SPA8
+    for goal in ('distributions','patterns','strengths','outcomes','workflow'):
+        assert suggest(goal,[])['primary']==2 and suggest(goal,['psychology'])['primary']==8
+        assert suggest(goal,['demographics'])['primary']==7 and suggest(goal,['proportions'])['primary']==4
+    assert suggest('distributions',['pilot'])['primary']==5 and suggest('strengths',['pilot'])['primary']==6
+    assert {5,6}<=set(suggest('distributions',['pilot'])['feasible']) and {7,8}<=set(suggest('patterns',['psychology'])['feasible'])
+    assert not suggest('outcomes',[])['task_supported'] and suggest('outcomes',['psychology'])['task_supported']
+    assert all('fidelity' not in suggest(g,[s])['reason'].lower() for g in ('distributions','patterns') for s in ('pilot','psychology'))
 
 def test_invalid_definition(study):
     for change in [lambda s:s['variables'][0].update(reverse=[3]),lambda s:s['variables'][0].update(code='participant_id'),lambda s:s['variables'][0].update(maximum=1),lambda s:s['variables'][0].update(items=['[Enter item]'])]:
@@ -140,9 +142,12 @@ def test_custom_codebook_tracks_items_scores_and_fixed_demographics(study):
     assert pd.read_csv(__import__('io').StringIO(csv(book))).column.tolist()==list(f)
 
 
-def test_custom_output_requires_demographic_definition(study):
-    study['demographics']=[]
-    with pytest.raises(ValueError,match='demographics'):custom.definition(study)
+def test_demographics_are_optional_except_for_profile_and_quota_approaches(study):
+    study['demographics']=[];s=custom.definition(study)
+    assert custom.demographics(s)==[]
+    for m in (1,2,5,6):assert public_jobs.prepare(Run(study=study,methods=[m],examples=True,population='Adults'),{})
+    for m in (4,7,8):
+        with pytest.raises(ValueError,match='need demographic categories'):public_jobs.prepare(Run(study=study,methods=[m],examples=True),{})
 
 
 def test_custom_pilot_accepts_items_or_construct_scores_and_needs_fifty(study):
@@ -167,3 +172,9 @@ def test_custom_pilot_accepts_items_or_construct_scores_and_needs_fifty(study):
     profiles=custom.fake(s,100)[custom.demographics(s)+[f for v in pred for f in custom.item_fields(v)]]
     ctx=public_jobs.prepare(Run(study=study,methods=[8],examples=False),{'profiles_SPA8':profiles})['SPA8_R0001']
     assert all(v['code'] in ctx['fixed'][0] for v in pred if v['aggregation']!='individual')
+
+def test_title_is_enough_without_target_population(study):
+    study=dict(study,population='');s=custom.definition(study)
+    assert s['population'].strip()
+    study['title']=''
+    with pytest.raises(ValueError,match='study title'):custom.definition(study)

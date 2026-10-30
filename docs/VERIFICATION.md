@@ -28,6 +28,14 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 5.1: guided questions
+
+Step 1 now asks two or three yes/no questions about what the researcher has (for example whether pilot data have been collected), which lead to one recommended approach from Table 6. Other approaches that fit are collapsed. The MIDUS demonstration always uses the supplied example inputs, so no upload appears after choosing it. Custom studies need only a title, and SPA3 asks who the participants are. A fictional MIDUS reference lets demonstration users practise the comparison step. Changing the study or editing a custom measure no longer resets the chosen approach. Browser QA covered every question path at 1280 px and 390 px. All 215 tests pass.
+
+## Version 5.0: goal-first flow
+
+The interface follows the proposal. Step 1 asks for the research goal (Goal 1: reproduce psychological scores; Goal 2: reproduce relationships among variables), then the information the researcher has now, and recommends an approach from Table 6 with the study result behind it. Step 2 asks once which study to use. The MIDUS demonstration uses the example inputs automatically, with an optional replacement file. Own studies upload only what the approach needs, and demographic categories are needed only for SPA4, SPA7 and SPA8. Tests cover the Table 6 mapping for every goal and stage (SPA2 with no data, SPA4 with proportions, SPA5 with a pilot and SPA6 for relationship strength, SPA7 with demographic profiles, SPA8 with demographic and psychological scores) and custom studies without demographics. Browser QA at 1280 px and 390 px completed MIDUS and custom runs through the new flow. The scientific core, prompts and statistics are unchanged. All 213 tests pass.
+
 ## Version 4.6.2: SPA4 target proportions
 
 SPA4 again takes target proportions, one row per demographic category, as in version 4.2.0. No participant data are needed. The quota construction and the SPA4 prompt are unchanged. New tests cover each proportions error (missing demographic, unknown variable or category, repeated category, invalid proportion, totals other than 1, invalid or overlapping age bands, missing columns), automatic conversion of percentages and rescaling of rounding differences, custom-study templates built from declared categories, and plan signatures after browser number serialisation. Browser QA confirmed the SPA4 template download, a valid upload through to a completed dataset, the error card for proportions that add up to 0.798 and the note for percentages. The example proportions are fictional. SPA5 and SPA6 text now states exactly 50 pilot participants throughout. All 213 tests pass.

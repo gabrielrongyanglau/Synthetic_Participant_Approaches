@@ -4,15 +4,15 @@ A synthetic participant approach (SPA) asks an AI to produce hypothetical partic
 
 ## First visit
 
-1. Keep **MIDUS study (recommended)** selected under *Which study?*. MIDUS is the Midlife in the United States study used in the original evaluation.
-2. Choose what you want to explore and tick the information you have. The suggested approach is pre-selected; click any other card to choose it instead. One approach is used per simulation. The left-hand panel shows your choice and progress through the four steps.
-3. Choose **Continue to inputs**. Keep **Supplied fictional examples** to try an approach without uploading data, or choose your own data and upload the matching CSV.
+1. Choose your research goal. Goal 1 is reproducing psychological scores. Goal 2 is reproducing relationships among variables: their direction and pattern, their strength, or a later outcome from baseline scores.
+2. Answer the yes/no questions about what you have so far, for example whether you have collected pilot data. The recommended approach, from Table 6 of the proposal, appears with the result behind it. Other approaches that fit are under *Other approaches that also fit your situation*. One approach is used per simulation.
+3. Choose **Continue to study and data**. Keep **MIDUS demonstration** to use the example inputs supplied with the toolkit, with nothing to upload. MIDUS is the Midlife in the United States study used in the original evaluation.
 4. Choose **Check inputs**, review the summary that appears and tick its confirmation.
 5. Tick the data-sharing confirmation, choose **Generate 100 participants with AI**, then **Download dataset and codebook (ZIP)** on *Your datasets*. It contains the CSV, variable codebook, metadata and supporting-information record. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
 
 ## Your own study
 
-Select **Use your own study, questionnaire and participant data**. Enter the target population, construct definitions, verified citations, all exact questionnaire items, response scales, scoring and demographic categories. Each item needs a valid response range. Choose predictor/outcome roles. Mean and sum scores require every item. Define at least one demographic. The example study is fictional and is not a validated questionnaire.
+On *Study and data*, select **My own study**. Enter a study title, construct definitions, verified citations, all exact questionnaire items, response scales, scoring and demographic categories. Each item needs a valid response range. Choose predictor/outcome roles. Mean and sum scores require every item. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. The example study is fictional and is not a validated questionnaire.
 
 Optional context and papers guide a custom adaptation. Add a research question, paste relevant empirical findings, or upload a PDF. Review all extracted text, including table order and symbols, remove unwanted sources and confirm the evidence checkbox. A DOI alone is not a paper upload.
 

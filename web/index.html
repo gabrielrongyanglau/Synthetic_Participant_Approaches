@@ -23,8 +23,8 @@
   <nav aria-label="Workflow">
     <p class="rail-group">Workflow</p>
     <ol class="steps">
-      <li><button data-page="choose" class="active"><span class="step-no">1</span><span class="step-text"><span class="step-title">Choose an approach</span><span class="step-status" id="railChoose">Not chosen</span></span></button></li>
-      <li><button data-page="prepare"><span class="step-no">2</span><span class="step-text"><span class="step-title">Prepare and generate</span><span class="step-status" id="railPrepare">Inputs not checked</span></span></button></li>
+      <li><button data-page="choose" class="active"><span class="step-no">1</span><span class="step-text"><span class="step-title">Goal and approach</span><span class="step-status" id="railChoose">Not chosen</span></span></button></li>
+      <li><button data-page="prepare"><span class="step-no">2</span><span class="step-text"><span class="step-title">Study and data</span><span class="step-status" id="railPrepare">Inputs not checked</span></span></button></li>
       <li><button data-page="datasets"><span class="step-no">3</span><span class="step-text"><span class="step-title">Your datasets</span><span class="step-status" id="railDatasets">None yet</span></span></button></li>
       <li><button data-page="compare"><span class="step-no">4</span><span class="step-text"><span class="step-title">Compare with human data</span><span class="step-status" id="railCompare">Optional</span></span></button></li>
     </ol>
@@ -47,42 +47,79 @@
 <section id="choose" class="page">
   <header class="page-head">
     <p class="kicker">Step 1 of 4</p>
-    <h1>Choose a synthetic participant approach</h1>
+    <h1>Choose your goal and approach</h1>
     <p id="intro" class="lead"></p>
   </header>
 
   <div class="sheet">
     <div class="block">
-      <h2>What would you like to explore?</h2>
-      <label for="purpose" class="sr-only">Research purpose</label>
-      <select id="purpose"></select>
-      <p id="purposeHelp" hidden></p>
+      <h2>1. What is your research goal?</h2>
+      <p class="help">The proposal evaluates two goals. An approach can serve one goal well and the other poorly.</p>
+      <div id="goalChoices" class="goal-groups" role="radiogroup" aria-label="Research goal"></div>
     </div>
 
     <div class="block">
+      <h2>2. What do you have so far?</h2>
+      <p class="help">Answer a few questions about your research stage. Each answer narrows down the approach.</p>
+      <div id="guideQuestions" class="guide"></div>
+    </div>
+
+    <div class="block">
+      <h2>3. Recommended approach</h2>
+      <div id="recommendation" class="recommendation" aria-live="polite"></div>
+      <div id="methodCards" class="method-list" role="radiogroup" aria-label="Approach"></div>
+    </div>
+  </div>
+
+  <div class="page-actions">
+    <button id="continue" class="primary" type="button">Continue to study and data</button>
+  </div>
+</section>
+
+<!-- Step 2 -->
+<section id="prepare" class="page" hidden>
+  <header class="page-head">
+    <p class="kicker">Step 2 of 4</p>
+    <h1>Study and data</h1>
+    <p id="prepareLead" class="lead">Choose the study, add data if your approach needs it, then check and generate.</p>
+  </header>
+
+  <div class="facts" aria-label="Trial limits">
+    <div><span class="fact-label">Each simulation</span><span class="fact-value">1 approach, 1 dataset, 100 participants</span></div>
+    <div><span class="fact-label">Generation time</span><span class="fact-value">A few minutes to an hour</span></div>
+    <div><span class="fact-label">Paid by</span><span class="fact-value">Research team’s API budget</span></div>
+  </div>
+  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes. Runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
+  <div id="notConnected" class="banner warn" hidden><strong>AI generation is offline.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs and preview the AI instructions.</div>
+  <details class="note">
+    <summary>About the research-funded trial</summary>
+    <p>To conserve a limited API budget, repetitions and larger datasets are unavailable.</p>
+    <p id="serviceEstimate"></p><p id="serviceFunding"></p><p id="serviceContact"></p><p id="serviceFuture"></p>
+  </details>
+
+  <div class="sheet">
+    <div class="block">
       <h2>Which study?</h2>
-      <label for="studyMode" class="sr-only">Study setup</label>
-      <select id="studyMode"></select>
+      <select id="studyMode" hidden aria-hidden="true"></select>
+      <div id="studyChoices" class="choice-grid two-up" role="radiogroup" aria-label="Study"></div>
       <div id="midusSetup" class="hint">
-        <p><strong>New here? Keep the MIDUS study.</strong> It comes with fictional example inputs, so you can try every approach with ready-made data. MIDUS is the Midlife in the United States study used in the original evaluation.</p>
         <p id="scope"></p>
-        <p>This mode generates the study’s existing score variables.</p>
+        <p>To use your own questionnaire and participant data, choose <strong>My own study</strong>.</p>
       </div>
 
       <div id="customSetup" hidden>
         <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 constructs and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
-        <div class="two">
-          <label>Study title<input id="studyTitle" type="text"></label>
-          <label>Target population<textarea id="targetPopulation" rows="2"></textarea></label>
-        </div>
+        <label>Study title<input id="studyTitle" type="text"></label>
         <h3>Psychological measures</h3>
         <div id="measureEditor"></div>
         <button id="addMeasure" class="btn-quiet" type="button">Add psychological measure</button>
-        <h3>Demographic information</h3>
-        <p class="help">Define between one and eight demographics, such as age group or employment arrangement, using numeric categories.</p>
-        <div id="demographicEditor"></div>
-        <div class="actions">
+        <details id="demographicSection" class="note">
+          <summary id="demographicSummary">Demographic categories (optional)</summary>
+          <p id="demographicHelp" class="help">Needed only for SPA4, SPA7 and SPA8, which keep demographic information fixed. Define up to eight, such as age group or employment arrangement, using numeric categories.</p>
+          <div id="demographicEditor"></div>
           <button id="addDemographic" class="btn-quiet" type="button">Add demographic</button>
+        </details>
+        <div class="actions">
           <button id="loadCustomExample" type="button">Load a fictional example study</button>
           <button id="validateStudy" type="button">Check definition and prepare templates</button>
         </div>
@@ -111,56 +148,15 @@
     </div>
 
     <div class="block">
-      <h2>What information can you provide?</h2>
-      <p class="help">Select all that apply, or none if you have no participant information.</p>
-      <div id="informationChoices" class="choice-grid"></div>
-      <p id="informationModeHelp" class="help">In the MIDUS study, each input type also has a fictional example for practice.</p>
-    </div>
-
-    <div class="block">
-      <h2>Choose an approach</h2>
-      <div id="recommendation" class="recommendation" aria-live="polite"></div>
-      <div id="methodCards" class="method-list" role="radiogroup" aria-label="Approach"></div>
-    </div>
-  </div>
-
-  <div class="page-actions">
-    <button id="downloadBrief" class="btn-quiet" type="button">Download study brief (JSON)</button>
-    <button id="continue" class="primary" type="button">Continue to inputs</button>
-  </div>
-</section>
-
-<!-- Step 2 -->
-<section id="prepare" class="page" hidden>
-  <header class="page-head">
-    <p class="kicker">Step 2 of 4</p>
-    <h1>Prepare and generate</h1>
-    <p class="lead">Choose the inputs, check them, then confirm before anything is generated.</p>
-  </header>
-
-  <div class="facts" aria-label="Trial limits">
-    <div><span class="fact-label">Each simulation</span><span class="fact-value">1 approach, 1 dataset, 100 participants</span></div>
-    <div><span class="fact-label">Generation time</span><span class="fact-value">A few minutes to an hour</span></div>
-    <div><span class="fact-label">Paid by</span><span class="fact-value">Research team’s API budget</span></div>
-  </div>
-  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes. Runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
-  <div id="notConnected" class="banner warn" hidden><strong>AI generation is offline.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs and preview the AI instructions.</div>
-  <details class="note">
-    <summary>About the research-funded trial</summary>
-    <p>To conserve a limited API budget, repetitions and larger datasets are unavailable.</p>
-    <p id="serviceEstimate"></p><p id="serviceFunding"></p><p id="serviceContact"></p><p id="serviceFuture"></p>
-  </details>
-
-  <div class="sheet">
-    <div class="block">
-      <h2>Inputs</h2>
-      <label>Which inputs should this simulation use?<select id="source"><option value="examples">Supplied fictional examples</option><option value="own">My own participant data</option></select></label>
-      <label id="populationLabel">Population description for SPA3<textarea id="population" rows="2">Middle-aged and older adults in the specified US longitudinal cohort.</textarea></label>
+      <h2 id="dataHeading">Data for this approach</h2>
+      <p id="dataSummary" class="data-summary"></p>
+      <label id="populationLabel">Who are the participants? (used by SPA3)<textarea id="population" rows="2">Middle-aged and older adults in the specified US longitudinal cohort.</textarea></label>
       <div id="uploads" class="uploads"></div>
+      <p id="exampleLink" class="help" hidden><a id="exampleFile" download>View the example input (CSV)</a></p>
       <div class="sr-only"><select id="n" aria-hidden="true" tabindex="-1"></select><select id="repetitions" aria-hidden="true" tabindex="-1"><option>1</option></select></div>
       <p id="total" class="help"></p>
 
-      <details class="note">
+      <details id="csvHelp" class="note">
         <summary>How to prepare your CSV</summary>
         <p>SPA5 to SPA8 uploads use <strong>one row per participant and one column per variable</strong>. The SPA4 upload uses one row per demographic category. Download the template for your approach, replace the example values with your own, and upload it.</p>
         <ul>
@@ -177,7 +173,7 @@
         <a id="variableGuideLink" href="/api/guide.csv" download>Download the variable guide (CSV)</a>
         <div id="guideTable"></div>
       </details>
-      <details class="note">
+      <details class="note" hidden>
         <summary>Sampling seed</summary>
         <label>Input sampling seed<input id="seed" type="number" min="0" max="2147483647" value="1"></label>
         <p>The seed controls which input records the tool draws. AI responses still vary from run to run.</p>
@@ -235,8 +231,8 @@
   </div>
   <div id="emptyResults" class="empty">
     <h2>No datasets yet</h2>
-    <p>Choose an approach, then prepare and generate a dataset. It will appear here.</p>
-    <button type="button" class="primary" data-goto="choose">Choose an approach</button>
+    <p>Choose your goal and approach, then the study and data. Your dataset will appear here.</p>
+    <button type="button" class="primary" data-goto="choose">Choose your goal and approach</button>
   </div>
   <div id="jobDetail"></div>
   <div id="datasetList"></div>
@@ -248,6 +244,7 @@
     <p class="kicker">Step 4 of 4 · optional</p>
     <h1>Compare with human data</h1>
     <p class="lead">See how closely a generated dataset reproduces observed human scores and relationships.</p>
+    <p id="compareMidusNote" class="help" hidden>The comparison of every approach with the real MIDUS participants is shown under <a href="#" data-goto="evidence">Study findings</a>. To practise this step with your demonstration dataset, download the fictional reference example below and upload it.</p>
   </header>
   <div class="sheet">
     <div class="block">
@@ -258,7 +255,7 @@
       <p class="help">Use observed human data with the same measures and outcomes. Custom studies can supply composite scores or the raw items needed to calculate them. Demographics are optional. The file is used only for this comparison on the toolkit server and is discarded afterwards.</p>
       <div class="actions">
         <button id="compareButton" class="primary" type="button">Compare</button>
-        <button id="customReference" class="btn-quiet" type="button" hidden>Download a fictional reference example</button>
+        <button id="customReference" class="btn-quiet" type="button">Download a fictional reference example</button>
       </div>
       <details class="note">
         <summary>How the comparison works</summary>
@@ -278,7 +275,7 @@
   <header class="page-head">
     <p class="kicker">Reference</p>
     <h1>What did the study find?</h1>
-    <p class="lead">Approaches differ in which aspect of fidelity they reproduce best. These are the original MIDUS results: eight approaches, 1,000 datasets of 100 participants each, compared with 2,709 human participants. They are separate from your own simulations.</p>
+    <p class="lead">Approaches differ in which goal they serve best: reproducing psychological scores (Goal 1) or reproducing relationships among variables (Goal 2). These are the original MIDUS results: eight approaches, 1,000 datasets of 100 participants each, compared with 2,709 human participants. They are separate from your own simulations.</p>
   </header>
 
   <div class="toolbar">
@@ -296,7 +293,7 @@
 
   <article class="chart-card">
     <div class="chart-head">
-      <div><h2>Score distributions</h2><p class="chart-q">How closely do generated psychological scores resemble human scores?</p></div>
+      <div><h2>Goal 1 · Score distributions</h2><p class="chart-q">How closely do generated psychological scores resemble human scores?</p></div>
       <label>Measure<select id="studyDistribution"><option value="wasserstein">Full distribution (Wasserstein distance)</option><option value="smd">Average score (standardised mean error)</option><option value="sd_error">Variability (SD-ratio error)</option></select></label>
     </div>
     <p id="distributionMeaning" class="help"></p>
@@ -306,7 +303,7 @@
   </article>
 
   <article class="chart-card">
-    <div class="chart-head"><div><h2>Relationship strengths</h2><p class="chart-q">How accurately are relationships with life satisfaction reproduced?</p></div></div>
+    <div class="chart-head"><div><h2>Goal 2 · Relationship strengths</h2><p class="chart-q">How accurately are relationships with life satisfaction reproduced?</p></div></div>
     <p class="help">Correlation mean absolute error averages the gaps between simulated and human correlations across 37 predictors. A correlation of .80 against a human .20 is an error of .60. Lower is closer.</p>
     <div id="relationshipChart" class="study-chart-scroll"></div>
     <p id="relationshipReadout" class="study-readout" aria-live="polite"></p>
@@ -314,7 +311,7 @@
   </article>
 
   <article class="chart-card">
-    <div class="chart-head"><div><h2>Pattern versus agreement</h2><p class="chart-q">A similar pattern can hide inaccurate relationship strengths.</p></div></div>
+    <div class="chart-head"><div><h2>Goal 2 · Pattern versus strength</h2><p class="chart-q">A similar pattern can hide inaccurate relationship strengths.</p></div></div>
     <p class="help">Pattern <em>r</em> asks whether predictors with stronger human correlations also have stronger simulated ones. ICC(A,1) and Lin’s CCC ask whether the actual values agree. Higher is closer to 1 for all three.</p>
     <div id="agreementLegend" class="study-legend"></div>
     <div id="agreementChart" class="study-chart-scroll"></div>
@@ -342,7 +339,7 @@
       <tr><td>No participant data, exploring theoretical predictions</td><td>SPA2, with SPA1 and SPA3 as alternatives</td><td>Explore possible patterns. Synthetic associations suggest patterns to test with human data.</td></tr>
       <tr><td>Pilot data, exploring score distributions or ceiling effects</td><td>SPA5, with SPA6 as an alternative</td><td>Pilot-informed scores were closer in MIDUS. Reliability, factor structure and construct validity need separate evidence.</td></tr>
       <tr><td>Pilot data, inspecting relationships</td><td>SPA6 and SPA5</td><td>SPA6 had smaller relationship errors. Both substantially overstated strengths.</td></tr>
-      <tr><td>Actual demographics only</td><td>SPA7</td><td>Preserves profiles. Psychological fidelity needs separate checking.</td></tr>
+      <tr><td>Actual demographics only</td><td>SPA7</td><td>Preserves profiles. Its psychological scores were no closer to human data than SPA2.</td></tr>
       <tr><td>Observed psychological profiles, exploring possible outcomes</td><td>SPA8</td><td>Closer relationship agreement for life satisfaction. Individual predictions, new outcomes and imputations need separate validation.</td></tr>
       <tr><td>Effect sizes and statistical power</td><td>Human evidence</td><td>Use human evidence or explicitly specified effect-size scenarios.</td></tr>
     </tbody>
