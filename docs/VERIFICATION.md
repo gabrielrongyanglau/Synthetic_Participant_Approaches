@@ -26,4 +26,8 @@ The public interface and request schema now limit simulations to one approach, o
 
 Dataset responses provide a column-matched codebook for MIDUS and custom studies. Checks cover all exported columns, the four example MIDUS codes raised during review, generated-versus-fixed provenance, custom items and composite scoring, demographic inclusion and UTF-8 codebook CSV parsing. New tests cover optional contact/estimate settings and sanitized budget-related provider errors without automatic retries. Browser QA checks the visible planning estimate, funding notice, disabled larger samples/repetitions, single approach selection, dataset/codebook download controls and demographic fields.
 
-The default 5–20 minute completion range is explicitly a provisional planning estimate, not a measured performance result. Only an owner-configured public email is displayed; no contact address is fabricated.
+The interface states that generation may take up to one hour depending on variables, complexity and service availability. This is a planning estimate, not a measured performance result. Only an owner-configured public email is displayed; no contact address is fabricated.
+
+## Version 4.2 additions
+
+The original method prompt bank and MIDUS scientific engines are byte-identical to the prior release. New checks cover all eight original prompt renderings, all eight custom evidence renderings, read-only previews and rejected prompt fields, review requirements, signed evidence integrity, blank templates, zero-provider input checks, PDF extraction, encrypted/scanned/malformed input handling, and PDF size/page/text bounds. Browser QA uses private fictional API fixtures; paid provider execution and live Vercel deployment were not tested. The extraction endpoint and generation requests are tested with the real FastAPI application and mocked provider calls. Supporting papers have not been tested for empirical simulation fidelity.

@@ -2,7 +2,7 @@
 
 ## Required setup
 
-Import the repository into Vercel with **FastAPI**, Root Directory `./`, default Build and Output settings, and `OPENAI_API_KEY` in server-side Environment Variables. Deploy. No other variable is required. Optional `SPA_CONTACT_EMAIL` supplies a public contact address; optional `SPA_ESTIMATED_MINUTES` overrides the provisional 5–20 minute planning range. No contact address is invented when this is blank. It does not read a database URL or invitation configuration. Remove old variables if copying settings from the earlier repository.
+Import the repository into Vercel with **FastAPI**, Root Directory `./`, default Build and Output settings, and `OPENAI_API_KEY` in server-side Environment Variables. Deploy. No other variable is required. Optional `SPA_CONTACT_EMAIL` supplies a public contact address; optional `SPA_ESTIMATED_MINUTES` overrides the planning estimate (default 60 minutes). No contact address is invented when this is blank. It does not read a database URL or invitation configuration. Remove old variables if copying settings from the earlier repository.
 
 The root `app.py` exports the FastAPI application. `.python-version` selects Python 3.13. `vercel.json` allows a 120-second function duration. OpenAI submission/retrieval calls have a 35-second network timeout and no automatic SDK retries. Model, reasoning and output allowance are fixed to `gpt-5.6-luna`, medium and 128,000.
 
@@ -45,3 +45,7 @@ Official references: [Vercel FastAPI](https://vercel.com/docs/frameworks/backend
 The custom questionnaire extension uses the same temporary processing and signed-response mechanism as MIDUS. The complete declared study and method-specific input snapshot are bound to the signed plan, then retained in browser memory for downloads and comparison. No new environment variables or database are needed. User-configured custom measures do not change the original MIDUS engine or its source aggregates.
 
 The visible 100-person limit conserves the team-funded budget per simulation; it is not a durable per-user or account-wide spending cap. Provider budget and usage controls remain the owner’s responsibility. Using visitor-supplied API keys is a future feature; there is no visitor key entry field.
+
+## Reviewed papers and input checks
+
+`/api/extract-paper` accepts bounded base64 PDFs and extracts text in function memory without a provider call or file writes. `/api/check-inputs` validates input records and constructs the fixed request without calling OpenAI. The server rejects visitor prompt/model fields. The default MIDUS template bank is unchanged; custom measure mapping and reviewed source evidence use server-owned system instructions. Full extracted text must be reviewed in the browser. See [Prompt policy](PROMPT_POLICY.md).

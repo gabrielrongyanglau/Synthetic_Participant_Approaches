@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 import pandas as pd
 from fastapi import FastAPI,Request,HTTPException
 from fastapi.responses import FileResponse,Response,JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel,ConfigDict,Field
 from dotenv import load_dotenv
 from spa.study import load_study,NAMES,json_records,selected_fields,clean_frame
@@ -27,6 +28,7 @@ class Run(BaseModel):
     consent:bool=False
     study:dict|None=None
     goal:str="workflow"
+    supporting:dict=Field(default_factory=dict)
 
 @app.middleware('http')
 async def guard(request,call_next):
@@ -52,6 +54,10 @@ async def guard(request,call_next):
     if request.url.path.startswith('/api/'):response.headers['Cache-Control']='no-store'
     return response
 
+@app.exception_handler(RequestValidationError)
+async def invalid_request(request,exc):
+    return JSONResponse({'detail':'Check the simulation settings and required fields. Select one approach and 100 participants. Use the supplied input templates; prompt editing and model changes are unavailable.'},status_code=422)
+
 @app.exception_handler(ValueError)
 async def bad_value(request,exc):return JSONResponse({'detail':str(exc)},status_code=400)
 @app.exception_handler(PermissionError)
@@ -63,7 +69,8 @@ def assets(req):
     if len(set(req.methods))!=len(req.methods) or any(m not in range(1,9) for m in req.methods):raise ValueError('Select distinct approaches M1–M8.')
     allowed={'proportions','pilot_M5','pilot_M6','profiles_M7','profiles_M8'}
     if set(req.assets)-allowed:raise ValueError('Unknown upload type.')
-    return {k:read_csv(v.encode('utf-8')) for k,v in req.assets.items()}
+    try:return {k:read_csv(v.encode('utf-8')) for k,v in req.assets.items()}
+    except (ValueError,TypeError,StopIteration,UnicodeError):raise ValueError('A CSV could not be read. Save it as UTF-8 comma-separated CSV, use the template headers once, and check that all data values are numeric or blank.') from None
 
 def display_results(frame,key):
     d=readable_results(frame)
@@ -82,6 +89,9 @@ def index():return FileResponse(ROOT/'web/index.html')
 def js():return FileResponse(ROOT/'web/app.js',media_type='text/javascript')
 @app.get('/study-charts.js')
 def study_charts_script():return FileResponse(ROOT/'web/study-charts.js',media_type='text/javascript')
+@app.get('/supporting.js')
+def supporting_script():return FileResponse(ROOT/'web/supporting.js',media_type='text/javascript')
+
 @app.get('/research.js')
 def research_script():return FileResponse(ROOT/'web/research.js',media_type='text/javascript')
 @app.get('/zip.js')
@@ -233,7 +243,8 @@ async def recommend(request:Request):
 async def custom_tools(request:Request):
     from spa.custom import definition,guide,template
     d=await request.json();s=definition(d.get('study'))
-    return dict(guide=guide(s),templates={k:template(s,k).to_csv(index=False) for k in ['pilot','demographics','psychology','proportions','reference']})
+    tables={k:template(s,k) for k in ['pilot','demographics','psychology','proportions','reference']}
+    return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:(f.assign(proportion='') if k=='proportions' else f.iloc[:0]).to_csv(index=False) for k,f in tables.items()})
 
 def compare_custom(data):
     import re
@@ -252,3 +263,40 @@ def compare_custom(data):
     return dict(summary=json_records(summary),comparisons=json_records(pairs),variables=json_records(variables),
       metadata=dict(datasets=len(datasets),human_n=len(human),note='Custom-study extension. Scores use the declared rules; no anxiety exclusion. Pattern r requires at least three varying paired coefficients. Undefined statistics remain blank. Intervals describe mean performance across available runs against the fixed supplied reference.'),
       csv_exports={k:f.to_csv(index=False) for k,f in [('summary',summary),('comparisons',pairs),('variables',variables)]})
+
+class Paper(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    filename:str=Field(max_length=300)
+    data:str=Field(max_length=2_000_004)
+
+@app.post('/api/extract-paper')
+def extract_paper(req:Paper):
+    from spa.evidence import extract_pdf
+    return extract_pdf(req.data,req.filename)
+
+@app.post('/api/check-inputs')
+def check_inputs(req:Run):
+    bank=jobs.prepare(req,assets(req))
+    run=next(iter(bank));ctx=bank[run]
+    body,_,_=jobs.batch(ctx,int(run[1]),0,req.n)
+    # Schema/prompt construction is checked here without calling any provider.
+    from spa.recommendations import public_label
+    return dict(api_calls=0,approach=public_label(int(run[1])),participants=req.n,
+      input_source='Supplied fictional examples' if req.examples else 'Your supplied study information',
+      mode=ctx['provenance']['prompt_mode'],supporting_sources=len(ctx.get('supporting',{}).get('sources',[])),
+      prompt_policy='Fixed research-team method template; server-controlled study/evidence layer; no visitor prompt editing.',
+      generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,
+      note='Structural checks passed. This does not verify source quality or scientific validity. Review the read-only instructions if needed.')
+
+@app.get('/api/template/{method}')
+def blank_template(method:int):
+    from spa.study import predictors
+    from spa.workflow import quota_template
+    if method not in (4,5,6,7,8):raise ValueError('This approach does not need a participant-data upload.')
+    s=load_study()
+    if method==4:
+        # Category rows and ranges are supplied; users fill in proportions.
+        from spa.simulation import invent_reference
+        frame=quota_template(invent_reference(s),s);frame['proportion']=''
+    else:frame=pd.DataFrame(columns=selected_fields(s) if method in (5,6) else predictors(s) if method==7 else s['demographic_covariates'])
+    return download(frame.to_csv(index=False),'input_template.csv','text/csv')

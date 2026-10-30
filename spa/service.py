@@ -12,13 +12,13 @@ def contact():
     return dict(text='Contact the research team through the person who shared this prototype with you.',email=None)
 
 def estimate():
-    raw=os.environ.get('SPA_ESTIMATED_MINUTES','5–20').strip()
-    if not re.fullmatch(r'\d{1,3}(?:\s*[-–]\s*\d{1,3})?',raw):raw='5–20'
+    raw=os.environ.get('SPA_ESTIMATED_MINUTES','60').strip()
+    if not re.fullmatch(r'\d{1,2}(?:\s*[-–]\s*\d{1,2})?',raw) or any(not 1<=int(x)<=60 for x in re.findall(r'\d+',raw)):raw='60'
     return raw
 
 def service_info():
     return dict(max_participants=MAX_PARTICIPANTS,max_repetitions=MAX_REPETITIONS,max_methods=MAX_METHODS,
-      estimated_minutes=estimate(),estimate_note='A provisional planning estimate, not a measured service guarantee. Larger questionnaires and provider demand can take longer.',
+      estimated_minutes=estimate(),estimate_note='Generation may take up to one hour, depending on the number of variables, complexity of the supplied information and service availability. This is a planning estimate, not a completion guarantee.',
       funding='AI simulations currently use the research team’s API budget. If funds or service limits are reached, generation may be interrupted or temporarily unavailable.',
       future='Using your own API key and paying for your simulations is planned for a future update; it is not available yet.',contact=contact())
 

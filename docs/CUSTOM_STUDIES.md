@@ -1,6 +1,6 @@
 # Custom questionnaires
 
-Custom-study generation extends the original score-level MIDUS prototype. It supports numeric item responses, user-defined psychological predictors/outcomes and one to eight categorical demographics. It does not validate citations, obtain questionnaire items automatically or establish psychometric validity.
+Custom-study generation extends the original score-level MIDUS prototype. It supports numeric item responses, user-defined psychological predictors/outcomes and one to eight categorical demographics. It does not validate citations, obtain questionnaire items automatically or establish psychometric validity. Optional reviewed PDF text or pasted findings can guide AI generation through a fixed server-controlled evidence layer. See [Prompt policy](PROMPT_POLICY.md).
 
 ## Definition
 

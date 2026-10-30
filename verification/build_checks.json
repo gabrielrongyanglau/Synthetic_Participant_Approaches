@@ -1,5 +1,5 @@
 {
-  "app_version": "4.1.0",
+  "app_version": "4.2.0",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",
@@ -14,8 +14,8 @@
   "provider_store_parameter": false,
   "provider_background_mode": true,
   "provider_cleanup": "Best effort after browser receipt; provider retention still applies",
-  "tests_passed": 104,
-  "test_seconds": 53.91,
+  "tests_passed": 129,
+  "test_seconds": 66.0,
   "live_api_calls": 0,
   "live_vercel_deployment_tested": false,
   "independent_security_audit": false,
@@ -35,7 +35,7 @@
     "text_flags": 439,
     "max_absolute_difference": 3.35231842285566e-13
   },
-  "browser_checks": "Private API fixtures: planning estimate, budget notice, disabled size/repetition controls, one approach selection, codebook controls and output fields",
+  "browser_checks": "Private fictional API fixtures: MIDUS default; one approach selection; one-hour/funding notices; pilot template controls; reviewed pasted evidence; checked-input summary; completed 100-person numerical demo and download controls",
   "study_findings_charts": [
     "Distribution errors with mean and 95% CI",
     "Correlation MAE at MIDUS 2 or MIDUS 3",
@@ -43,7 +43,7 @@
     "Human versus mean simulated correlations for 37 predictors"
   ],
   "chart_source_verification": "All raw chart aggregates match the original source rows exactly; Node selectors checked for all display metrics and all 16 method/wave scatter combinations",
-  "focused_tests_after_final_display_change": 21,
+  "focused_tests_after_final_display_change": 46,
   "public_method_mapping": {
     "SPA7": "original M8",
     "SPA8": "original M7"
@@ -52,11 +52,22 @@
   "max_participants_per_simulation": 100,
   "max_approaches_per_simulation": 1,
   "max_repetitions": 1,
-  "default_planning_estimate_minutes": "5\u201320 (provisional, not measured)",
+  "default_planning_estimate_minutes": "Up to 60 (planning estimate, dependent on variables/complexity/service)",
   "optional_environment_variables": [
     "SPA_CONTACT_EMAIL",
     "SPA_ESTIMATED_MINUTES"
   ],
-  "dataset_download": "Dataset CSV, matching separate codebook CSV, and metadata in ZIP",
-  "custom_demographics": "At least one defined; fictional example includes age group and employment arrangement"
+  "dataset_download": "Dataset CSV, separate matching codebook, metadata and reviewed supporting-information JSON in browser-generated ZIP",
+  "custom_demographics": "At least one defined; fictional example includes age group and employment arrangement",
+  "user_prompt_editing": false,
+  "system_prompt_editing": false,
+  "original_method_bank_unchanged": true,
+  "supporting_evidence": "Custom studies only. Up to three pasted/PDF sources, 60,000 source characters. Read-only full PDF extraction review; server-controlled system wrapper; signed input digest.",
+  "pdf_limits": {
+    "max_bytes": 1500000,
+    "max_pages": 40,
+    "ocr": false,
+    "storage": "Request memory only"
+  },
+  "free_numerical_demo_uses_paper_findings": false
 }

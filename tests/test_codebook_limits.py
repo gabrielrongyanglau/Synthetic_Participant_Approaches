@@ -55,11 +55,11 @@ def test_contact_and_estimate_have_safe_defaults_and_optional_email(monkeypatch)
     monkeypatch.setenv('SPA_ESTIMATED_MINUTES','7–25')
     info=service.service_info()
     assert info['contact']['email']=='team@example.org' and info['estimated_minutes']=='7–25'
-    assert 'provisional' in info['estimate_note'].lower()
+    assert 'planning estimate' in info['estimate_note'].lower() and 'one hour' in info['estimate_note']
     monkeypatch.setenv('SPA_CONTACT_EMAIL','<script>alert(1)</script>')
     assert service.contact()['email'] is None
     monkeypatch.setenv('SPA_ESTIMATED_MINUTES','untrusted text')
-    assert service.estimate()=='5–20'
+    assert service.estimate()=='60'
 
 
 def test_budget_error_gives_contact_without_exposing_provider_details(monkeypatch):

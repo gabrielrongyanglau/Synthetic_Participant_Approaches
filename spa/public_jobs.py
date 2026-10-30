@@ -35,10 +35,20 @@ def verify(token,kind):
 def settings(req):return dict(methods=req.methods,n=req.n,repetitions=req.repetitions,seed=req.seed,
     population=req.population,model=MODEL,reasoning_effort='medium',max_output_tokens=128000,batch_size=100)
 def prepare(req,assets):
+    from .evidence import clean
+    evidence=clean(getattr(req,'supporting',{}))
+    if not getattr(req,'study',None) and evidence['reviewed']:
+        raise ValueError('Supporting papers and research context are available in Use your own study. The MIDUS demonstration keeps the original study prompts.')
     if getattr(req,'study',None):
         from .custom import contexts
-        return contexts(req,assets)
-    return context_bank(load_study(),req.methods,req.n,req.repetitions,req.seed,assets,req.examples,req.population)
+        bank=contexts(req,assets)
+    else:bank=context_bank(load_study(),req.methods,req.n,req.repetitions,req.seed,assets,req.examples,req.population)
+    for ctx in bank.values():
+        if evidence['reviewed']:ctx['supporting']=evidence
+        from .study import PROJECT_ROOT
+        ctx['provenance']['method_prompt_bank_sha256']=hashlib.sha256((PROJECT_ROOT/'prompts/methods.json').read_bytes()).hexdigest()
+        ctx['provenance']['prompt_mode']='Literature-informed custom adaptation' if evidence['reviewed'] else ('Custom measurement adaptation' if ctx.get('custom') else 'Original MIDUS method template')
+    return bank
 def plan(req,assets):
     from .service import check_run
     check_run(req)
@@ -52,6 +62,8 @@ def batch(ctx,method,offset,n):
     if ctx.get('custom'):
         from .custom import batch as custom_batch
         system,user,schema=custom_batch(ctx,method,ids,fixed)
+        from .evidence import system_extension
+        system+=system_extension(ctx.get('supporting',{}))
         return dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,background=True,store=False,text={'format':{'type':'json_schema','name':'custom_participant_batch','strict':True,'schema':schema}}),fixed,ids
     system,user=build_prompt(load_study(),method,ids,fixed,ctx['pilot'],ctx['summary'],generated_only=True,
       population_guidance=ctx['provenance'].get('population_guidance',''))

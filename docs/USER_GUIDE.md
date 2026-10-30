@@ -1,42 +1,49 @@
-# Using the toolkit
+# Using the prototype
 
-Start on **Choose an approach**. A synthetic participant is a hypothetical record, not a newly recruited person. Select the feature you want to explore, then the study setup and the information you can supply. The suggestion is based on the MIDUS comparison and does not guarantee validity for your study. You may select alternatives.
+A synthetic participant approach (SPA) asks an AI to produce hypothetical participant records from specified information. This tool helps researchers choose and try eight approaches. The generated data require validation before supporting substantive research claims.
 
-| Public approach | Information supplied | Generated values |
-| --- | --- | --- |
-| SPA1 Persona prompted | Study definitions | All values, using imagined personas |
-| SPA2 Direct generation | Study definitions | All values directly |
-| SPA3 Population guided | Definitions and a population description | All values |
-| SPA4 Quota matched | Demographic proportions | Psychological responses and outcomes; constructed demographics fixed |
-| SPA5 Pilot calibrated | 50 pilot records and toolkit-computed summaries | New complete records |
-| SPA6 Pilot analysis guided | 50 pilot records; model instructed to analyze them | New complete records |
-| SPA7 Demographic-only profiles | Observed demographics | Psychological responses and outcomes |
-| SPA8 Demographic and psychological profiles | Observed demographics and predictors | Outcomes only |
+## First visit
 
-SPA7 is original analysis M8 and SPA8 is original M7. Historical source files keep their original IDs; public downloads use SPA labels.
+1. Keep **Try our MIDUS demonstration** selected. MIDUS is the Midlife in the United States study used in the original evaluation.
+2. Choose your purpose. Select available information to see suitable approaches; one approach can be selected per simulation.
+3. Continue to **Prepare and generate**. The free numerical demonstration uses invented records, makes no AI call and shows how the workflow and downloads work.
+4. Choose **Check inputs and review simulation**, review the summary and tick its confirmation.
+5. Generate and download the dataset ZIP. It contains the CSV, variable codebook, metadata and supporting-information record. A numerical demonstration is not an AI performance result.
 
-## Research purpose
+## Your own study
 
-For score distributions with pilot data, SPA5 is the suggested starting point and SPA6 is an alternative. For relationships with pilot data, SPA6 had smaller errors than SPA5, but both substantially overstated strengths. With observed psychological profiles, SPA8 simulates hypothetical outcomes. Without participant information, SPA2 is the simplest starting point. Demographic profiles can be preserved without establishing accurate psychological responses.
+Select **Use your own study, questionnaire and participant data**. Enter the target population, construct definitions, verified citations, all exact questionnaire items, response scales, scoring and demographic categories. Each item needs a valid response range. Choose predictor/outcome roles. Mean and sum scores require every item. Define at least one demographic. The example study is fictional and is not a validated questionnaire.
 
-These uses inform preliminary exploration and human study planning. Synthetic results cannot establish a human hypothesis, a causal mechanism, measurement validity, individual prediction or a valid missing-value imputation. Do not use their correlations as empirical inputs to power calculations.
+Optional context and papers guide a custom adaptation. Add a research question, paste relevant empirical findings, or upload a PDF. Review all extracted text, including table order and symbols, remove unwanted sources and confirm the evidence checkbox. A DOI alone is not a paper upload. Free numerical demonstrations do not use literature evidence to generate values.
 
-## Prepare and generate
+Choose AI generation to use your own participant inputs and reviewed evidence. There is no prompt editor. Our fixed method templates and server-controlled mapping/evidence instructions produce the request. Custom measures and literature-informed simulations have not been validated by the original MIDUS comparison.
 
-Choose the MIDUS demonstration or define a custom study. Filled fictional examples illustrate the exact CSV structure. Custom inputs must match your declared codes; arbitrary uploaded column names are not automatically inferred or mapped. Rename your columns using the guide before upload.
+## Upload the right information
 
-Pilot approaches draw 50 separately for each method and repetition. Profile approaches require at least the requested number of people. Exact-size files retain their order; larger pools are sampled without replacement. Input pools can overlap, and exact-size pools recur. The seed controls input draws, not deterministic AI output.
+Download the blank template ZIP and filled fictional example after finishing your measures. Read READ_ME.txt and input_variable_guide.csv. Keep CSV headers; enter one participant per row; remove direct identifiers. Use UTF-8 comma-separated CSV, numeric codes and allowed ranges.
 
-The free demonstration uses fictional numerical rules and makes no AI requests. For a custom free demonstration, load the filled fictional study first. To use your own measures and participant inputs, select AI generation and supply the matching CSVs. Preview instructions and confirm permission to send the inputs to OpenAI. Each simulation is restricted to one approach and one dataset of 100 participants to conserve the research team’s API budget. Larger samples and repetitions are unavailable. Visitors using their own API keys is planned for a future update.
+| Public approach | Participant input |
+| --- | --- |
+| SPA1–SPA3 | No participant CSV. SPA3 uses a population description. |
+| SPA4 | Demographic proportions. Fill each category; proportions sum to 1 within a demographic. |
+| SPA5–SPA6 | At least 50 pilot records with demographics, psychological measures and outcomes. Exactly 50 are drawn without replacement. |
+| SPA7 | At least 100 demographic profiles. |
+| SPA8 | At least 100 demographic and observed psychological predictor profiles. Outcomes are generated. |
 
-## Results and comparison
+MIDUS pilots contain the listed score columns and both life-satisfaction outcomes. Blank predictors are permitted; outcomes must be observed. Custom pilots contain every defined raw item and demographic, all complete; composite scores are recalculated. Custom SPA8 uses observed predictor score columns or item-only predictor columns. Fixed missing predictors remain missing. Names, emails and source person IDs are unnecessary.
 
-Allow approximately 5–20 minutes per AI simulation as a provisional planning estimate. Runtime varies with the questionnaire and provider demand. Budget or service limits can interrupt the simulation; contact the research team using the instructions displayed before generation. Keep the tab open, inspect quality flags and download results. Duplicates are retained. Fixed supplied values retain their precision and missingness; generated values have at most four decimals. The recommended ZIP download includes the dataset, `codebook.csv` and metadata. The codebook has one row per exported column, including demographic category labels, psychological definitions, scoring and whether values were generated or retained. Metadata contains the study setup, input provenance and method mapping, without API credentials or temporary access handles.
+SPA5 receives pilot records and precomputed summaries. SPA6 receives pilot records and analyzes them within the model. SPA7 generates psychology and outcomes with fixed demographics. SPA8 generates outcomes with fixed demographics and predictors. Profile pools larger than 100 are sampled without replacement; exact-size pools keep their order.
 
-Optional comparison uses all supplied human records; demographic columns are unnecessary. It does not match generated people to real people. Custom references can supply computed construct scores or the raw items needed to derive them. MIDUS references use its predefined scores. Missing and constant values can leave statistics undefined; they are not replaced by zero.
+## Start and wait
 
-The current single-run trial cannot estimate a confidence interval across user runs. The original study charts retain their 1,000-repetition intervals. Intervals describe the precision of mean performance against the fixed supplied reference. Custom pattern r is suppressed when fewer than three predictor coefficients are available, because two coefficients give a mechanically perfect positive or negative pattern correlation.
+Review the time/funding notice, authorize sharing with OpenAI for AI runs, then check inputs. Fix any reported issues before continuing. Review the summary and confirm it. Any subsequent settings/input changes require another check. One simulation creates one dataset of 100 people.
 
-An independent human reference provides a stronger assessment of generalization than reusing generation inputs. The original reported MIDUS analyses used the full eligible reference, including participants who could supply generation inputs.
+AI generation may take up to one hour depending on variables, complexity and service availability. The interface shows elapsed minutes, latest status and check time. It polls an existing background request through short server calls, avoiding an hour-long Vercel function. No percentage is invented while the provider is generating.
 
-The **Study findings** page reports the original study, not your generated datasets. Its recommendations for other research settings are potential applications requiring separate validation.
+Keep the tab open and your device awake. If a progress check fails, choose **Check progress again**. This reads the existing response, not a new paid simulation. If submission is uncertain, contact the team before trying another run. Budget exhaustion, provider outages and invalid model output remain possible; zero failures cannot be guaranteed. Repeated profiles and pilot matches are retained and flagged.
+
+## Download and optional comparison
+
+Download before refreshing or leaving. The prototype has no saved history. The codebook explains every exported column. Metadata records settings, provenance, quality flags and whether evidence was used. The supporting-information JSON records the reviewed text, not the original PDFs.
+
+Optional human comparison uses observed records with the same measures. It is separate from generation and is not sent to OpenAI. Original MIDUS findings on page 5 are separate from visitor simulations. One visitor run cannot estimate a Monte Carlo confidence interval.
