@@ -78,6 +78,8 @@ def download(content,name,typ='application/zip'):
 def index():return FileResponse(ROOT/'web/index.html')
 @app.get('/app.js')
 def js():return FileResponse(ROOT/'web/app.js',media_type='text/javascript')
+@app.get('/study-charts.js')
+def study_charts_script():return FileResponse(ROOT/'web/study-charts.js',media_type='text/javascript')
 @app.get('/zip.js')
 def zip_script():return FileResponse(ROOT/'web/zip.js',media_type='text/javascript')
 @app.get('/style.css')
@@ -191,5 +193,12 @@ async def compare(request:Request):
 
 @app.get('/api/evidence')
 def evidence():
-    return {k:json_records(display_results(read_csv(ROOT/'data/original_study'/f'{k}.csv'),k)) for k in ['summary','comparisons','variables','human']}
+    raw={k:read_csv(ROOT/'data/original_study'/f'{k}.csv') for k in ['summary','comparisons','variables','human']}
+    study=load_study()
+    return {**{k:json_records(display_results(frame,k)) for k,frame in raw.items()},
+      'charts':{'summary':json_records(raw['summary']),'variables':json_records(raw['variables']),
+        'human':json_records(raw['human']),'method_names':NAMES,
+        'variable_labels':{code:study['variables'][code]['label'] for code in study['psychological_predictors']},
+        'reference_n':2709,'planned_repetitions':1000,'participants_per_dataset':100}}
+
 

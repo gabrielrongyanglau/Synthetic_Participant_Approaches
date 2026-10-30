@@ -27,7 +27,7 @@ Anyone reaching the public site can incur API charges on the owner's account. Th
 2. **Prepare and generate.** Choose fictional examples or upload your own CSVs, select **100–1,000 participants**, and preview the instructions. One dataset per selected method is the default; 1–5 repetitions are optional.
 3. **Your datasets.** Keep the tab open while requests run. Inspect the preview and quality flags, then download each CSV or one ZIP. If interrupted, valid received batches can be downloaded as clearly marked partial datasets.
 4. **Compare with human data**, if needed. Supply a reference with the same variables. The comparison is temporary and does not send that reference to OpenAI.
-5. **Study findings** shows the original study's verified aggregate results, separate from the current session.
+5. **Study findings** presents the original study’s verified results through interactive charts and detailed tables, separate from the current session. Switch between MIDUS 2 and MIDUS 3, inspect distribution measures, compare pattern correlation with numerical agreement, and explore each method’s variable-level correlations. Means and confidence intervals use the full-precision source aggregates.
 
 The **free demonstration** uses fictional numerical rules, not an AI model, and makes no paid calls. It illustrates the workflow and file format. It is not evidence of model performance.
 
@@ -62,3 +62,7 @@ py -3.13 -m pytest -q
 No database or API key is needed to run the tests. OpenAI calls are mocked. The representative prompt bank, study definitions and statistical formulas are preserved. `analyse.py` and `import_r.py` are optional offline reproducibility tools; they write results only when explicitly run locally and are not the website's storage mechanism. The repository includes invented examples and aggregate study results, not actual human participant microdata.
 
 See [Verification](docs/VERIFICATION.md) for what was tested and its limits. No live Vercel deployment, paid API call or independent security audit was performed. See `LICENSE` for attribution.
+
+## Updating an existing deployment with the study charts
+
+Replace `app.py` and the complete `web/` folder in your existing GitHub repository with those from this ZIP, then commit the changes. The new `web/study-charts.js` file is required. Vercel will redeploy the linked project after the commit. No new environment variables are needed. The other files in this ZIP contain the matching documentation and verification checks.
