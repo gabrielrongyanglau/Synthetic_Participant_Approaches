@@ -34,8 +34,14 @@ def verify(token,kind):
 
 def settings(req):return dict(methods=req.methods,n=req.n,repetitions=req.repetitions,seed=req.seed,
     population=req.population,model=MODEL,reasoning_effort='medium',max_output_tokens=128000,batch_size=100)
-def prepare(req,assets):return context_bank(load_study(),req.methods,req.n,req.repetitions,req.seed,assets,req.examples,req.population)
+def prepare(req,assets):
+    if getattr(req,'study',None):
+        from .custom import contexts
+        return contexts(req,assets)
+    return context_bank(load_study(),req.methods,req.n,req.repetitions,req.seed,assets,req.examples,req.population)
 def plan(req,assets):
+    from .service import check_run
+    check_run(req)
     bank=prepare(req,assets);config=settings(req)
     if len(json.dumps(bank,allow_nan=False).encode())>3_500_000:raise ValueError('Prepared inputs are too large for one web response. Choose fewer approaches or repetitions in this run.')
     ticket=issue(dict(kind='plan',settings=config,runs={run:digest(ctx) for run,ctx in bank.items()},nonce=secrets.token_hex(16)))
@@ -43,6 +49,10 @@ def plan(req,assets):
 
 def batch(ctx,method,offset,n):
     ids=list(range(offset+1,min(n,offset+100)+1));fixed=ctx['fixed'][offset:offset+len(ids)] if ctx['fixed'] else None
+    if ctx.get('custom'):
+        from .custom import batch as custom_batch
+        system,user,schema=custom_batch(ctx,method,ids,fixed)
+        return dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,background=True,store=False,text={'format':{'type':'json_schema','name':'custom_participant_batch','strict':True,'schema':schema}}),fixed,ids
     system,user=build_prompt(load_study(),method,ids,fixed,ctx['pilot'],ctx['summary'],generated_only=True,
       population_guidance=ctx['provenance'].get('population_guidance',''))
     body=dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,
@@ -57,13 +67,18 @@ def provider():
 def submit(ticket,run,offset,ctx,client=None):
     claims=verify(ticket,'plan')
     if run not in claims['runs'] or digest(ctx)!=claims['runs'][run]:raise ValueError('The inputs changed after preparation. Start a new run using the intended inputs.')
+    from .service import check_run
+    from types import SimpleNamespace
+    check_run(SimpleNamespace(**claims['settings']))
     n=claims['settings']['n']
     if type(offset) is not int or offset<0 or offset>=n or offset%100:raise ValueError('Invalid batch position.')
     body,_,ids=batch(ctx,int(run[1]),offset,n)
     try:response=(client or provider()).responses.create(**body).model_dump(mode='json')
     except Exception as exc:
         code=getattr(exc,'status_code',None)
-        if code and 400<=code<500:raise RuntimeError(f'OpenAI rejected this request (HTTP {code}). Ask the owner to check model access, billing or limits. No automatic retry was made.') from None
+        if code and 400<=code<500:
+            from .service import unavailable
+            raise RuntimeError(unavailable()) from None
         raise RuntimeError('The submission could not be confirmed. It may have been accepted and charged. No automatic retry was made. Keep any completed downloads and contact the owner before starting this batch again.') from None
     handle=issue(dict(kind='response',response_id=response['id'],run=run,offset=offset,n=n,context_sha=digest(ctx)))
     return dict(handle=handle,status=response.get('status','queued'),run=run,start=ids[0],end=ids[-1])
@@ -77,12 +92,22 @@ def poll(handle,ctx,client=None):
         raise RuntimeError('Progress could not be retrieved. Keep this page open and choose Check again. Your current response handle remains in browser memory; no new paid request will be submitted by checking.') from None
     status=response.get('status')
     if status in ('queued','in_progress'):return dict(status=status)
-    if status!='completed':return dict(status='error',message=f'OpenAI returned {status}. No automatic paid retry was made. Download any completed datasets before leaving.')
+    if status!='completed':
+        from .service import contact
+        return dict(status='error',message='The simulation could not finish. The team’s API budget or service limits may have been reached, or the response may have hit an output limit. No automatic paid retry was made. Download any completed datasets. '+contact()['text'])
     ids=list(range(claims['offset']+1,min(claims['n'],claims['offset']+100)+1))
     fixed=ctx['fixed'][claims['offset']:claims['offset']+len(ids)] if ctx['fixed'] else None
-    try:frame=parse_records(json.loads(response_text(response)),load_study(),ids,fixed)
+    try:
+        if ctx.get('custom'):
+            from .custom import parse as custom_parse
+            frame=custom_parse(json.loads(response_text(response)),ctx['study'],ids,fixed)
+        else:frame=parse_records(json.loads(response_text(response)),load_study(),ids,fixed)
     except (ValueError,KeyError,TypeError):return dict(status='error',message='The returned batch did not pass record-count, identifier, structure or range checks. No automatic paid retry was made.')
-    return dict(status='completed',run=claims['run'],records=json_records(frame),quality=quality_flags(frame,load_study(),ctx['pilot']))
+    if ctx.get('custom'):
+        from .custom import quality
+        flags=quality(frame,ctx['study'],ctx['pilot'])
+    else:flags=quality_flags(frame,load_study(),ctx['pilot'])
+    return dict(status='completed',run=claims['run'],records=json_records(frame),quality=flags)
 
 def release(handle,cancel=False,client=None):
     claims=verify(handle,'response');client=client or provider()

@@ -17,14 +17,16 @@ app=FastAPI(title='Synthetic Participant Research Toolkit',docs_url=None,redoc_u
 
 class Run(BaseModel):
     model_config=ConfigDict(extra='forbid')
-    methods:list[int]=Field(min_length=1,max_length=8)
-    n:int=Field(default=100,ge=100,le=1000,multiple_of=100)
-    repetitions:int=Field(default=1,ge=1,le=5)
+    methods:list[int]=Field(min_length=1,max_length=1)
+    n:int=Field(default=100,ge=100,le=100,multiple_of=100)
+    repetitions:int=Field(default=1,ge=1,le=1)
     seed:int=Field(default=1,ge=0,le=2147483647)
     examples:bool=True
     population:str=Field(default='Middle-aged and older adults in the specified US longitudinal cohort.',max_length=4000)
     assets:dict[str,str]=Field(default_factory=dict)
     consent:bool=False
+    study:dict|None=None
+    goal:str="workflow"
 
 @app.middleware('http')
 async def guard(request,call_next):
@@ -80,6 +82,8 @@ def index():return FileResponse(ROOT/'web/index.html')
 def js():return FileResponse(ROOT/'web/app.js',media_type='text/javascript')
 @app.get('/study-charts.js')
 def study_charts_script():return FileResponse(ROOT/'web/study-charts.js',media_type='text/javascript')
+@app.get('/research.js')
+def research_script():return FileResponse(ROOT/'web/research.js',media_type='text/javascript')
 @app.get('/zip.js')
 def zip_script():return FileResponse(ROOT/'web/zip.js',media_type='text/javascript')
 @app.get('/style.css')
@@ -88,7 +92,9 @@ def css():return FileResponse(ROOT/'web/style.css',media_type='text/css')
 @app.get('/api/config')
 def config():
     study=load_study()
-    return dict(intro=INTRO,scope=SCOPE,methods={m:dict(name=NAMES[m],**METHODS[m]) for m in NAMES},
+    from spa.recommendations import PUBLIC_ID,PUBLIC_NAMES
+    from spa.service import service_info
+    return dict(service=service_info(),public_ids=PUBLIC_ID,public_names=PUBLIC_NAMES,intro=INTRO,scope=SCOPE,methods={m:dict(name=NAMES[m],**METHODS[m]) for m in NAMES},
       purpose_help={k:purpose_guidance(k,list(NAMES)) for k in PURPOSES},purposes=PURPOSES,information=INFORMATION,compatible=METHODS_BY_INFORMATION,terms=TERMS,metrics=METRICS,
       variable_guide=json_records(variable_guide(study)),model=jobs.MODEL,reasoning='medium',
       configured=bool(os.environ.get('OPENAI_API_KEY','').strip()))
@@ -115,6 +121,10 @@ def demo(req:Run):
     if not req.examples:raise ValueError('The free demonstration uses fictional examples. Choose AI generation to use your own data.')
     if req.repetitions!=1 or len(req.methods)!=1:raise ValueError('Request one approach and one repetition at a time for the demonstration.')
     bank=jobs.prepare(req,assets(req));study=load_study();frames={}
+    if req.study:
+        from spa.custom import demo,quality
+        for run,ctx in bank.items():frames[run]=demo(ctx,int(run[1]),req.n,req.seed)
+        return dict(datasets={run:json_records(f) for run,f in frames.items()},metadata=dict(input_provenance={run:c['provenance'] for run,c in bank.items()},quality_flags={run:quality(f,ctx['study'],bank[run]['pilot']) for run,f in frames.items()}))
     for run,ctx in bank.items():
         m=int(run[1]);r=int(run.split('_R')[1]);frames[(m,r)]=illustrative_generation(study,m,req.n,req.seed,r,ctx)
     meta=generated_metadata(frames,bank,study,jobs.settings(req),'Invented numerical demonstration — no AI calls','workflow')
@@ -160,13 +170,21 @@ async def dataset_details(request:Request):
     data=await request.json();name=str(data.get('name',''))
     import re
     if not re.fullmatch(r'M[1-8]_R[0-9]{4}',name):raise ValueError('Invalid dataset name.')
+    if data.get('study'):
+        from spa.custom import definition,clean_dataset as custom_clean,quality
+        s=definition(data['study']);frame=custom_clean(data.get('records'),s,int(name[1]))
+        from spa.codebook import build,csv
+        book=build(list(frame.columns),int(name[1]),s)
+        return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(frame.head(10).rename(columns={r['column']:r['name']+' ['+r['column']+']' for r in book})),quality=quality(frame,s,data.get('pilot')))
     frame=clean_dataset(data.get('records'))
     pilot=data.get('pilot')
     if pilot is not None:
         if not isinstance(pilot,list) or len(pilot)!=50:raise ValueError('Expected 50 pilot records.')
         pilot=json_records(clean_frame(pd.DataFrame(pilot),load_study(),expected_n=50))
     from spa.simulation import quality_flags
-    return dict(name=name,csv=frame.to_csv(index=False),preview=json_records(readable_records(frame.head(10),load_study())),
+    from spa.codebook import build,csv
+    book=build(list(frame.columns),int(name[1]))
+    return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(readable_records(frame.head(10),load_study())),
                 quality=quality_flags(frame,load_study(),pilot))
 
 def clean_dataset(rows):
@@ -180,7 +198,9 @@ def clean_dataset(rows):
 async def compare(request:Request):
     from spa.analysis import analyse
     import re
-    data=await request.json();human=evaluation_reference(read_csv(str(data.get('csv','')).encode()),load_study())
+    data=await request.json()
+    if data.get('study'):return compare_custom(data)
+    human=evaluation_reference(read_csv(str(data.get('csv','')).encode()),load_study())
     raw=data.get('datasets',{})
     if not isinstance(raw,dict) or not 1<=len(raw)<=40:raise ValueError('Provide 1–40 completed datasets.')
     entries=[]
@@ -197,8 +217,38 @@ def evidence():
     study=load_study()
     return {**{k:json_records(display_results(frame,k)) for k,frame in raw.items()},
       'charts':{'summary':json_records(raw['summary']),'variables':json_records(raw['variables']),
-        'human':json_records(raw['human']),'method_names':NAMES,
+        'human':json_records(raw['human']),'method_names':{m:__import__('spa.recommendations',fromlist=['PUBLIC_ID','PUBLIC_NAMES']).PUBLIC_NAMES[__import__('spa.recommendations',fromlist=['PUBLIC_ID']).PUBLIC_ID[m]] for m in NAMES},
         'variable_labels':{code:study['variables'][code]['label'] for code in study['psychological_predictors']},
         'reference_n':2709,'planned_repetitions':1000,'participants_per_dataset':100}}
 
 
+
+@app.post('/api/recommend')
+async def recommend(request:Request):
+    from spa.recommendations import suggest
+    d=await request.json()
+    return suggest(d.get('goal','workflow'),d.get('information',[]))
+
+@app.post('/api/custom-tools')
+async def custom_tools(request:Request):
+    from spa.custom import definition,guide,template
+    d=await request.json();s=definition(d.get('study'))
+    return dict(guide=guide(s),templates={k:template(s,k).to_csv(index=False) for k in ['pilot','demographics','psychology','proportions','reference']})
+
+def compare_custom(data):
+    import re
+    from spa.custom import definition,comparison
+    from spa.recommendations import public_label,public_run
+    s=definition(data['study']);datasets=data.get('datasets',{})
+    if not isinstance(datasets,dict) or not 1<=len(datasets)<=40 or any(not re.fullmatch(r'M[1-8]_R[0-9]{4}',r) for r in datasets):raise ValueError('Provide 1–40 completed datasets with valid names.')
+    human=read_csv(str(data.get('csv','')).encode());methods=sorted({int(r[1]) for r in datasets})
+    summary,pairs,variables=comparison(datasets,human,s,methods)
+    if 'run' in variables:variables['run']=variables['run'].map(public_run)
+    for frame in (summary,pairs):
+        if 'metric' in frame:frame['metric']=frame['metric'].map(lambda m:METRICS[m][0] if m in METRICS else 'Proportion of matching correlation signs')
+        if 'domain' in frame:frame['domain']=frame['domain'].map({'distribution':'Score distributions','relationship':'Psychological relationships'})
+        for key in ('method','first','second'):
+            if key in frame:frame[key]=frame[key].map(public_label)
+    return dict(summary=json_records(summary),comparisons=json_records(pairs),variables=json_records(variables),
+      metadata=dict(datasets=len(datasets),human_n=len(human),note='Custom-study extension. Scores use the declared rules; no anxiety exclusion. Pattern r requires at least three varying paired coefficients. Undefined statistics remain blank. Intervals describe mean performance across available runs against the fixed supplied reference.'),
+      csv_exports={k:f.to_csv(index=False) for k,f in [('summary',summary),('comparisons',pairs),('variables',variables)]})

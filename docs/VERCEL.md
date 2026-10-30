@@ -2,7 +2,7 @@
 
 ## Required setup
 
-Import the repository into Vercel with **FastAPI**, Root Directory `./`, default Build and Output settings, and `OPENAI_API_KEY` in server-side Environment Variables. Deploy. The application needs no other environment variable. It does not read a database URL or invitation configuration. Remove old variables if copying settings from the earlier repository.
+Import the repository into Vercel with **FastAPI**, Root Directory `./`, default Build and Output settings, and `OPENAI_API_KEY` in server-side Environment Variables. Deploy. No other variable is required. Optional `SPA_CONTACT_EMAIL` supplies a public contact address; optional `SPA_ESTIMATED_MINUTES` overrides the provisional 5–20 minute planning range. No contact address is invented when this is blank. It does not read a database URL or invitation configuration. Remove old variables if copying settings from the earlier repository.
 
 The root `app.py` exports the FastAPI application. `.python-version` selects Python 3.13. `vercel.json` allows a 120-second function duration. OpenAI submission/retrieval calls have a 35-second network timeout and no automatic SDK retries. Model, reasoning and output allowance are fixed to `gpt-5.6-luna`, medium and 128,000.
 
@@ -20,9 +20,9 @@ A prepared input plan and a signed temporary response handle stay in the open br
 
 The browser asks the server to prepare method-specific input snapshots. This unpaid preparation performs the same pilot draws, summary calculations and profile validation as before. It then submits one 100-person batch at a time to OpenAI. OpenAI generates in background mode; the browser polls through short server requests. Validated rows return to browser memory. Fixed fields are attached from the exact input snapshot.
 
-All batches within a dataset share that repetition's pilot/profile draw. New repetitions/methods use distinct input-sampling streams. A supplied exact-size pool will recur across repetitions; different draws can overlap. A seed controls input sampling, not model randomness. Multi-batch generation differs from one single request for 1,000 participants.
+Each current public simulation uses one approach and one 100-person request, with no repetitions. Both request validation and signed-plan submission enforce the limit, including attempts to submit an older larger plan. Input pools may exceed 100 people and are sampled to the required size. A seed controls input sampling, not model randomness. Historical engines retain their larger-sample functions for offline reproducibility.
 
-Duplicate profiles and pilot matches do not stop a run. Invalid counts, IDs, schemas or ranges do stop that batch, without another paid request. Downloads label incomplete datasets as `*_partial.csv`. Completed dataset ZIPs contain a CSV per full dataset and metadata with quality flags and provenance. Full-dataset duplicate checks include matches across batches.
+Duplicate profiles and pilot matches do not stop a run. Invalid counts, IDs, schemas or ranges do stop that batch, without another paid request. Downloads label incomplete datasets as `*_partial.csv`. Completed dataset ZIPs include the CSV, a separate codebook matching its columns, and metadata with quality flags and provenance. Full-dataset duplicate checks include matches across batches.
 
 If a progress read fails, choose **Check progress again** in the same tab. This retrieves the existing response rather than submitting another request. The temporary provider response may expire, so check promptly. If submission itself fails before the browser receives its handle, the accepted/billed outcome can be uncertain. The app does not retry automatically. Ask the owner to inspect provider usage before deliberately starting a replacement run. With no durable state, exactly-once delivery, server-crash recovery and cross-tab resumption are not guaranteed.
 
@@ -32,10 +32,16 @@ If a progress read fails, choose **Check progress again** in the same tab. This 
 
 There is no sign-in or account-based quota. The API key remains server-side, but anyone using the public endpoints can incur charges. Application bounds and origin checks do not prevent determined API automation. Vercel firewall/rate controls and OpenAI usage controls can be configured by the owner without adding accounts to this application. Those settings are separate from this repository.
 
-Requests are limited to 3 MB total and upload examples recommend individual files under 2.2 MB. Prepared input plans must fit within 3.5 MB for the web response; select fewer approaches/repetitions if needed. A demonstration requests one approach at a time; the interface handles multi-approach selection sequentially. ZIPs are assembled in browser memory so the whole download is not constrained by a Vercel response-size limit. Optional comparisons may need one dataset at a time if a large group plus its human reference exceeds 3 MB.
+Requests are limited to 3 MB total and upload examples recommend individual files under 2.2 MB. Prepared input plans must fit within 3.5 MB for the web response; use a smaller input pool if needed. The interface permits one approach and one dataset per simulation. ZIPs are assembled in browser memory so the whole download is not constrained by a Vercel response-size limit. Use a smaller reference file if the comparison request exceeds 3 MB.
 
 ## Deployment check
 
 Before sharing, run one 100-person AI simulation with fictional inputs, inspect the preview/CSV/metadata, and check the completed result at the provider. Test the temporary-read recovery flow. No live provider credentials or Vercel account were used while preparing this package.
 
 Official references: [Vercel FastAPI](https://vercel.com/docs/frameworks/backend/fastapi), [OpenAI background mode](https://developers.openai.com/api/docs/guides/background), [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data), [GPT-5.6 Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna).
+
+## Custom studies
+
+The custom questionnaire extension uses the same temporary processing and signed-response mechanism as MIDUS. The complete declared study and method-specific input snapshot are bound to the signed plan, then retained in browser memory for downloads and comparison. No new environment variables or database are needed. User-configured custom measures do not change the original MIDUS engine or its source aggregates.
+
+The visible 100-person limit conserves the team-funded budget per simulation; it is not a durable per-user or account-wide spending cap. Provider budget and usage controls remain the owner’s responsibility. Using visitor-supplied API keys is a future feature; there is no visitor key entry field.

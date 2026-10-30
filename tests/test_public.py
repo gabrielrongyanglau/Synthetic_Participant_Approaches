@@ -43,7 +43,7 @@ def test_no_accounts_database_or_secret_exposure(client):
 def test_no_key_needed_for_demo_or_preview(client,monkeypatch):
     monkeypatch.delenv('OPENAI_API_KEY')
     assert client.get('/api/config').json()['configured'] is False
-    assert client.post('/api/preview',json={'methods':[5,6]},headers=H).status_code==200
+    assert client.post('/api/preview',json={'methods':[5]},headers=H).status_code==200
     assert client.post('/api/demo',json={'methods':[1]},headers=H).status_code==200
     assert client.post('/api/prepare',json={'methods':[1],'consent':True},headers=H).status_code==503
 
@@ -59,9 +59,9 @@ def test_guard_and_validation(client):
 @pytest.mark.parametrize('method',range(1,9))
 def test_public_generation_and_fixed_values(client,monkeypatch,method):
     fake=FakeProvider();monkeypatch.setattr(jobs,'provider',lambda:fake)
-    plan=client.post('/api/prepare',json={'methods':[method],'n':200,'consent':True},headers=H).json()
+    plan=client.post('/api/prepare',json={'methods':[method],'n':100,'consent':True},headers=H).json()
     run=f'M{method}_R0001';ctx=plan['contexts'][run];rows=[]
-    for offset in [0,100]:
+    for offset in [0]:
         r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run=run,offset=offset,context=ctx),headers=H)
         assert r.status_code==200,r.text
         handle=r.json()['handle'];assert 'fake-key-for-tests-only' not in handle
@@ -69,7 +69,7 @@ def test_public_generation_and_fixed_values(client,monkeypatch,method):
         assert result.status_code==200,result.text
         assert result.json()['status']=='completed';rows.extend(result.json()['records'])
         release=client.post('/api/release',json={'handle':handle},headers=H);assert release.json()['released']
-    assert len(fake.created)==2 and len(fake.deleted)==2
+    assert len(fake.created)==1 and len(fake.deleted)==1
     for req in fake.created:assert req['model']=='gpt-5.6-luna' and req['background'] is True and req['store'] is False and req['reasoning']['effort']=='medium' and req['max_output_tokens']==128000
     assert (ctx['pilot'] is not None)==(method in (5,6));assert (ctx['summary'] is not None)==(method==5)
     if ctx['fixed']:
@@ -77,18 +77,14 @@ def test_public_generation_and_fixed_values(client,monkeypatch,method):
             for f,v in fixed.items():assert row[f]==v
     result=client.post('/api/dataset',json=dict(name=run,records=rows,pilot=ctx['pilot']),headers=H)
     assert result.status_code==200,result.text
-    assert len(pd.read_csv(__import__('io').StringIO(result.json()['csv'])))==200
-    if method not in (4,7,8):assert result.json()['quality']['repeated_complete_profiles']==199
+    assert len(pd.read_csv(__import__('io').StringIO(result.json()['csv'])))==100
+    if method not in (4,7,8):assert result.json()['quality']['repeated_complete_profiles']==99
     assert 'fake-key-for-tests-only' not in result.text
 
 @pytest.mark.parametrize('method',[1,7,8])
 def test_thousand_person_plan_and_bounds(client,method):
     p=client.post('/api/prepare',json={'methods':[method],'n':1000,'consent':True},headers=H)
-    assert p.status_code==200
-    run=f'M{method}_R0001';ctx=p.json()['contexts'][run]
-    body,fixed,ids=jobs.batch(ctx,method,900,1000)
-    assert ids==list(range(901,1001));assert body['text']['format']['schema']['properties']['participants']['minItems']==100
-    if fixed:assert len(fixed)==100
+    assert p.status_code==422
 
 @pytest.mark.parametrize('method',range(1,9))
 def test_each_demo_in_memory(client,method):

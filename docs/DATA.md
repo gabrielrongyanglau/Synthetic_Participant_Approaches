@@ -1,3 +1,5 @@
+> Historical IDs in this source-data guide are retained for reproducibility. Public SPA7 = original M8; public SPA8 = original M7. Custom-study definitions and examples are described in CUSTOM_STUDIES.md.
+
 # Data and files
 
 `data/examples/reference.csv` is an invented 2,709-row reference generated deterministically from measurement ranges and latent normal variables. It contains no actual MIDUS participants or empirical MIDUS coefficients. Its size illustrates the original workflow.

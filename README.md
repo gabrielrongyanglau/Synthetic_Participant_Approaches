@@ -1,68 +1,50 @@
 # Synthetic Participant Research Toolkit
 
-A **synthetic participant approach (SPA)** is a way of asking an artificial intelligence (AI) model to create participant records using specified instructions and information. This toolkit lets anyone choose among eight approaches, prepare inputs and download simulated datasets.
+A public research prototype for choosing and trying eight synthetic participant approaches (SPAs). Select a research purpose, define the study, identify available information, review a suggestion and generate downloadable datasets with demographic and psychological variables.
 
-**Public access. No sign-in. No database. No saved run history.** The application keeps inputs and results temporarily in request/browser memory. Users download the results they want to keep before closing or refreshing the tab.
+## Deploy to Vercel
 
-## Deploy on Vercel
+Upload the contents of this folder to the root of a GitHub repository. Import it into Vercel, select **FastAPI**, and keep the root directory as `./`. Add **OPENAI_API_KEY** as a server-side environment variable, then deploy. No invitations, accounts or database are required. Never upload a completed `.env` file.
 
-1. Extract the ZIP and upload its **contents** to a new GitHub repository. `app.py`, `requirements.txt`, `.python-version`, `vercel.json` and the folders should be at the repository root.
-2. In Vercel, import that repository. Select **FastAPI**, keep Root Directory at `./`, and leave Build and Output settings at their defaults.
-3. Add just one required **server-side environment variable**:
+When updating the earlier prototype, replace the repository contents with this complete package, including the new `spa/custom.py`, `spa/recommendations.py` and `web/research.js` files. Keep the existing Vercel environment variable. The linked project redeploys after the commit.
 
-   ```text
-   OPENAI_API_KEY = your actual OpenAI project API key
-   ```
+AI generation uses **GPT-5.6 Luna**, **medium** reasoning and a 128,000-token output allowance. The research-funded trial currently permits **one approach, one dataset and 100 participants per simulation**. The interface and server both enforce this limit. Larger or repeated runs are unavailable. Using a visitor’s own API key and paying their own costs is planned for a future update, not currently implemented.
 
-4. Click **Deploy**. No database, invitation JSON, username or password is needed. `DATABASE_URL` and `SPA_INVITES_JSON` are not used by this version.
-5. Open the deployed site. Try one AI approach with 100 fictional participants and check the download before sharing the URL.
+Before generation, the interface displays a provisional **5–20 minute** planning estimate and explains that the research team’s API budget or provider limits may interrupt service. This is not a measured runtime guarantee. Optionally set `SPA_CONTACT_EMAIL` to the team's public support email and `SPA_ESTIMATED_MINUTES` to an updated planning range, such as `5–20`. Without a configured email, users are directed to contact the person who shared the prototype. Only `OPENAI_API_KEY` is required.
 
-Every AI simulation uses **GPT-5.6 Luna**, **medium reasoning**, and a **128,000-token maximum output allowance per request**. These settings are fixed on the server. Users cannot see the API key or change the model. The owner's OpenAI project must support the model, structured outputs and background Responses. A large token allowance does not guarantee every response will complete.
+## Five pages
 
-Anyone reaching the public site can incur API charges on the owner's account. This version has no per-person allowances or database-backed global rate limits. It bounds input sizes, sample sizes and batch sizes and checks browser request origins; these are not protection against determined automated use. Apply hosting/provider usage controls appropriate to your public test. Do not expose paid credentials to untrusted pull-request preview deployments.
+1. **Choose an approach.** Select a purpose, use the MIDUS setup or define your own questionnaire, and select all available input types. Suggestions explain the empirical evidence and limitations; alternatives remain selectable.
+2. **Prepare and generate.** Use fictional examples or upload matching CSVs. Preview the prompts before generating. The free numerical demonstration makes no AI calls.
+3. **Your datasets.** Inspect progress, previews and duplication flags. Download a ZIP containing the dataset, a separate codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance. Dataset-only and codebook-only CSVs are also available. Repeated profiles are retained and flagged.
+4. **Compare with human data.** Optionally upload observed human data using the same measures. Distributions, relationship patterns and relationship strengths are evaluated separately. This reference is not sent to OpenAI.
+5. **Study findings.** Explore verified MIDUS charts and practical applications based on the proposal. The original findings are separate from your current simulation.
 
-## Use the prototype
+## Study modes
 
-1. **Choose an approach.** Select your purpose and available information. Read each method's inputs, procedure and generated values.
-2. **Prepare and generate.** Choose fictional examples or upload your own CSVs, select **100–1,000 participants**, and preview the instructions. One dataset per selected method is the default; 1–5 repetitions are optional.
-3. **Your datasets.** Keep the tab open while requests run. Inspect the preview and quality flags, then download each CSV or one ZIP. If interrupted, valid received batches can be downloaded as clearly marked partial datasets.
-4. **Compare with human data**, if needed. Supply a reference with the same variables. The comparison is temporary and does not send that reference to OpenAI.
-5. **Study findings** presents the original study’s verified results through interactive charts and detailed tables, separate from the current session. Switch between MIDUS 2 and MIDUS 3, inspect distribution measures, compare pattern correlation with numerical agreement, and explore each method’s variable-level correlations. Means and confidence intervals use the full-precision source aggregates.
+**MIDUS demonstration** preserves the original representative prompts, score definitions and statistical engine. It uses 38 psychological scores, six demographics and life satisfaction at MIDUS 2 and MIDUS 3. The original study benchmark contains 2,709 eligible people. Only invented example records and aggregate study results are distributed.
 
-The **free demonstration** uses fictional numerical rules, not an AI model, and makes no paid calls. It illustrates the workflow and file format. It is not evidence of model performance.
+**My own study** accepts construct definitions, source citations, exact items, response ranges and anchors, reverse coding, predictor/outcome roles and mean, sum or item-only scoring. Define up to 30 constructs and 60 item/demographic fields. Custom studies must define demographic fields; they use numeric category codes. The filled example includes age group and employment arrangement. Generated raw items are scored locally; mean/sum scores require all items. Custom studies are a functional extension, not an empirically validated result of the MIDUS study. Sources and measurement validity are not automatically verified. See [Custom studies](docs/CUSTOM_STUDIES.md).
 
-This version uses the study definitions for 38 psychological scores, six demographic variables and life satisfaction at MIDUS 2 and MIDUS 3. It is not an arbitrary-questionnaire generator. The site includes a variable guide, filled upload examples, definitions and metric explanations. See [User guide](docs/USER_GUIDE.md).
+## Method numbering
 
-## Data handling and recovery
+Public labels follow the revised proposal: **SPA7 retains actual demographics only; SPA8 retains actual demographics and psychological scores**. Original engine IDs, prompt-bank IDs and source aggregate files are unchanged: public SPA7 = original M8; public SPA8 = original M7. Displayed charts, result tables and dataset download names use the public labels. Downloaded metadata records the mapping. See `spa/recommendations.py`.
 
-- The application has no database, server-side dataset files, accounts, cookies, analytics, browser local storage or saved session history. It processes request data in memory and sends validated results back to the open browser tab. User-requested downloads save files on the user's own device.
-- The browser temporarily holds input snapshots, progress handles, received records, CSVs and comparison results. **Refreshing, closing or clearing the tab loses that session.** The browser's own restore/cache behavior is outside this guarantee; do not rely on it for recovery. Download files before leaving.
-- OpenAI generates in background mode so each Vercel request can be short. Requests use `store=false`; OpenAI still temporarily stores background responses for polling, and separate provider retention rules apply. The browser asks the server to delete a response after receiving its validated records. Cleanup is best effort, not a guarantee of zero provider retention. See [Privacy and operation](docs/VERCEL.md).
-- Within the same open tab, a temporary retrieval failure can be checked again using the existing response handle. An uncertain submission or invalid response is not automatically regenerated. Without durable state, the application cannot guarantee exactly-once submission or recover a lost submission/response handle.
-- Each AI request generates 100 participants. A 1,000-person dataset combines ten requests using the same repetition's input draw. Later batches do not see earlier generated rows. Duplicates and pilot-record matches are retained and flagged across the assembled dataset.
-- M4/M7/M8 fixed values are attached from the supplied input snapshots without rounding or imputation. Newly generated values have at most four decimal places.
+## Data handling
 
-## Local preview
+No accounts, database, saved run history, browser local storage or application dataset files are used. Inputs and results are processed temporarily and held in the open browser tab. **Download results before refreshing or closing the tab.** The application cannot recover a lost session.
 
-With Python 3.12 or 3.13 installed, run from the extracted folder:
+The server uses the owner's key. OpenAI background responses are temporarily retained for polling; the application requests deletion after receipt on a best-effort basis. Provider retention policies still apply. Known-response retrieval can be checked again without another generation. Unknown submissions and invalid responses are not automatically regenerated. Larger datasets combine requests whose later batches do not see earlier generated rows.
 
-```powershell
-py -3.13 run.py
-```
+Public access incurs charges for the owner. Input bounds and same-origin checks do not provide durable account-wide usage limits or protection against determined automated use. Configure hosting/provider usage controls appropriate for the test.
 
-Open **http://127.0.0.1:8000**. Keep PowerShell open; Ctrl+C stops the app. Free demonstrations and prompt previews work without a key. For local AI generation, copy `.env.example` to `.env`, enter the key and restart. Never upload the completed `.env` to GitHub or share it.
+## Local use and tests
 
-## Tests and transparency
+With Python 3.12 or 3.13, run `py -3.13 run.py` from the extracted folder and open http://127.0.0.1:8000. Keep PowerShell open. Free demonstrations work without a key. For local AI generation, copy `.env.example` to `.env`, add the key and restart.
 
 ```powershell
 py -3.13 -m pip install -r requirements-dev.txt
 py -3.13 -m pytest -q
 ```
 
-No database or API key is needed to run the tests. OpenAI calls are mocked. The representative prompt bank, study definitions and statistical formulas are preserved. `analyse.py` and `import_r.py` are optional offline reproducibility tools; they write results only when explicitly run locally and are not the website's storage mechanism. The repository includes invented examples and aggregate study results, not actual human participant microdata.
-
-See [Verification](docs/VERIFICATION.md) for what was tested and its limits. No live Vercel deployment, paid API call or independent security audit was performed. See `LICENSE` for attribution.
-
-## Updating an existing deployment with the study charts
-
-Replace `app.py` and the complete `web/` folder in your existing GitHub repository with those from this ZIP, then commit the changes. The new `web/study-charts.js` file is required. Vercel will redeploy the linked project after the commit. No new environment variables are needed. The other files in this ZIP contain the matching documentation and verification checks.
+Tests mock provider requests and make no paid calls. See [Verification](docs/VERIFICATION.md), [User guide](docs/USER_GUIDE.md) and [Vercel operation](docs/VERCEL.md). Optional `analyse.py` and `import_r.py` retain the original offline reproduction workflow and historical method IDs. They are not the website's storage mechanism.

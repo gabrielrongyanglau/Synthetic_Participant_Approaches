@@ -1,5 +1,5 @@
 {
-  "app_version": "3.1.0",
+  "app_version": "4.1.0",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",
@@ -14,8 +14,8 @@
   "provider_store_parameter": false,
   "provider_background_mode": true,
   "provider_cleanup": "Best effort after browser receipt; provider retention still applies",
-  "tests_passed": 83,
-  "test_seconds": 95.24,
+  "tests_passed": 104,
+  "test_seconds": 53.91,
   "live_api_calls": 0,
   "live_vercel_deployment_tested": false,
   "independent_security_audit": false,
@@ -35,12 +35,28 @@
     "text_flags": 439,
     "max_absolute_difference": 3.35231842285566e-13
   },
-  "browser_checks": "Original-study charts, four-decimal confidence limits, MIDUS 2/MIDUS 3 switching and method selection; earlier public generation workflow retained",
+  "browser_checks": "Private API fixtures: planning estimate, budget notice, disabled size/repetition controls, one approach selection, codebook controls and output fields",
   "study_findings_charts": [
     "Distribution errors with mean and 95% CI",
     "Correlation MAE at MIDUS 2 or MIDUS 3",
     "Pearson pattern r versus ICC(A,1) and CCC",
     "Human versus mean simulated correlations for 37 predictors"
   ],
-  "chart_source_verification": "All raw chart aggregates match the original source rows exactly; Node selectors checked for all display metrics and all 16 method/wave scatter combinations"
+  "chart_source_verification": "All raw chart aggregates match the original source rows exactly; Node selectors checked for all display metrics and all 16 method/wave scatter combinations",
+  "focused_tests_after_final_display_change": 21,
+  "public_method_mapping": {
+    "SPA7": "original M8",
+    "SPA8": "original M7"
+  },
+  "custom_questionnaires": "Functional extension; no empirical fidelity claim",
+  "max_participants_per_simulation": 100,
+  "max_approaches_per_simulation": 1,
+  "max_repetitions": 1,
+  "default_planning_estimate_minutes": "5\u201320 (provisional, not measured)",
+  "optional_environment_variables": [
+    "SPA_CONTACT_EMAIL",
+    "SPA_ESTIMATED_MINUTES"
+  ],
+  "dataset_download": "Dataset CSV, matching separate codebook CSV, and metadata in ZIP",
+  "custom_demographics": "At least one defined; fictional example includes age group and employment arrangement"
 }

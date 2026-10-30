@@ -1,54 +1,42 @@
-# First-time user guide
+# Using the toolkit
 
-A **synthetic participant** is a partly or wholly computer-generated participant record. A **synthetic participant approach (SPA)** is the combination of instructions and information used to create such records. These approaches do not recruit new human respondents. An AI model, or large language model (LLM), reads a prompt and produces values.
+Start on **Choose an approach**. A synthetic participant is a hypothetical record, not a newly recruited person. Select the feature you want to explore, then the study setup and the information you can supply. The suggestion is based on the MIDUS comparison and does not guarantee validity for your study. You may select alternatives.
 
-## Choose an approach
-
-| Approach | Information used | Generated values |
+| Public approach | Information supplied | Generated values |
 | --- | --- | --- |
-| M1 Persona prompted | Variable definitions; imagine a different person per row | All demographics, psychological scores and both life-satisfaction outcomes |
-| M2 Ungrounded random | Variable definitions; generate records directly | All values; the “random” instruction is not probability sampling |
-| M3 Population guided | Definitions plus a written description of the eligible population | All values |
-| M4 Quota matched | Demographic proportions | Psychology and outcomes; constructed demographics are fixed |
-| M5 Pilot calibrated | 50 actual pilot records plus tool-computed summaries | New complete records |
-| M6 Pilot analysis guided | 50 actual pilot records; the AI analyses them itself | New complete records |
-| M7 Demographic and psychological profiles | Actual demographics and psychological scores | Life satisfaction at both assessments only |
-| M8 Demographic only profiles | Actual demographics | Psychological scores and both outcomes |
+| SPA1 Persona prompted | Study definitions | All values, using imagined personas |
+| SPA2 Direct generation | Study definitions | All values directly |
+| SPA3 Population guided | Definitions and a population description | All values |
+| SPA4 Quota matched | Demographic proportions | Psychological responses and outcomes; constructed demographics fixed |
+| SPA5 Pilot calibrated | 50 pilot records and toolkit-computed summaries | New complete records |
+| SPA6 Pilot analysis guided | 50 pilot records; model instructed to analyze them | New complete records |
+| SPA7 Demographic-only profiles | Observed demographics | Psychological responses and outcomes |
+| SPA8 Demographic and psychological profiles | Observed demographics and predictors | Outcomes only |
 
-Choose according to your available information and intended purpose. Results from the original study guide interpretation; they do not guarantee accuracy for your own runs. M5 may suit illustrative score distributions, M6 exploratory pilot-informed simulations, and M7 hypothetical follow-up outcomes for existing profiles. All require validation before substantive inference or individual prediction.
+SPA7 is original analysis M8 and SPA8 is original M7. Historical source files keep their original IDs; public downloads use SPA labels.
 
-## Prepare inputs
+## Research purpose
 
-The study variables are already defined: 38 psychological predictors, age, sex, education, marital status, racial origin, religious preference, and life satisfaction at MIDUS 2 and MIDUS 3. The AI prompts refer to these assessments as Wave 1 and Wave 2. Use the variable guide for exact CSV names, ranges and category codes. Blank predictors mean missing values.
+For score distributions with pilot data, SPA5 is the suggested starting point and SPA6 is an alternative. For relationships with pilot data, SPA6 had smaller errors than SPA5, but both substantially overstated strengths. With observed psychological profiles, SPA8 simulates hypothetical outcomes. Without participant information, SPA2 is the simplest starting point. Demographic profiles can be preserved without establishing accurate psychological responses.
 
-M1–M3 require no participant CSV. M3 needs a population description consistent with the study population. M4 needs a proportion table for all six demographics, each summing to 1. The tool matches these separate proportions; it does not reconstruct an observed joint demographic distribution.
+These uses inform preliminary exploration and human study planning. Synthetic results cannot establish a human hypothesis, a causal mechanism, measurement validity, individual prediction or a valid missing-value imputation. Do not use their correlations as empirical inputs to power calculations.
 
-M5/M6 need at least 50 pilot records, including both outcomes. Each method and repetition draws 50 separately, without replacement within a draw. M5 also receives precomputed statistics; M6 receives no such statistics. M7/M8 need at least as many profiles as requested output participants. An exact-size profile file is kept in order; larger pools are sampled. Draws across methods or repetitions can overlap, and exact-size pools recur. An input sampling seed controls these draws, not the AI's randomness.
+## Prepare and generate
 
-Filled fictional examples are available for every upload type. They demonstrate the format, not actual human distributions. Use the free demonstration to practise without charges. It uses one repetition and invented numerical rules. Use AI generation to simulate using actual instructions and your selected inputs.
+Choose the MIDUS demonstration or define a custom study. Filled fictional examples illustrate the exact CSV structure. Custom inputs must match your declared codes; arbitrary uploaded column names are not automatically inferred or mapped. Rename your columns using the guide before upload.
 
-## Generate and download
+Pilot approaches draw 50 separately for each method and repetition. Profile approaches require at least the requested number of people. Exact-size files retain their order; larger pools are sampled without replacement. Input pools can overlap, and exact-size pools recur. The seed controls input draws, not deterministic AI output.
 
-No account or sign-in is needed. Select 100–1,000 participants and, if needed, up to five repetitions per approach. Check the total record count, preview the first batch's prompt and consent to sending inputs to OpenAI. All AI calls use the owner's key, GPT-5.6 Luna and medium reasoning.
+The free demonstration uses fictional numerical rules and makes no AI requests. For a custom free demonstration, load the filled fictional study first. To use your own measures and participant inputs, select AI generation and supply the matching CSVs. Preview instructions and confirm permission to send the inputs to OpenAI. Each simulation is restricted to one approach and one dataset of 100 participants to conserve the research team’s API budget. Larger samples and repetitions are unavailable. Visitors using their own API keys is planned for a future update.
 
-Keep the progress page open. Each request generates 100 participants and saves a validated batch. If a progress check fails, keep this tab open and choose Check progress again. It retrieves the same temporary provider response. The application does not save the results. Refreshing or closing this tab loses them. Download all wanted datasets before leaving. All batches in a dataset use the same pilot/profile draw. Later batches do not receive generated records from earlier batches.
+## Results and comparison
 
-Download one CSV per complete dataset or the ZIP. `participant_id` links each generated outcome to its fixed inputs within that dataset. Original input row numbers are in the metadata, so you can join your source IDs privately. The download contains no API key. CSVs retain original variable codes and numeric category codes.
+Allow approximately 5–20 minutes per AI simulation as a provisional planning estimate. Runtime varies with the questionnaire and provider demand. Budget or service limits can interrupt the simulation; contact the research team using the instructions displayed before generation. Keep the tab open, inspect quality flags and download results. Duplicates are retained. Fixed supplied values retain their precision and missingness; generated values have at most four decimals. The recommended ZIP download includes the dataset, `codebook.csv` and metadata. The codebook has one row per exported column, including demographic category labels, psychological definitions, scoring and whether values were generated or retained. Metadata contains the study setup, input provenance and method mapping, without API credentials or temporary access handles.
 
-Duplicates and pilot matches are preserved and flagged in the metadata. Fixed input values stay exact, including nulls and their original precision. New values have at most four decimal places. Incorrect record counts, IDs, structure or ranges require review. Provider errors do not trigger automatic paid retries. If a large dataset is interrupted, received valid batches can be downloaded as a clearly marked partial CSV. OpenAI temporarily retains background responses and its separate retention policies still apply.
+Optional comparison uses all supplied human records; demographic columns are unnecessary. It does not match generated people to real people. Custom references can supply computed construct scores or the raw items needed to derive them. MIDUS references use its predefined scores. Missing and constant values can leave statistics undefined; they are not replaced by zero.
 
-## Optional comparison
+The current single-run trial cannot estimate a confidence interval across user runs. The original study charts retain their 1,000-repetition intervals. Intervals describe the precision of mean performance against the fixed supplied reference. Custom pattern r is suppressed when fewer than three predictor coefficients are available, because two coefficients give a mechanically perfect positive or negative pattern correlation.
 
-Supply a human reference CSV using the same psychological variables and outcomes. All eligible supplied records are used, with available observations for each correlation. No one-to-one pairing is assumed. The file is not sent to OpenAI or saved by the application. The original study findings are a separate screen and do not change with your inputs.
+An independent human reference provides a stronger assessment of generalization than reusing generation inputs. The original reported MIDUS analyses used the full eligible reference, including participants who could supply generation inputs.
 
-Distribution metrics assess mean differences, variability and full score distributions across 38 predictors. Relationship metrics compare 37 psychological–life-satisfaction correlations at each assessment, excluding anxiety. Lower errors and higher agreement indicate closer reproduction. High Pearson pattern correlation can coexist with large errors in relationship strengths. The screen explains each measure and its calculation.
-
-Each dataset is scored separately. Confidence intervals describe the precision of average performance across scorable repetitions and are conditional on the fixed human reference. One repetition cannot produce a confidence interval. Welch comparisons use Bonferroni adjustment for the number of selected method pairs within each statistic/outcome. This is 28 pairs when all eight approaches are compared. Small numbers of repetitions provide limited precision. Missing or undefined statistics remain blank.
-
-## Visual study findings
-
-The Study findings page uses the original verified aggregates, not the datasets in your browser session. Summary cards identify M5’s closest generated psychological-score distributions, M6’s closest relationships among approaches generating psychological scores, and M7’s closest relationships overall. M7 retains actual psychological predictors, so its low distribution error is explicitly separated from generated-score fidelity.
-
-Use the assessment selector to switch relationship results between MIDUS 2 and MIDUS 3. The distribution selector changes between full score distributions (Wasserstein distance), standardized mean error and variability error. Dot-and-interval charts display means with 95% confidence intervals and numerical bounds. Hover or focus points for full method labels and scored-run counts. A common-scale chart contrasts Pearson pattern correlation with ICC(A,1) and Lin’s CCC.
-
-The final scatterplot lets you inspect all 37 primary psychological correlations for one method and assessment. Points near the diagonal have closer human and average simulated correlations. Each variable uses its own available runs; counts need not match the complete-statistic counts in the method-level charts. Original detailed tables and adjusted pairwise comparisons remain below the charts. On narrow screens, charts can be scrolled horizontally. No new simulations or API charges are involved in viewing this page.
+The **Study findings** page reports the original study, not your generated datasets. Its recommendations for other research settings are potential applications requiring separate validation.
