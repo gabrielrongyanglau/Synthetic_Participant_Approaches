@@ -149,9 +149,9 @@ def content(req):
             if re.search(rx,low):blocked.setdefault(topic,where)
         for topic,rx in SENSITIVE.items():
             if re.search(rx,low):found.setdefault(topic,where)
-    if blocked:raise AppError('prohibited_content',topics=' and '.join(blocked),where='; '.join(sorted(set(blocked.values()))))
+    if blocked:raise AppError('prohibited_content',topics=' and '.join(blocked),where=', '.join(sorted(set(blocked.values()))))
     if found and not getattr(req,'sensitive_ack',False):
-        raise AppError('sensitive_content',topics=' and '.join(found),where='; '.join(sorted(set(found.values()))))
+        raise AppError('sensitive_content',topics=' and '.join(found),where=', '.join(sorted(set(found.values()))))
     return sorted(found)
 
 ROWS={'sample_SPA4':('exact',50),'pilot_SPA5':('exact',50),'pilot_SPA6':('exact',50),'profiles_SPA7':('min',100),'profiles_SPA8':('min',100)}

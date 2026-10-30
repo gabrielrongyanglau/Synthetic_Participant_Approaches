@@ -68,7 +68,7 @@ def test_pilot_and_samples_are_exactly_fifty_and_profiles_fixed(study,reference)
 def test_purpose_is_not_a_ranking():
     assert 'hypothetical' not in purpose_guidance('workflow',[1]).lower()
     assert 'overstated' in purpose_guidance('relationships',[5,6])
-    assert 'individual' in purpose_guidance('outcomes',[8])
+    assert 'Individual-level' in purpose_guidance('outcomes',[8])
 
 def test_optional_validation_uses_only_required_scores(study,reference):
     from spa.workflow import evaluation_reference

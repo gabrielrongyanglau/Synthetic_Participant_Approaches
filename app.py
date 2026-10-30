@@ -52,7 +52,7 @@ async def guard(request,call_next):
     except Exception:
         # Do not expose the API key or provider error bodies.
         return JSONResponse(dict(detail='The toolkit hit an unexpected problem while handling this request.',code='server_error',title='Something went wrong on the server',
-          advice='Your inputs and any datasets are still in this tab. Try again in a moment; if it happens again, download completed datasets and contact the research team with the time of the error.',auto='none'),status_code=503)
+          advice='Your inputs and any datasets are still in this tab. Try again in a moment. If it happens again, download completed datasets and contact the research team with the time of the error.',auto='none'),status_code=503)
     if request.url.path.startswith('/api/') and not custom_request(request):response=await publicise(response)
     response.headers['X-Content-Type-Options']='nosniff'
     response.headers['Referrer-Policy']='same-origin'
@@ -107,7 +107,7 @@ def assets(req,collect=None):
         text=v if req.study else names.inbound_csv(v)
         warn,text=checks.check_upload(k,text,custom);warnings+=warn
         try:out[k]=read_csv(text.lstrip('\ufeff').encode('utf-8'))
-        except (ValueError,TypeError,StopIteration,UnicodeError):raise AppError('not_csv',label=checks.LABELS.get(k,'The file'),kind='a file that cannot be read as CSV') from None
+        except (ValueError,TypeError,StopIteration,UnicodeError):raise AppError('not_csv',label=checks.LABELS.get(k,'The file'),kind='an unreadable file') from None
     if collect is not None:collect.extend(warnings)
     return out
 
@@ -311,7 +311,7 @@ def compare_custom(data):
         for key in ('method','first','second'):
             if key in frame:frame[key]=frame[key].map(public_label)
     return dict(summary=json_records(summary),comparisons=json_records(pairs),variables=json_records(variables),
-      metadata=dict(datasets=len(datasets),human_n=len(human),note='Custom-study extension. Scores use the declared rules; no anxiety exclusion. Pattern r requires at least three varying paired coefficients. Undefined statistics remain blank. Intervals describe mean performance across available runs against the fixed supplied reference.'),
+      metadata=dict(datasets=len(datasets),human_n=len(human),note='Custom-study extension. Scores use the declared rules and include every defined predictor. Pattern r requires at least three varying paired coefficients. Undefined statistics remain blank. Intervals describe mean performance across available runs against the fixed supplied reference.'),
       csv_exports={k:f.to_csv(index=False) for k,f in [('summary',summary),('comparisons',pairs),('variables',variables)]})
 
 class Paper(BaseModel):
@@ -337,15 +337,15 @@ def check_inputs(req:Run):
     return dict(api_calls=0,approach=public_label(run_spa(run)),participants=req.n,
       input_source='Supplied fictional examples' if req.examples else 'Your supplied study information',
       mode=ctx['provenance']['prompt_mode'],supporting_sources=len(ctx.get('supporting',{}).get('sources',[])),
-      prompt_policy='Fixed research-team method template; server-controlled study/evidence layer; no visitor prompt editing.',
+      prompt_policy='Fixed research-team method template with a server-controlled study and evidence layer.',
       generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,
-      note='Structural checks passed. This does not verify source quality or scientific validity. Review the read-only instructions if needed.',
+      note='Structural checks passed. Source quality and scientific validity need your own review. Review the read-only instructions if needed.',
       warnings=warnings,sensitive_topics=topics)
 
 @app.get('/api/template/{method}')
 def blank_template(method:int):
     from spa.study import predictors
-    if method not in (4,5,6,7,8):raise ValueError('This approach does not need a participant-data upload.')
+    if method not in (4,5,6,7,8):raise ValueError('This approach uses the study definitions only.')
     s=load_study()
     # One row per participant, one column per variable.
     frame=pd.DataFrame(columns=selected_fields(s) if method in (5,6) else predictors(s) if method==8 else s['demographic_covariates'])

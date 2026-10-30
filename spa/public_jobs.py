@@ -43,7 +43,7 @@ def verify(token,kind):
         claims=json.loads(unb64(payload))
         if claims['kind']!=kind or type(claims['expires']) is not int or claims['expires']<time.time():raise ValueError()
         return claims
-    except (ValueError,TypeError,KeyError,UnicodeError):raise ValueError('This temporary request handle is invalid or expired. It cannot be used to access a response.') from None
+    except (ValueError,TypeError,KeyError,UnicodeError):raise ValueError('This temporary request handle is invalid or expired.') from None
 
 def settings(req):return dict(methods=req.methods,n=req.n,repetitions=req.repetitions,seed=req.seed,
     population=req.population,model=MODEL,reasoning_effort='medium',max_output_tokens=128000,batch_size=batch_size())

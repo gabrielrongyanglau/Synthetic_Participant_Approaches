@@ -103,7 +103,7 @@ def test_failed_submit_never_retries(client,monkeypatch):
     plan=client.post('/api/prepare',json={'methods':[1],'consent':True},headers=H).json()
     r=client.post('/api/submit',json=dict(ticket=plan['ticket'],run='SPA1_R0001',offset=0,context=plan['contexts']['SPA1_R0001']),headers=H)
     assert r.status_code==503;assert len(f.created)==1
-    assert 'may or may not have been accepted' in r.text and r.json()['code']=='submission_uncertain';assert 'private provider message' not in r.text
+    assert 'may have accepted and charged' in r.text and r.json()['code']=='submission_uncertain';assert 'private provider message' not in r.text
 
 def test_read_failure_retains_handle_without_resubmission(client,monkeypatch):
     class FailReadOnce(FakeProvider):

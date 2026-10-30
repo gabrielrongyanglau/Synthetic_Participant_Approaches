@@ -18,9 +18,9 @@ def estimate():
 
 def service_info():
     return dict(max_participants=MAX_PARTICIPANTS,max_repetitions=MAX_REPETITIONS,max_methods=MAX_METHODS,
-      estimated_minutes=estimate(),estimate_note='Generation time varies. It may take a few minutes, or up to an hour when the data to be generated are more complex, for example with many variables or large pilot inputs. Service availability also affects timing. This is a planning estimate, not a guarantee.',
+      estimated_minutes=estimate(),estimate_note='Generation time varies. It may take a few minutes, or up to an hour when the data to be generated are more complex, for example with many variables or large pilot inputs. Service availability also affects timing. This is a planning estimate.',
       funding='AI simulations currently use the research team’s API budget. If funds or service limits are reached, generation may be interrupted or temporarily unavailable.',
-      future='Using your own API key and paying for your simulations is planned for a future update; it is not available yet.',contact=contact())
+      future='Using your own API key and paying for your simulations is planned for a future update.',contact=contact())
 
 def check_run(req):
     if req.n!=100 or req.repetitions!=1 or len(req.methods)!=1:

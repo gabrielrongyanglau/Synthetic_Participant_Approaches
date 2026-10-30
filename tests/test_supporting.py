@@ -71,7 +71,7 @@ def test_evidence_is_quoted_data_and_frozen_in_signed_plan(study,monkeypatch):
     payload=body['instructions'].split('Reference data JSON follows, through the end of these instructions:\n')[1]
     assert json.loads(payload)['sources'][0]['text']==e['sources'][0]['text']
     tampered=copy.deepcopy(ctx);tampered['supporting']['sources'][0]['text']='Changed'
-    with pytest.raises(ValueError,match='no longer match'):public_jobs.submit(plan['ticket'],'SPA2_R0001',0,tampered)
+    with pytest.raises(ValueError,match='differ from the prepared'):public_jobs.submit(plan['ticket'],'SPA2_R0001',0,tampered)
 
 
 def test_preflight_templates_and_pdf_routes_make_zero_provider_calls(study,monkeypatch):
@@ -115,4 +115,4 @@ def test_unreadable_pdfs_have_actionable_errors(data):
 def test_size_and_page_bounds():
     with pytest.raises(ValueError):evidence.extract_pdf('a'*2000005,'test.pdf')
     w=PdfWriter();[w.add_blank_page(200,200) for _ in range(41)];b=io.BytesIO();w.write(b)
-    with pytest.raises(ValueError,match='the limit is 40'):evidence.extract_pdf(base64.b64encode(b.getvalue()).decode(),'test.pdf')
+    with pytest.raises(ValueError,match='The limit is 40'):evidence.extract_pdf(base64.b64encode(b.getvalue()).decode(),'test.pdf')

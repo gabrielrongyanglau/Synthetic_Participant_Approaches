@@ -1,5 +1,5 @@
 {
-  "app_version": "4.6.0",
+  "app_version": "4.6.1",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",
@@ -22,9 +22,9 @@
   "preserved_core": {
     "spa/metrics.py": "32a0092aec84f549116f5fb04ec037d8abac532b60ed7ec9370d9458af33347d",
     "spa/analysis.py": "40cdb0b0224086aa3663248f63bd77e032f9c85e1e98de557b2c3081fc69c139",
-    "spa/study.py": "fd2c59481469a55600e7444b1e0e8097b3792d2a3e6427f398568eaa22009381",
+    "spa/study.py": "18f82402daa457d37646939ca0be857d44703e08746447bc47259725b667bc52",
     "spa/verify.py": "63da4c8d935118cd1e28bb8f6425c1392588466d1739187a1afa9ad8a1d53ca7",
-    "spa/workflow.py": "06ada18cd2dea4d834febc11799bff8ab2b1a022a94dece978bb8f616acad95d",
+    "spa/workflow.py": "23387284a32f0615964783c44103345ca0524494b2755c1abc75d770663133a9",
     "spa/prompts.py": "365d05448c1c460e56ba86860b9c5c5122b06bc42401e0177b1918259885d597",
     "prompts/methods.json": "91658c4ed155debf852f86ef016183859688c35104cec1c82d2e97471fbe4d51",
     "config/study.yaml": "d71ef14885c33c091717a0cd943c95700bf73d83e366b8827f9bdedbc9876c9a"
@@ -72,5 +72,6 @@
   "approach_numbering": "SPA1-SPA8 as in the revised proposal throughout code, run names, uploads and outputs: SPA7 demographic-only profiles; SPA8 demographic and psychological profiles. Prompt bank, study configuration and verified original-study files are byte-identical to the original; spa/numbering.py relabels them on load. Changed core files (spa/analysis.py, spa/study.py, spa/workflow.py, spa/prompts.py) contain numbering and label changes only; statistical code (metrics.py) is unchanged.",
   "upload_templates": "One row per participant, one column per variable. SPA4 demographic sample and SPA5/SPA6 pilot sample fixed at exactly 50 participants (all used); SPA7/SPA8 profiles 100 rows. Custom constructs may be supplied as item columns or construct scores.",
   "signature_fix": "4.5.0: signed input fingerprints normalise whole-number decimals so uploads survive browser JSON serialisation (previously a 3.0 sent back as 3 caused submission to be rejected).",
-  "error_catalogue": "spa/errors.py; documented in docs/ERRORS.md"
+  "error_catalogue": "spa/errors.py; documented in docs/ERRORS.md",
+  "wording_revision_4_6_1": "User-facing text in spa/study.py and spa/workflow.py was reworded (message strings only, no logic changes); their hashes above are updated. Study configuration, prompt bank and model-facing prompt text are unchanged."
 }

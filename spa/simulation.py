@@ -37,7 +37,7 @@ def prepare_inputs(reference,study,method,n,seed=1,replication=1,pilot_override=
             chosen=clean_frame(pilot_override,study)
             if len(chosen)!=50:raise ValueError('Pilot must have exactly 50 rows.')
         else:
-            if len(pool)<50:raise ValueError('The 20% pilot pool needs at least 50 participants; upload a 50-record pilot or use ≥250 reference rows.')
+            if len(pool)<50:raise ValueError('The 20% pilot pool needs at least 50 participants. Upload a 50-record pilot or use ≥250 reference rows.')
             chosen=pool.iloc[rng.choice(len(pool),50,replace=False)]
         context['pilot']=json_records(chosen[selected_fields(study)])
         if method==5:context['summary']=summarise_pilot(chosen,study)
@@ -52,7 +52,7 @@ def prepare_inputs(reference,study,method,n,seed=1,replication=1,pilot_override=
             chosen=clean_frame(dummy,study)
         else:
             pool=reference.iloc[order[cut:]]
-            if n>len(pool):raise ValueError('Profile sample exceeds the 80% profile pool; upload profiles or a larger reference.')
+            if n>len(pool):raise ValueError('Profile sample exceeds the 80% profile pool. Upload profiles or a larger reference.')
             chosen=pool.iloc[rng.choice(len(pool),n,replace=False)]
         context['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(chosen[fields]))]
     return context

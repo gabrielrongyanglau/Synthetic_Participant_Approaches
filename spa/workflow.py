@@ -15,7 +15,7 @@ PURPOSES={
  'relationships':'Explore how psychological scores relate to life satisfaction',
  'outcomes':'Generate life-satisfaction scores for people whose profiles I already have'}
 INFORMATION={
- 'definitions':'Only the study definitions; no participant data',
+ 'definitions':'Study definitions only',
  'population':'A written description of the people I want to simulate',
  'proportions':'Population percentages for demographics, such as age or sex',
  'pilot':'A small existing participant dataset with at least 50 people',
@@ -39,12 +39,12 @@ def compatible_methods(information):
 def purpose_guidance(purpose,methods):
     if purpose=='workflow':return 'Use this option to inspect the instructions sent to the AI and practise creating and downloading datasets. To assess whether generated values resemble human responses, you would need to compare them with observed human data.'
     if purpose=='distributions':
-        if set(methods)&{5,6}:return 'In our MIDUS study, SPA5 and SPA6 reproduced average scores, variation and score distributions more closely than approaches without pilot records. SPA5 was closest among the methods that generated psychological scores. These findings do not guarantee the same accuracy for your data.'
-        if 8 in methods:return 'SPA8 keeps the psychological scores you supply. Its score distributions describe those input scores, rather than the accuracy of newly generated psychological measurements.'
-        return 'In our MIDUS study, these methods had substantial errors in the averages, variation or distributions of generated scores. They can help you practise the workflow; realistic-looking output still needs comparison with human data.'
+        if set(methods)&{5,6}:return 'In our MIDUS study, SPA5 and SPA6 reproduced average scores, variation and score distributions more closely than approaches without pilot records. SPA5 was closest among the methods that generated psychological scores. Accuracy for your data needs its own check against human data.'
+        if 8 in methods:return 'SPA8 keeps the psychological scores you supply. Its score distributions describe those input scores.'
+        return 'In our MIDUS study, these methods had substantial errors in the averages, variation or distributions of generated scores. They can help you practise the workflow. Realistic-looking output still needs comparison with human data.'
     if purpose=='relationships':return 'Treat generated relationships as exploratory. In our MIDUS study, methods that generated psychological scores substantially overstated relationship strengths. SPA8 also retained errors. Use observed human evidence to test substantive research claims.'
     if purpose=='outcomes':
-        if 8 in methods:return 'SPA8 uses each person’s observed demographics and psychological scores to generate life satisfaction at two assessments. Our study does not establish accurate individual predictions or show that generated scores can validly replace missing human responses.'
+        if 8 in methods:return 'SPA8 uses each person’s observed demographics and psychological scores to generate life satisfaction at two assessments. Individual-level accuracy and the replacement of missing human responses need separate evidence.'
         return 'SPA8 is the approach for generating only life satisfaction from existing psychological and demographic values. It needs both types of information. The approaches shown here generate additional values as well.'
     raise ValueError('Unknown purpose.')
 
@@ -53,7 +53,7 @@ def _clean_fields(frame,study,fields):
     if frame.columns.duplicated().any() or not set(fields)<=set(frame):raise ValueError('Missing or repeated input columns. Use the supplied template.')
     out=frame[fields].copy()
     for f in fields:
-        if out[f].map(lambda v:isinstance(v,(bool,np.bool_))).any():raise ValueError('Boolean values are not valid scores in '+f)
+        if out[f].map(lambda v:isinstance(v,(bool,np.bool_))).any():raise ValueError('Scores must be numbers in '+f)
         spec=study['variables'][study['outcomes'].get(f,f)];x=pd.to_numeric(out[f],errors='raise')
         x=x.mask(x.isin(spec['missing_codes']))
         valid=x.isin(list(spec['categories'])) if spec['kind']=='category' else x.between(spec['minimum'],spec['maximum'])
@@ -127,7 +127,7 @@ def prepare_context(study,method,n,seed=1,replication=1,assets=None,examples=Fal
     if method==4:
         sample=assets.get('sample_SPA4')
         if sample is None:raise ValueError('SPA4 needs a demographic sample: one row per participant, one column per demographic.')
-        if len(sample)!=PILOT_N:raise ValueError(f'SPA4 needs a demographic sample of exactly {PILOT_N} participants (one row each); this file has {len(sample)} rows.')
+        if len(sample)!=PILOT_N:raise ValueError(f'SPA4 needs a demographic sample of exactly {PILOT_N} participants, one row each. This file has {len(sample)} rows.')
         sample=_clean_fields(sample,study,study['demographic_covariates'])
         profiles,audit=profiles_from_proportions(quota_template(sample,study),study,n,rng)
         ctx.update(fixed=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(profiles))],quota_audit=audit)
@@ -135,7 +135,7 @@ def prepare_context(study,method,n,seed=1,replication=1,assets=None,examples=Fal
     elif method in (5,6):
         pilot=assets.get(f'pilot_SPA{method}')
         if pilot is None:raise ValueError(f'SPA{method} needs a pilot sample: one row per participant, one column per variable.')
-        if len(pilot)!=PILOT_N:raise ValueError(f'SPA{method} needs a pilot sample of exactly {PILOT_N} participants (one row each); this file has {len(pilot)} rows.')
+        if len(pilot)!=PILOT_N:raise ValueError(f'SPA{method} needs a pilot sample of exactly {PILOT_N} participants, one row each. This file has {len(pilot)} rows.')
         chosen=clean_frame(_clean_fields(pilot,study,selected_fields(study)),study)
         ctx['pilot']=json_records(chosen[selected_fields(study)])
         if method==5:ctx['summary']=summarise_pilot(chosen,study)
@@ -162,7 +162,7 @@ def input_digest(bank):
     return hashlib.sha256(json.dumps(bank,sort_keys=True,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 
 def evaluation_reference(frame,study):
-    """Only scores and outcomes are used by fidelity metrics; demographics are optional."""
+    """Only scores and outcomes are used by fidelity metrics. Demographics are optional."""
     frame=frame.copy()
     for field in study['demographic_covariates']:
         if field not in frame:frame[field]=np.nan
@@ -196,4 +196,4 @@ def generated_metadata(frames,contexts,study,settings,source,purpose):
       'methods':sorted({m for m,r in frames}),'datasets':len(frames),'records':sum(len(f) for f in frames.values()),
       'input_provenance':{name:ctx['provenance'] for name,ctx in contexts.items()},
       'quality_flags':{run_name(m,r):quality_flags(f,study,contexts[run_name(m,r)].get('pilot')) for (m,r),f in frames.items()},
-      'sampling_note':'Draws use separate method/run random streams. A supplied pool of exactly 50 pilot rows reuses those people across runs. A supplied profile file with exactly n rows retains those same profiles. Shared supplied pools can overlap; these are new user runs, not the independent-input MIDUS benchmark.'}
+      'sampling_note':'Draws use separate method/run random streams. A supplied pool of exactly 50 pilot rows reuses those people across runs. A supplied profile file with exactly n rows retains those same profiles. Shared supplied pools can overlap. These are new user runs, separate from the independent-input MIDUS benchmark.'}

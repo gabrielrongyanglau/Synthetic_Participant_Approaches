@@ -136,7 +136,7 @@ def test_custom_codebook_tracks_items_scores_and_fixed_demographics(study):
     assert lookup['a']['provenance']=='Retained from supplied profiles'
     assert lookup['outcome__i1']['name']=='outcome item 1'
     assert lookup['outcome']['provenance']=='Calculated locally from generated items'
-    assert 'reverse-coded item positions: [2]' in lookup['outcome']['scoring']
+    assert 'Reverse-coded item positions: [2]' in lookup['outcome']['scoring']
     assert pd.read_csv(__import__('io').StringIO(csv(book))).column.tolist()==list(f)
 
 

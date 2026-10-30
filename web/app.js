@@ -8,18 +8,18 @@ function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefine
 class AppError extends Error{constructor(info){super(info.detail||info.message||'Something went wrong.');Object.assign(this,{code:info.code||'error',title:info.title||'Something went wrong',advice:info.advice||'',auto:info.auto||'none'})}}
 const CLIENT_ERRORS={
   offline:{title:'You are offline',detail:'This device has lost its internet connection.',advice:'Reconnect to the internet. Running batches continue at OpenAI, and the toolkit resumes checking automatically when you are back online.'},
-  network_error:{title:'The connection was interrupted',detail:'The toolkit could not reach its server.',advice:'Check your connection and try again. If generation has started, keep this tab open; progress checks resume automatically and never start a new paid request.'},
-  server_timeout:{title:'The server took too long to respond',detail:'The hosting service stopped waiting for a reply ({status}).',advice:'Try again in a moment. Running batches are not affected; the toolkit keeps checking them.'},
+  network_error:{title:'The connection was interrupted',detail:'The toolkit could not reach its server.',advice:'Check your connection and try again. If generation has started, keep this tab open. Progress checks resume automatically and only read existing requests.'},
+  server_timeout:{title:'The server took too long to respond',detail:'The hosting service stopped waiting for a reply ({status}).',advice:'Try again in a moment. Running batches continue, and the toolkit keeps checking them.'},
   unreadable_response:{title:'The server sent an unexpected reply',detail:'The reply could not be read ({status}).',advice:'Try again. If it continues, download any completed datasets and contact the research team.'},
   request_too_large:{title:'The inputs are too large to send',detail:'The uploaded data and supporting text exceed the 3 MB request limit.',advice:'Use a smaller profile file (100 rows is enough), remove unused columns, or include fewer supporting excerpts.'},
-  wrong_file_type:{title:'Upload a CSV file',detail:'{name} is not a .csv file.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
-  file_too_large:{title:'The file is too large',detail:'{name} is {size}; the limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
+  wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
+  file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the template, fill it with your data and choose it here, or switch to the supplied fictional examples.'},
   review_needed:{title:'Check your inputs first',detail:'The inputs have not been checked, or they changed after the check.',advice:'Choose Check inputs, review the summary, tick the confirmation, then generate.'},
   session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session on Your datasets before starting another run.'},
   no_dataset:{title:'No dataset to compare yet',detail:'There is no completed dataset in this tab.',advice:'Generate a dataset first, then return to Compare with human data.'},
   reference_missing:{title:'Choose a human reference file',detail:'No human reference CSV has been selected.',advice:'Choose a CSV of observed human data with the same variables as the generated dataset (see the variable guide).'},
-  not_configured:{title:'AI generation is not connected',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs and preview the instructions. Contact the research team to ask when generation will be available.'}
+  not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs and preview the instructions. Contact the research team to ask when generation will be available.'}
 };
 function clientError(code,params={}){const t=CLIENT_ERRORS[code],fill=s=>String(s).replace(/\{(\w+)\}/g,(_,k)=>params[k]??'');return new AppError({code,title:t.title,detail:fill(t.detail),advice:fill(t.advice)})}
 function errorCard(err,cls='notice error'){
@@ -73,12 +73,12 @@ function csvText(rows){if(!rows.length)return '';const keys=Object.keys(rows[0])
 function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=el('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 
 const ROWS={4:50,5:50,6:50,7:100,8:100};
-function inputRule(m){return m===4?'Demographic sample: exactly 50 participants, one row each, one column per demographic. The toolkit uses the proportions in this sample to build 100 demographic profiles; it does not copy these people.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including both outcomes. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant; only outcomes are generated.'}
+function inputRule(m){return m===4?'Demographic sample: exactly 50 participants, one row each, one column per demographic. The toolkit uses the proportions in this sample to build 100 new demographic profiles.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including both outcomes. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
 function inputInstructions(m,custom){return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
 
 ${inputRule(m)}
 
-1. Open template.csv (or the filled example). Each row is one participant; each column is one variable.
+1. Open template.csv (or the filled example). Each row is one participant, and each column is one variable.
 2. Keep the header row exactly as it is. Replace the example values with your own data, keeping exactly ${ROWS[m]} rows.
 3. ${custom?'For each psychological construct, fill either all of its item columns or a single column with its construct score (named with the construct code shown in the variable guide). Composite scores are calculated by the toolkit when items are supplied.':'Each psychological column is a construct score as defined in input_variable_guide.csv.'}
 4. Use numeric values and the category codes and ranges in input_variable_guide.csv. ${m<7&&m!==4?'Every cell needs a value except missing psychological predictors in the MIDUS study. Outcomes must be observed.':'Leave a cell blank only where a value is genuinely missing.'}
@@ -167,13 +167,13 @@ async function request(){
 
 function metadata(){
   const size=session.settings.batch_size;
-  return {schema_version:'4.5',study_brief:session.brief,approach_numbering:'SPA1–SPA8 as in the revised proposal: SPA7 demographic-only profiles; SPA8 demographic and psychological profiles.',source:session.source,settings:session.settings,model:cfg.model,reasoning_effort:cfg.reasoning,
+  return {schema_version:'4.5',study_brief:session.brief,approach_numbering:'SPA1–SPA8 as in the revised proposal: SPA7 uses demographic-only profiles, and SPA8 uses demographic and psychological profiles.',source:session.source,settings:session.settings,model:cfg.model,reasoning_effort:cfg.reasoning,
     validation_status:'Not evaluated against a human reference',datasets:Object.keys(session.details).length,records:Object.values(session.details).reduce((n,d)=>n+d.count,0),
     input_provenance:Object.fromEntries(Object.entries(session.contexts).map(([run,ctx])=>[run,ctx.provenance])),
     quality_flags:Object.fromEntries(Object.entries(session.details).map(([run,d])=>[run,d.quality])),
-    batching:`${size} participants per AI request; ${Math.ceil(session.settings.n/size)} requests per dataset ran in parallel. Requests do not see each other's participants.${size<100?' The original MIDUS evaluation generated 100 participants per request.':''}`,
+    batching:`${size} participants per AI request, ${Math.ceil(session.settings.n/size)} requests per dataset ran in parallel. Each request sees only its own participants.${size<100?' The original MIDUS evaluation generated 100 participants per request.':''}`,
     storage:'Held in browser memory for download. No accounts, database or application-saved run history. OpenAI processing/retention policies still apply.',
-    sampling_note:'Separate method/repetition random streams are used for input draws. Exact-size pools recur across repetitions, and supplied pools may overlap. The seed does not make AI responses deterministic.'};
+    sampling_note:'Separate method/repetition random streams are used for input draws. Exact-size pools recur across repetitions, and supplied pools may overlap. AI responses vary between runs with the same seed.'};
 }
 function downloadAll(){
   const files={};
@@ -245,13 +245,13 @@ async function drive(){
         if(s.halt){for(const c of chunks)if(c.status==='new'||c.status==='waiting')fail(c,{...s.halt,message:'Not submitted: '+s.halt.message});break}
         const due=chunks.filter(c=>c.status==='new'||(c.status==='waiting'&&Date.now()>=c.retryAt));
         if(due.length){s.message=`Submitting ${due.length} request${due.length>1?'s':''}…`;render();await Promise.all(due.map(c=>submitChunk(s,run,c)));render();continue}
-        if(!navigator.onLine){s.message='You are offline. Checking resumes automatically when the connection returns; running batches continue at OpenAI.';render();await sleep(3000);continue}
+        if(!navigator.onLine){s.message='You are offline. Checking resumes automatically when the connection returns. Running batches continue at OpenAI.';render();await sleep(3000);continue}
         const waiting=chunks.filter(pendingChunk);
         if(!waiting.length&&!chunks.some(c=>c.status==='waiting'))break;
         try{await Promise.all(waiting.map(c=>pollChunk(s,run,c)))}
         catch(e){s.pollError=e;s.message='Progress checks keep failing. Your batches are still running at OpenAI.';notice(e,true);break}
         const done=chunks.filter(c=>c.status==='done').length;
-        s.message=`${done} of ${chunks.length} batches received. Elapsed: ${minutes(s.started)} min. Last checked ${new Date().toLocaleTimeString('en-GB')}. Checking existing requests only; nothing new is charged by checking.`;
+        s.message=`${done} of ${chunks.length} batches received. Elapsed: ${minutes(s.started)} min. Last checked ${new Date().toLocaleTimeString('en-GB')}. Checking reads existing requests and is free.`;
         render();
         if(chunks.some(c=>pendingChunk(c)||c.status==='waiting'))await sleep(5000);
       }
@@ -352,7 +352,7 @@ function render(){
   for(const [run,d] of Object.entries(s.details)){
     const card=el('div',undefined,'job dataset'),top=el('div',undefined,'job-head');
     top.append(el('h2',Research.runLabel(run)),el('span',d.count+' participants','tag'));
-    card.append(top,el('p',run.startsWith('SPA8_')?'Observed demographic and psychological predictors are kept; only outcomes were generated.':'Inspect the generated score distributions and relationships before using this dataset to plan human research.'));
+    card.append(top,el('p',run.startsWith('SPA8_')?'Observed demographic and psychological predictors are kept, and the AI generated the outcomes.':'Inspect the generated score distributions and relationships before using this dataset to plan human research.'));
     const links=el('div',undefined,'link-row'),cb=el('button','Codebook only (CSV)'),dl=el('button','Dataset only (CSV)');
     cb.type=dl.type='button';cb.className=dl.className='link';
     cb.addEventListener('click',()=>saveBlob(new Blob([d.codebook_csv],{type:'text/csv;charset=utf-8'}),'codebook.csv'));
@@ -360,7 +360,7 @@ function render(){
     links.append(dl,cb);card.append(links);
     const q=d.quality,flags=el('dl',undefined,'flags');
     [['Repeated complete profiles',q.repeated_complete_profiles],['Repeated baseline profiles',q.repeated_baseline_profiles],['Pilot-record matches',q.pilot_record_matches]].forEach(([k,v])=>{const w=el('div');w.append(el('dt',k),el('dd',String(v)));flags.append(w)});
-    card.append(flags,el('p','Duplicates are kept and flagged, not removed.','help'));
+    card.append(flags,el('p','Duplicates are kept and flagged.','help'));
     const notes=[...(d.warnings||[]),...s.chunks[run].filter(c=>c.quality).map(c=>c.quality)];
     if(notes.length){const w=el('div',undefined,'dataset-warnings');w.append(el('h3',`Quality notes (${notes.length})`),warningList(notes));card.append(w)}
     const preview=el('details',undefined,'note'),target=el('div');preview.append(el('summary','Preview the first 10 participants'));table(d.preview,target);

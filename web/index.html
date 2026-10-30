@@ -64,13 +64,13 @@
       <label for="studyMode" class="sr-only">Study setup</label>
       <select id="studyMode"></select>
       <div id="midusSetup" class="hint">
-        <p><strong>New here? Keep the MIDUS study.</strong> It comes with fictional example inputs, so you can try every approach without uploading data. MIDUS is the Midlife in the United States study used in the original evaluation.</p>
+        <p><strong>New here? Keep the MIDUS study.</strong> It comes with fictional example inputs, so you can try every approach with ready-made data. MIDUS is the Midlife in the United States study used in the original evaluation.</p>
         <p id="scope"></p>
-        <p>This mode generates existing score variables, not original questionnaire items.</p>
+        <p>This mode generates the study’s existing score variables.</p>
       </div>
 
       <div id="customSetup" hidden>
-        <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges; you verify sources and wording. Up to 30 constructs and 60 item and demographic fields. Custom questionnaires go beyond the evaluated MIDUS setup and have not been validated for your measures.</p>
+        <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 constructs and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
         <div class="two">
           <label>Study title<input id="studyTitle" type="text"></label>
           <label>Target population<textarea id="targetPopulation" rows="2"></textarea></label>
@@ -91,21 +91,21 @@
 
         <div id="supportingSetup" hidden>
           <h3>Research context and supporting papers <span class="tag">Optional</span></h3>
-          <p class="help">A research question, pasted findings or PDF papers can guide a custom simulation. They are reference inputs, not a prompt editor; the method instructions stay fixed. Literature-informed simulations were not part of the MIDUS evaluation.</p>
+          <p class="help">A research question, pasted findings or PDF papers can guide a custom simulation. They are reference inputs, and the method instructions stay fixed. Literature-informed simulation is an extension beyond the MIDUS evaluation.</p>
           <label>Research context or question <span class="label-note">up to 4,000 characters</span><textarea id="researchQuestion" maxlength="4000" rows="3" placeholder="Describe your study setting and the relationships you want to explore."></textarea></label>
-          <p class="help">A research question or hypothesis is never treated as a finding the simulation must reproduce.</p>
+          <p class="help">A research question or hypothesis serves as context only. The simulation can produce results that differ from it.</p>
           <div class="actions">
             <button id="addSupportingText" class="btn-quiet" type="button">Add pasted findings or an excerpt</button>
             <label class="file-button">Upload a PDF<input id="paperUpload" type="file" accept=".pdf,application/pdf"></label>
           </div>
           <details class="note">
             <summary>Limits for supporting sources</summary>
-            <p>Up to three sources and 60,000 characters of text in total. Each PDF must be under 1.5 MB and 40 pages. Text extraction makes no AI calls. Scanned or protected files may need the relevant text pasted instead. A citation or DOI alone does not let the model read a paper.</p>
+            <p>Up to three sources and 60,000 characters of text in total. Each PDF must be under 1.5 MB and 40 pages. Text extraction makes no AI calls. For scanned or protected files, paste the relevant text. The model reads only the text supplied here, so include the findings alongside any citation or DOI.</p>
           </details>
           <div id="sourceEditor"></div>
           <p id="paperStatus" class="status-line" role="status" aria-live="polite"></p>
           <label class="check confirm"><input id="evidenceReviewed" type="checkbox"><span>I have reviewed the research context and the full source text. They are relevant and I may share them with OpenAI.</span></label>
-          <p class="help">Only the reviewed text shown here is sent during AI generation. PDFs themselves are not sent to OpenAI or saved. Extraction does not verify claims, citations or table accuracy.</p>
+          <p class="help">Only the reviewed text shown here is sent during AI generation. The PDF files are read in memory and discarded after extraction. Extraction copies text as written, so check claims, citations and tables yourself.</p>
         </div>
       </div>
     </div>
@@ -114,7 +114,7 @@
       <h2>What information can you provide?</h2>
       <p class="help">Select all that apply, or none if you have no participant information.</p>
       <div id="informationChoices" class="choice-grid"></div>
-      <p id="informationModeHelp" class="help">In the MIDUS study, each input type also has a fictional example you can use instead of your own data.</p>
+      <p id="informationModeHelp" class="help">In the MIDUS study, each input type also has a fictional example for practice.</p>
     </div>
 
     <div class="block">
@@ -143,8 +143,8 @@
     <div><span class="fact-label">Generation time</span><span class="fact-value">A few minutes to an hour</span></div>
     <div><span class="fact-label">Paid by</span><span class="fact-value">Research team’s API budget</span></div>
   </div>
-  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes; runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
-  <div id="notConnected" class="banner warn" hidden><strong>AI generation is not connected yet.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs and preview the AI instructions.</div>
+  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes. Runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
+  <div id="notConnected" class="banner warn" hidden><strong>AI generation is offline.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs and preview the AI instructions.</div>
   <details class="note">
     <summary>About the research-funded trial</summary>
     <p>To conserve a limited API budget, repetitions and larger datasets are unavailable.</p>
@@ -173,14 +173,14 @@
       </details>
       <details class="note">
         <summary>Variable guide</summary>
-        <p>Variables and numeric category codes for uploaded CSV files. Blank cells mean missing predictors. MIDUS pilot files need both life-satisfaction outcomes; custom pilot files need every defined item and demographic.</p>
+        <p>Variables and numeric category codes for uploaded CSV files. Blank cells mean missing predictors. MIDUS pilot files need both life-satisfaction outcomes, and custom pilot files need every defined item and demographic.</p>
         <a id="variableGuideLink" href="/api/guide.csv" download>Download the variable guide (CSV)</a>
         <div id="guideTable"></div>
       </details>
       <details class="note">
         <summary>Sampling seed</summary>
         <label>Input sampling seed<input id="seed" type="number" min="0" max="2147483647" value="1"></label>
-        <p>The seed controls which input records the tool draws. It does not make the AI response deterministic.</p>
+        <p>The seed controls which input records the tool draws. AI responses still vary from run to run.</p>
       </details>
     </div>
 
@@ -188,7 +188,7 @@
       <h2>Check and confirm</h2>
       <div id="paidConsent" class="consent">
         <label class="check confirm"><input id="consent" type="checkbox"><span>These inputs may be sent to OpenAI, and this simulation uses the research team’s limited API budget. If a batch fails or returns unusable data, it is requested once more automatically.</span></label>
-        <p class="help">Uploaded records and generated datasets are not saved to a database or server files; they stay in this browser tab for download. OpenAI temporarily retains background responses for progress checks, and its own retention policies apply. Use fictional data unless you are authorised to share real records.</p>
+        <p class="help">Uploaded records and generated datasets stay in this browser tab for download, with no database or server copy. OpenAI temporarily retains background responses for progress checks, and its own retention policies apply. Use fictional data unless you are authorised to share real records.</p>
       </div>
       <div id="sensitiveBox" class="sensitive" hidden>
         <p id="sensitiveTopics"></p>
@@ -198,7 +198,7 @@
         <button id="reviewInputs" class="primary" type="button">Check inputs</button>
         <button id="preview" class="btn-quiet" type="button">Preview the AI instructions</button>
       </div>
-      <p class="help">Prompts are fixed by the research team and cannot be edited. Custom measures and papers are added through a server-controlled layer.</p>
+      <p class="help">Prompts are fixed by the research team. Custom measures and papers are added through a server-controlled layer.</p>
 
       <div id="runReview" class="review" hidden>
         <h3>Review before starting</h3>
@@ -255,16 +255,16 @@
         <label>Dataset to compare<select id="comparisonData"></select></label>
         <label>Human reference CSV<input id="humanFile" type="file" accept=".csv,text/csv"></label>
       </div>
-      <p class="help">Use observed human data with the same measures and outcomes. Custom studies can supply composite scores or the raw items needed to calculate them; demographics are optional. The file is used only for this comparison and is not sent to OpenAI or saved.</p>
+      <p class="help">Use observed human data with the same measures and outcomes. Custom studies can supply composite scores or the raw items needed to calculate them. Demographics are optional. The file is used only for this comparison on the toolkit server and is discarded afterwards.</p>
       <div class="actions">
         <button id="compareButton" class="primary" type="button">Compare</button>
         <button id="customReference" class="btn-quiet" type="button" hidden>Download a fictional reference example</button>
       </div>
       <details class="note">
         <summary>How the comparison works</summary>
-        <p>All eligible human records form the reference; rows are not matched one-to-one with generated participants. Each dataset is scored separately. One dataset cannot give a confidence interval.</p>
-        <p>The original MIDUS analysis excludes anxiety; custom analyses use all defined predictors. Pattern correlation needs at least three varying paired coefficients. Undefined values appear blank, never as zero.</p>
-        <p>An independent human benchmark is a stronger check when it was not used to guide generation. The original MIDUS results used the full eligible reference, including people who could supply input records, so the two answer different questions.</p>
+        <p>All eligible human records form the reference, compared with the generated dataset as a whole. Each dataset is scored separately. Confidence intervals need more than one dataset.</p>
+        <p>The original MIDUS analysis excludes anxiety, and custom analyses use all defined predictors. Pattern correlation needs at least three varying paired coefficients. Undefined values appear blank.</p>
+        <p>The strongest check is an independent human benchmark kept separate from generation. The original MIDUS results used the full eligible reference, including people who could supply input records, so the two answer different questions.</p>
       </details>
     </div>
   </div>
@@ -290,8 +290,8 @@
 
   <details class="note">
     <summary>How to read these charts</summary>
-    <p>For error measures, lower is closer to human data. For ICC, concordance and pattern correlation, higher is closer to the target of 1. Each dot is the mean across scorable datasets; whiskers show the 95% confidence interval, which can be narrower than the dot. Narrow intervals mean average performance is precisely estimated, not that the data are accurate.</p>
-    <p>Intervals are conditional on the fixed human reference, and overlap alone does not show whether methods differ; see the adjusted pairwise comparisons below. SPA8 keeps actual psychological scores, so its distribution results describe supplied scores. Hover over or focus a point for its values.</p>
+    <p>For error measures, lower is closer to human data. For ICC, concordance and pattern correlation, higher is closer to the target of 1. Each dot is the mean across scorable datasets. Whiskers show the 95% confidence interval, which can be narrower than the dot. Narrow intervals mean average performance is precisely estimated. Accuracy is shown by the position of the dot.</p>
+    <p>Intervals are conditional on the fixed human reference, and the adjusted pairwise comparisons below test whether methods differ. SPA8 keeps actual psychological scores, so its distribution results describe supplied scores. Hover over or focus a point for its values.</p>
   </details>
 
   <article class="chart-card">
@@ -335,19 +335,19 @@
   <details class="note"><summary>What each approach receives</summary><div id="studyMethodGuide"></div></details>
 
   <h2 class="section-title">How might researchers use these approaches?</h2>
-  <p class="help">From Table 6 of the proposal. The study evaluated distributions and correlations, not whether these uses improve research decisions.</p>
+  <p class="help">From Table 6 of the proposal. The study evaluated distributions and correlations. Effects on research decisions need separate study.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Research situation</th><th>Possible starting point</th><th>Interpretation</th></tr></thead>
     <tbody>
-      <tr><td>No participant data; explore theoretical predictions</td><td>SPA2; SPA1 and SPA3 are alternatives</td><td>Explore possible patterns. Synthetic associations do not test human hypotheses or distinguish causal explanations.</td></tr>
-      <tr><td>Pilot data; explore score distributions or ceiling effects</td><td>SPA5, with SPA6 as an alternative</td><td>Pilot-informed scores were closer in MIDUS. This does not establish reliability, factor structure or construct validity.</td></tr>
-      <tr><td>Pilot data; inspect relationships</td><td>SPA6 and SPA5</td><td>SPA6 had smaller relationship errors. Both substantially overstated strengths.</td></tr>
-      <tr><td>Actual demographics only</td><td>SPA7</td><td>Preserves profiles. Realistic demographics did not establish psychological fidelity.</td></tr>
-      <tr><td>Observed psychological profiles; explore possible outcomes</td><td>SPA8</td><td>Closer relationship agreement for life satisfaction. Individual predictions, new outcomes and imputations need separate validation.</td></tr>
-      <tr><td>Effect sizes and statistical power</td><td>No evaluated approach is validated for this</td><td>Use human evidence or explicitly specified effect-size scenarios.</td></tr>
+      <tr><td>No participant data, exploring theoretical predictions</td><td>SPA2, with SPA1 and SPA3 as alternatives</td><td>Explore possible patterns. Synthetic associations suggest patterns to test with human data.</td></tr>
+      <tr><td>Pilot data, exploring score distributions or ceiling effects</td><td>SPA5, with SPA6 as an alternative</td><td>Pilot-informed scores were closer in MIDUS. Reliability, factor structure and construct validity need separate evidence.</td></tr>
+      <tr><td>Pilot data, inspecting relationships</td><td>SPA6 and SPA5</td><td>SPA6 had smaller relationship errors. Both substantially overstated strengths.</td></tr>
+      <tr><td>Actual demographics only</td><td>SPA7</td><td>Preserves profiles. Psychological fidelity needs separate checking.</td></tr>
+      <tr><td>Observed psychological profiles, exploring possible outcomes</td><td>SPA8</td><td>Closer relationship agreement for life satisfaction. Individual predictions, new outcomes and imputations need separate validation.</td></tr>
+      <tr><td>Effect sizes and statistical power</td><td>Human evidence</td><td>Use human evidence or explicitly specified effect-size scenarios.</td></tr>
     </tbody>
   </table></div>
-  <p class="help">Approach numbers follow the revised proposal: SPA7 uses demographic-only profiles and SPA8 uses demographic and psychological profiles. The findings do not establish accurate individual predictions, valid replacement of missing responses or intervention effects.</p>
+  <p class="help">Approach numbers follow the revised proposal: SPA7 uses demographic-only profiles and SPA8 uses demographic and psychological profiles. Individual predictions, replacement of missing responses and intervention effects need separate evidence.</p>
 
   <h2 class="section-title">Detailed statistical results</h2>
   <p class="help">Means, confidence intervals, variable-level results and adjusted pairwise comparisons.</p>

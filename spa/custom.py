@@ -32,7 +32,7 @@ def definition(raw):
         else:
             if v.get('role') not in ('predictor','outcome'):raise ValueError('Choose predictor or outcome for each construct.')
             for k in ('definition','citation','anchorLow','anchorHigh'):
-                if not isinstance(v.get(k),str) or not v[k].strip() or len(v[k])>4000 or re.search(r'\[insert|\[enter',v[k],re.I):raise ValueError('Complete definitions, sources and scale anchors. Placeholder text is not a completed measure.')
+                if not isinstance(v.get(k),str) or not v[k].strip() or len(v[k])>4000 or re.search(r'\[insert|\[enter',v[k],re.I):raise ValueError('Complete definitions, sources and scale anchors. Replace placeholder text with the final wording.')
             items=v.get('items')
             if not isinstance(items,list) or not 1<=len(items)<=30 or any(not isinstance(x,str) or not x.strip() or len(x)>1500 or re.search(r'\[insert|\[enter',x,re.I) for x in items):raise ValueError('Enter every item in each measure.')
             lo,hi=v.get('minimum'),v.get('maximum')
@@ -67,7 +67,7 @@ def numeric(frame,s,fields):
     if frame.columns.duplicated().any() or not set(fields)<=set(frame):raise ValueError('Missing columns: '+', '.join(sorted(set(fields)-set(frame))))
     f=frame[fields].copy();b=bounds(s)
     for code in fields:
-        if f[code].map(lambda x:isinstance(x,(bool,np.bool_))).any():raise ValueError('Boolean values are not scores.')
+        if f[code].map(lambda x:isinstance(x,(bool,np.bool_))).any():raise ValueError('Scores must be numbers.')
         x=pd.to_numeric(f[code],errors='raise');lo,hi,integer,cats=b[code]
         valid=x.isin(cats) if cats else x.between(lo,hi)
         if integer:valid &= x.mod(1).eq(0)
@@ -123,8 +123,8 @@ def fake(s,n=1000,seed=7):
 def guide(s):
     rows=[]
     for v in s['variables']:
-        for c,item in zip(item_fields(v),v['items']):rows.append({'Column':c,'Meaning':item,'Role':v['role'],'Allowed':f"{v['minimum']} to {v['maximum']} ({v['responseType']})",'Scoring':'Raw item; reverse coding is applied locally.'})
-        if v['aggregation']!='individual':rows.append({'Column':v['code'],'Meaning':v['name'],'Role':v['role'],'Allowed':'Composite score','Scoring':v['aggregation']+'; all items required; four decimal places'})
+        for c,item in zip(item_fields(v),v['items']):rows.append({'Column':c,'Meaning':item,'Role':v['role'],'Allowed':f"{v['minimum']} to {v['maximum']} ({v['responseType']})",'Scoring':'Raw item. Reverse coding is applied locally.'})
+        if v['aggregation']!='individual':rows.append({'Column':v['code'],'Meaning':v['name'],'Role':v['role'],'Allowed':'Composite score','Scoring':v['aggregation']+', all items required, four decimal places'})
     for v in s['demographics']:rows.append({'Column':v['code'],'Meaning':v['name'],'Role':'demographic','Allowed':json.dumps(v['categories']),'Scoring':'Fixed category code'})
     return rows
 
@@ -150,7 +150,7 @@ def contexts(req,assets):
             if m in (5,6):
                 f=template(s,'pilot') if req.examples else assets.get(f'pilot_SPA{m}')
                 if f is None:raise ValueError(f'SPA{m} needs a pilot sample: one row per participant, one column per item or construct score.')
-                if len(f)!=SAMPLE_N:raise ValueError(f'SPA{m} needs a pilot sample of exactly {SAMPLE_N} participants (one row each); this file has {len(f)} rows.')
+                if len(f)!=SAMPLE_N:raise ValueError(f'SPA{m} needs a pilot sample of exactly {SAMPLE_N} participants, one row each. This file has {len(f)} rows.')
                 f,cols=construct_columns(f,s,s['variables']);fields=demographics(s)+cols
                 f=f[fields].copy();f[demographics(s)]=numeric(f,s,demographics(s))
                 if f.isna().any().any():raise ValueError('Custom pilot samples need a value in every cell (items or construct scores, and demographics).')
@@ -171,7 +171,7 @@ def contexts(req,assets):
             if m==4:
                 sample=template(s,'sample') if req.examples else assets.get('sample_SPA4');data={}
                 if sample is None:raise ValueError('SPA4 needs a demographic sample: one row per participant, one column per demographic.')
-                if len(sample)!=SAMPLE_N:raise ValueError(f'SPA4 needs a demographic sample of exactly {SAMPLE_N} participants (one row each); this file has {len(sample)} rows.')
+                if len(sample)!=SAMPLE_N:raise ValueError(f'SPA4 needs a demographic sample of exactly {SAMPLE_N} participants, one row each. This file has {len(sample)} rows.')
                 sample=numeric(sample,s,demographics(s))
                 if sample.isna().any().any():raise ValueError('Every participant in the SPA4 demographic sample needs a value for every demographic.')
                 for v in s['demographics']:

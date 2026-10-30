@@ -104,7 +104,7 @@ const StudyCharts=(()=>{
     svg.append(node('text',{x:23,y:T+plot/2,transform:`rotate(-90 23 ${T+plot/2})`,'text-anchor':'middle',fill:'#344e58','font-size':16},'Average simulated correlation with life satisfaction'));
     for(const r of rows){
       const dot=node('circle',{cx:x(r.human),cy:y(r.generated),r:5.6,fill:method===8?'white':rowColor(method),stroke:rowColor(method),'stroke-width':2,opacity:.85});
-      interactive(dot,`${r.label}. Human correlation ${fmt(r.human)}; average simulated correlation ${fmt(r.generated)}; mean absolute correlation error ${fmt(r.mae)}; ${r.n} available repetitions.`,'correlationReadout');svg.append(dot);
+      interactive(dot,`${r.label}. Human correlation ${fmt(r.human)}. Average simulated correlation ${fmt(r.generated)}. Mean absolute correlation error ${fmt(r.mae)}. ${r.n} available repetitions.`,'correlationReadout');svg.append(dot);
     }
     document.getElementById('correlationReadout').textContent=display(`SPA${method} ${source.method_names[method]} at MIDUS ${wave}. Inspect a point to see the psychological variable and its values. Points closer to the diagonal have closer average correlation values.`);
   }
@@ -116,7 +116,7 @@ const StudyCharts=(()=>{
     document.getElementById('studyTakeaways').replaceChildren(
       takeaway('SPA5 · Closest generated score distributions',fmt(m5.mean),'Normalized Wasserstein distance','The lowest distribution error among approaches that generate psychological scores.','takeaway-m5'),
       takeaway('SPA6 · Closest relationships from generated scores',fmt(m6.mean),`Correlation error · MIDUS ${wave}`,'The lowest relationship error among approaches that generate psychological scores.','takeaway-m6'),
-      takeaway('SPA8 · Closest relationships overall',fmt(m8.mean),`Correlation error · MIDUS ${wave}`,'Actual demographics and psychological predictors are supplied; the model generates only outcomes.','takeaway-spa8'));
+      takeaway('SPA8 · Closest relationships overall',fmt(m8.mean),`Correlation error · MIDUS ${wave}`,'Actual demographics and psychological predictors are supplied, and the model generates the outcomes.','takeaway-spa8'));
     document.getElementById('distributionMeaning').textContent=definitions[metric].meaning;
     intervalChart('distributionChart',distributions,definitions[metric].axis,'distributionReadout',5);
     const worst=distributions.filter(r=>r.method!==8).reduce((a,b)=>a.mean>b.mean?a:b);
@@ -131,7 +131,7 @@ const StudyCharts=(()=>{
     for(const id of ['studyWave','studyDistribution','studyScatterMethod'])document.getElementById(id).onchange=update;
     const guide=document.getElementById('studyMethodGuide');guide.replaceChildren();
     const table=html('table'),head=html('tr');['Method','Information supplied'].forEach(t=>head.append(html('th',t)));const thead=html('thead');thead.append(head);table.append(thead);const tbody=html('tbody');
-    const inputs={1:'Definitions and an instruction to imagine a different person for each row.',2:'Definitions and an instruction to generate records directly.',3:'Definitions plus qualitative population guidance.',4:'Constructed demographic profiles matching marginal proportions.',5:'50 pilot records plus precomputed statistical summaries.',6:'50 pilot records; the model is instructed to analyse them itself.',7:'Actual demographic profiles; these values are fixed.',8:'Actual demographic and psychological profiles; these values are fixed.'};
+    const inputs={1:'Definitions and an instruction to imagine a different person for each row.',2:'Definitions and an instruction to generate records directly.',3:'Definitions plus qualitative population guidance.',4:'Constructed demographic profiles matching marginal proportions.',5:'50 pilot records plus precomputed statistical summaries.',6:'50 pilot records, which the model is instructed to analyse itself.',7:'Actual demographic profiles, kept fixed.',8:'Actual demographic and psychological profiles, kept fixed.'};
     for(const m of order){const row=html('tr');row.append(html('td',`SPA${m} · ${data.method_names[m]}`),html('td',inputs[m]));tbody.append(row)}table.append(tbody);guide.append(table);update();
   }
   return {render,dataFor,scatterFor,intervalSpec};
