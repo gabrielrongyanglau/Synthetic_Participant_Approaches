@@ -18,7 +18,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v6.2</span>
+  <span class="chip">v6.3</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -33,24 +33,17 @@
 <section id="overview" class="page">
   <header class="page-head"><p class="crumb">Workflow</p><h1>Overview</h1></header>
   <p id="intro" class="lead"></p>
+  <p class="sub">The proposal compared these approaches with real responses from the Midlife in the United States (MIDUS) study. You can try out the toolkit with that MIDUS study, or enter your own.</p>
   <div class="stats">
-    <div class="stat"><b>8</b><span>approaches evaluated</span></div>
-    <div class="stat"><b>1,000</b><span>datasets per approach in the study</span></div>
-    <div class="stat"><b>2,709</b><span>MIDUS participants as the benchmark</span></div>
-    <div class="stat"><b>100</b><span>participants per dataset here</span></div>
-  </div>
-  <div class="panel"><h2>Two ways to use the toolkit</h2>
-    <div class="grid2 ways">
-      <div class="way"><h3>1. MIDUS demonstration</h3><p>Repeat the setup evaluated in the proposal. The MIDUS study, its 38 psychological measures, six demographic characteristics and two life-satisfaction outcomes are already defined, and example inputs are supplied for every approach. Nothing needs uploading, so this is the quickest way to see how each approach works.</p></div>
-      <div class="way"><h3>2. Your own study</h3><p>Enter your own questionnaire: measures, items, scoring and, if needed, demographic categories. Approaches that use participant information ask you to upload it, with a blank template and a completed example for each upload. Results for your own study go beyond the proposal’s evaluation and need their own check against human data.</p></div>
-    </div>
-    <p class="help">You choose between them in step 1.</p>
+    <div class="stat"><b>8</b><span>approaches compared in the proposal</span></div>
+    <div class="stat"><b>1,000</b><span>simulated datasets per approach</span></div>
+    <div class="stat"><b>2,709</b><span>real MIDUS participants for comparison</span></div>
+    <div class="stat"><b>100</b><span>participants per dataset you generate</span></div>
   </div>
   <div class="panel"><h2>How this works <small>The MIDUS demonstration skips steps 3 and 6</small></h2>
-    <ol class="how"><li>Choose the MIDUS demonstration or your own study</li><li>Choose your research goal</li><li>For your own study, define your questionnaire</li><li>Answer up to three questions about what you have</li><li>Use the recommended approach or an alternative</li><li>For your own study, provide the inputs the approach needs</li><li>Check inputs and generate 100 participants</li><li>Download the dataset and codebook</li></ol>
+    <ol class="how"><li>Try out the MIDUS study from the proposal, or enter your own study</li><li>Choose your research goal</li><li>For your own study, define your questionnaire</li><li>Answer up to three questions about what you have</li><li>Use the recommended approach or an alternative</li><li>For your own study, provide the inputs the approach needs</li><li>Check inputs and generate 100 participants</li><li>Download the dataset and codebook</li></ol>
   </div>
   <p class="sub">Generation uses GPT-5.6 Luna with medium reasoning. AI calls use the research team’s server-side key and its limited budget, so each simulation creates one dataset of 100 participants.</p>
-  <div class="callout blue">Goal 1 is generating psychological variables that resemble human responses. Goal 2 is exploring relationships among variables, covering their patterns and strengths. An approach can serve one goal well and the other poorly.</div>
   <div class="btns"><button type="button" class="btn" data-goto="study">Start with your study</button></div>
 </section>
 
@@ -60,9 +53,8 @@
       <h2>Study path</h2>
       <select id="studyMode" hidden aria-hidden="true"></select>
       <div id="studyChoices" class="choice-grid two-up" role="radiogroup" aria-label="Study"></div>
-      <div id="midusSetup" class="hint">
+      <div id="midusSetup" class="hint" hidden>
         <p id="scope"></p>
-        <p>To use your own questionnaire and participant data, choose <strong>My own study</strong>.</p>
       </div>
       <p id="ownNext" class="callout blue" hidden>Next, choose your research goal. You then define your questionnaire.</p>
   </div>
@@ -80,14 +72,14 @@
   <div class="panel" id="customPanel">
     <h2>Your study <small>measures, optional demographics and papers</small></h2>
       <div id="customSetup" hidden>
-        <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 constructs and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
+        <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 measures and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
         <label>Study title<input id="studyTitle" type="text"></label>
         <h3>Psychological measures</h3>
         <div id="measureEditor"></div>
         <button id="addMeasure" class="btn-quiet" type="button">Add psychological measure</button>
         <details id="demographicSection" class="note">
           <summary id="demographicSummary">Demographic categories (optional)</summary>
-          <p id="demographicHelp" class="help">Needed only for SPA4, SPA7 and SPA8, which keep demographic information fixed. Define up to eight, such as age group or employment arrangement, using numeric categories.</p>
+          <p id="demographicHelp" class="help">Add these if you know the demographic make-up you want to simulate, or have each participant’s demographic details. Approaches that use this information need them. Define up to eight, such as age group or employment arrangement, using numeric categories.</p>
           <div id="demographicEditor"></div>
           <button id="addDemographic" class="btn-quiet" type="button">Add demographic</button>
         </details>
@@ -126,8 +118,9 @@
   <header class="page-head"><p class="crumb" data-crumb="situation">Workflow</p><h1>What do you have so far?</h1><p class="sub">Answer each question. The next one appears when needed.</p></header>
   <div class="grid2">
     <div class="panel"><div id="guideQuestions" class="guide"></div></div>
-    <div class="panel"><h2>Decision path <small>Table 6 of the proposal</small></h2>
-      <ul class="tree"><li>No data yet, demographic make-up known: SPA4. Otherwise SPA2.</li><li>Psychological scores measured, outcome still to come: SPA8.</li><li>A pilot sample of 50 participants: SPA5, with SPA6 as an alternative.</li><li>Demographic details only: SPA7.</li></ul>
+    <div class="panel"><h2>Where your answers lead <small>from the proposal</small></h2>
+      <p class="help">Each approach is explained on the next page.</p>
+      <ul class="tree"><li>No data yet: SPA2, direct generation. If you know the demographic make-up you want: SPA4, quota matched.</li><li>A pilot sample of 50 participants: SPA5, pilot calibrated, with SPA6 as an alternative.</li><li>Only each participant’s demographic details: SPA7, demographic-only profiles.</li><li>Psychological scores measured, outcome still to come: SPA8, demographic and psychological profiles.</li></ul>
       <div id="situationResult" class="callout blue" hidden></div>
     </div>
   </div>
@@ -139,7 +132,7 @@
   <p id="approachNeeds" class="callout" hidden>Choose a goal and answer the questions under Your situation first.</p>
   <div class="panel"><div id="recommendation" class="recommendation" aria-live="polite"></div>
     <div id="methodCards" class="method-list" role="radiogroup" aria-label="Approach"></div></div>
-  <div class="panel"><h2>Results from the study <small>1,000 datasets per approach. Green marks the closest value among approaches that generate scores.</small></h2>
+  <div class="panel"><h2>Results from the proposal’s study <small>1,000 datasets per approach. Green marks the closest value among approaches that generate scores.</small></h2>
     <div class="tabs" role="tablist"><button type="button" role="tab" class="active" data-tab="all">All approaches</button><button type="button" role="tab" data-tab="fit">Only approaches that fit</button></div>
     <div id="resultsTable" class="wide"></div>
   </div>
@@ -159,18 +152,11 @@
 
       <details id="csvHelp" class="note">
         <summary>How to prepare your CSV</summary>
-        <p>SPA5 to SPA8 uploads use <strong>one row per participant and one column per variable</strong>. The SPA4 upload uses one row per demographic category. Download the template for your approach, replace the example values with your own, and upload it.</p>
-        <ul>
-          <li><strong>SPA4:</strong> target proportions, one row per demographic category. No participant data are needed. The toolkit builds 100 demographic profiles that match them.</li>
-          <li><strong>SPA5 and SPA6:</strong> a pilot sample of exactly 50 participants with every variable, including both outcomes. All 50 are used.</li>
-          <li><strong>SPA7:</strong> 100 participant profiles with demographics. Each row becomes one synthetic participant.</li>
-          <li><strong>SPA8:</strong> 100 participant profiles with demographics and psychological scores. Each row becomes one synthetic participant, and only outcomes are generated.</li>
-        </ul>
-        <p>In the MIDUS study each psychological column is a construct score. In your own study, each construct can be supplied either as its individual item columns or as one construct-score column. Keep the header row unchanged, use the numeric codes in the variable guide, remove names and other direct identifiers, and save as UTF-8 CSV. Choose <em>Check inputs</em> to see any problems before a paid request is made.</p>
+        <p>Fill the blank template, or replace the values in the completed example with your own. Each measure can be supplied either as its individual item columns or as one score column. Keep the header row unchanged, use the numeric codes in the variable guide, remove names and other direct identifiers, and save as UTF-8 CSV. Choose <em>Check inputs</em> to see any problems before a paid request is made.</p>
       </details>
       <details class="note">
         <summary>Variable guide</summary>
-        <p>Variables and numeric category codes for uploaded CSV files. Blank cells mean missing predictors. MIDUS pilot files need both life-satisfaction outcomes, and custom pilot files need every defined item and demographic.</p>
+        <p>The columns and allowed values for your upload. Blank cells mean missing values. Pilot files need every item, demographic and outcome.</p>
         <a id="variableGuideLink" href="/api/guide.csv" download>Download the variable guide (CSV)</a>
         <div id="guideTable"></div>
       </details>
@@ -213,7 +199,7 @@
         <button id="reviewInputs" class="primary" type="button">Check inputs</button>
         <button id="preview" class="btn-quiet" type="button">Preview the AI instructions</button>
       </div>
-      <p class="help">Prompts are fixed by the research team. Custom measures and papers are added through a server-controlled layer.</p>
+      <p class="help">The AI instructions are fixed by the research team. Your measures and papers are added to them automatically.</p>
 
       <div id="runReview" class="review" hidden>
         <h3>Review before starting</h3>
@@ -337,6 +323,8 @@
     <p class="lead">The concepts used in this toolkit, in plain language.</p>
   </header>
   <div id="terms" class="glossary"></div>
+  <h2 class="section-title">Measures in the results table</h2>
+  <div id="metricGuide" class="glossary"></div>
 </section>
 
 <section id="help" class="page" hidden>

@@ -72,7 +72,7 @@ const Console=(()=>{
  function table(){
   const host=$('resultsTable');if(!results){host.replaceChildren(el('p','Loading the study results…','help'));return}
   const r=Research.recommendation(),fit=r&&stage()?r.feasible:[1,2,3,4,5,6,7,8],chosen=spa();
-  const cols=[['smd',0,'|SMD|',true,'Average score difference, in standard deviations'],['wasserstein',0,'Distance',true,'Normalised Wasserstein distance between distributions'],['sd_ratio',0,'SD ratio',null,'Generated SD divided by human SD (1 is equal)'],['correlation_mae',2,'Error M2',true,'Correlation error with MIDUS 2 life satisfaction'],['correlation_mae',3,'Error M3',true,'Correlation error with MIDUS 3 life satisfaction'],['pattern_r',2,'Pattern r',false,'Pattern correlation at MIDUS 2'],['icc',2,'ICC',false,'Absolute agreement at MIDUS 2']];
+  const cols=[['smd',0,'|SMD|',true,'Average score difference, in standard deviations'],['wasserstein',0,'Distance',true,'Normalised Wasserstein distance between distributions'],['sd_ratio',0,'SD ratio',null,'Generated SD divided by human SD (1 is equal)'],['correlation_mae',2,'Error, MIDUS 2',true,'Correlation error with MIDUS 2 life satisfaction'],['correlation_mae',3,'Error, MIDUS 3',true,'Correlation error with MIDUS 3 life satisfaction'],['pattern_r',2,'Pattern r',false,'Pattern correlation at MIDUS 2'],['icc',2,'ICC',false,'Absolute agreement at MIDUS 2']];
   const best=(k,w,low)=>{const vals=[1,2,3,4,5,6,7].map(m=>metric(k,w,m));return low?Math.min(...vals):Math.max(...vals)};
   const t=el('table'),head=el('tr');['','Approach','Fits'].forEach(x=>head.append(el('th',x)));cols.forEach(c=>{const th=el('th',c[2]);th.title=c[4];th.setAttribute('scope','col');head.append(th)});const thead=el('thead');thead.append(head);t.append(thead);const body=el('tbody');
   for(const m of [1,2,3,4,5,6,7,8]){if(tab==='fit'&&!fit.includes(m))continue;
@@ -93,7 +93,7 @@ const Console=(()=>{
   const res=$('situationResult');res.hidden=!stage();if(stage())res.textContent='Your situation: '+stage()+'.';
   const ready=!!(Research.goal()&&stage()&&spa());$('approachNeeds').hidden=ready;
   $('confirmApproach').disabled=!ready;$('confirmApproach').textContent=ready?`Continue with SPA${spa()}`:'Continue with this approach';
-  const midus=!own()&&!!spa();$('midusInputs').hidden=!midus;
+  const midus=!own()&&!!spa();$('midusInputs').hidden=!midus;$('midusSetup').hidden=!(studyChosen&&!own());
   if(midus){$('midusInputText').textContent=$('dataSummary').textContent;const ex=$('midusExample');ex.hidden=$('exampleLink').hidden;ex.href=$('exampleFile').href;ex.download=$('exampleFile').download}
  }
  function refresh(){

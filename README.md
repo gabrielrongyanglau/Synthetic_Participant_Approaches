@@ -33,7 +33,7 @@ Generation time varies with the complexity of the data being generated: simple r
 
 The interface is a research console: a status bar along the top, side navigation showing each step as to do, locked or completed, the current page in the middle, and an inspector on the right with your selections, the study evidence for the chosen approach, tips and an activity log.
 
-The Overview explains the two ways to use the toolkit: the MIDUS demonstration, which repeats the setup evaluated in the proposal, or your own study. The steps come in this order. The MIDUS demonstration skips steps 3 and 6, and later steps stay locked until the earlier ones are complete.
+You can try out the toolkit with the MIDUS study used in the proposal, where everything is already set up, or enter your own study. The steps come in this order. The MIDUS demonstration skips steps 3 and 6, and later steps stay locked until the earlier ones are complete.
 
 1. **Choose your study.** The MIDUS demonstration, which always uses the example inputs supplied with the toolkit, or your own study.
 2. **Research goal.** The proposal's two goals: generate psychological variables that resemble human responses (Goal 1), or explore relationships among variables, covering patterns and strengths (Goal 2).

@@ -9,7 +9,7 @@ def plain(text):
     return re.sub(r';\s+(\w)',lambda m:'. '+m.group(1).upper(),text)
 
 INTRO='A synthetic participant approach (SPA) is a way of asking an artificial intelligence (AI) model to create participant records intended to resemble human responses. This toolkit lets you choose among eight approaches, prepare their inputs and create datasets.'
-SCOPE='The MIDUS study setup uses 38 psychological scores, six demographic characteristics, and life satisfaction at a baseline and a later assessment. The variable names, scales and eligible population are already defined. Recommendations outside MIDUS need their own check against human data.'
+SCOPE='The MIDUS study includes 38 psychological measures, six demographic characteristics and life satisfaction at a first and a later assessment. Its variables, scales and eligible population are already set up.'
 METHODS={
  1:dict(input='The study’s variable definitions and rules for who is included. No participant data are needed.',
         procedure='The AI is instructed to imagine a different person for each row and then create that person’s values.',
@@ -62,7 +62,7 @@ TERMS.update({
  'Statistical significance':'Evidence of a difference under a specified statistical test. A statistically significant difference can still be too small to matter in practice.'})
 
 METRICS={
- 'smd':('Error in average scores (standardized mean difference)',
+ 'smd':('Error in average scores (standardised mean difference)',
         'Compares the generated and human averages after accounting for score variability. Zero means identical averages, and lower values are closer.',
         'For each variable: absolute difference in means / square root of the average of the two sample variances. Average these errors across variables within each dataset.'),
  'sd_ratio':('Score variability ratio (SD ratio)',
@@ -116,8 +116,8 @@ def readable_results(frame):
     return d.rename(columns={'method':'Method','first':'First method','second':'Second method','wave':'Assessment / comparison',
       'domain':'Evaluation type','metric':'Measure','n':'Datasets included','mean':'Average across datasets','lower':'Lower 95% confidence limit',
       'upper':'Upper 95% confidence limit','difference':'First minus second','p_display':'Adjusted p-value','significant':'Statistically significant?',
-      'p_adjusted':'Adjusted p-value','welch_df':'Welch degrees of freedom','se':'Standard error of the difference','n_first':'Scored datasets for first method','n_second':'Scored datasets for second method','family_size':'Number of adjusted comparisons','distribution_runs':'Datasets with score results','sd':'Average score SD','smd':'Standardized mean error',
-      'sd_ratio':'SD ratio','sd_error':'SD-ratio error','wasserstein':'Normalized Wasserstein distance',
+      'p_adjusted':'Adjusted p-value','welch_df':'Welch degrees of freedom','se':'Standard error of the difference','n_first':'Scored datasets for first method','n_second':'Scored datasets for second method','family_size':'Number of adjusted comparisons','distribution_runs':'Datasets with score results','sd':'Average score SD','smd':'Standardised mean error',
+      'sd_ratio':'SD ratio','sd_error':'SD-ratio error','wasserstein':'Normalised Wasserstein distance',
       'midus2_runs':'Datasets with baseline correlations','midus2_mean_r':'Average baseline correlation','midus2_mae':'Baseline correlation error',
       'midus3_runs':'Datasets with later correlations','midus3_mean_r':'Average later correlation','midus3_mae':'Later correlation error',
       'code':'CSV variable code','variable':'Psychological variable'})

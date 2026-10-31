@@ -70,7 +70,7 @@ function csvText(rows){if(!rows.length)return '';const keys=Object.keys(rows[0])
 function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=el('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 
 const ROWS={5:50,6:50,7:100,8:100};
-function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. The toolkit builds 100 demographic profiles that match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including both outcomes. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
+function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. The toolkit builds 100 demographic profiles that match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including every outcome. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
 function proportionInstructions(m,custom){return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
 
 ${inputRule(m)}
@@ -155,11 +155,12 @@ function inputs(){
   const own={};$('uploads').querySelectorAll('input').forEach(x=>own[x.dataset.asset]=x);
   $('uploads').replaceChildren();
   $('dataHeading').textContent=m?`Data for ${Research.methodLabel(m)}`:'Data for this approach';
-  const name=m?`SPA${m}`:'This approach';let summary;
+  const name=m?`SPA${m}`:'This approach';let summary,blocked=false;
   if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description':''}.`;
   else if(!custom){summary=`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
+  else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Check and continue, then return here.`;blocked=true}
   else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`+(Research.fictionalStudy()?' The fictional example study includes example data, so the upload is optional for it.':'');$('uploads').append(uploadCard(m,own))}
-  $('dataSummary').textContent=summary;
+  $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;
   $('exampleLink').hidden=custom||!needs;
   $('total').textContent='';
   updateRail();
@@ -397,6 +398,7 @@ async function init(){
   $('serviceEstimate').textContent=cfg.service.estimate_note+(cfg.service.estimated_minutes!=='60'?` The team's current planning estimate is ${cfg.service.estimated_minutes} minutes.`:'');
   $('serviceFunding').textContent=cfg.service.funding;$('serviceFuture').textContent=cfg.service.future;$('serviceContact').textContent=cfg.service.contact.text;
   Object.entries(cfg.terms).forEach(([title,text])=>{const d=el('details');d.append(el('summary',title),el('p',text));$('terms').append(d)});
+  Object.values(cfg.metrics).forEach(([title,meaning,formula])=>{const d=el('details');d.append(el('summary',title),el('p',meaning),el('p',formula,'subtle'));$('metricGuide').append(d)});
   document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();page(b.dataset.goto)}));
   $('reviewInputs').addEventListener('click',action(reviewInputs));

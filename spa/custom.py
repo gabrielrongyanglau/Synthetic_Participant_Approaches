@@ -122,9 +122,9 @@ def fake(s,n=1000,seed=7):
 def guide(s):
     rows=[]
     for v in s['variables']:
-        for c,item in zip(item_fields(v),v['items']):rows.append({'Column':c,'Meaning':item,'Role':v['role'],'Allowed':f"{v['minimum']} to {v['maximum']} ({v['responseType']})",'Scoring':'Raw item. Reverse coding is applied locally.'})
+        for c,item in zip(item_fields(v),v['items']):rows.append({'Column':c,'Meaning':item,'Role':v['role'],'Allowed':f"{v['minimum']} to {v['maximum']} ({v['responseType']})",'Scoring':'Raw item. Reverse coding is applied by the toolkit.'})
         if v['aggregation']!='individual':rows.append({'Column':v['code'],'Meaning':v['name'],'Role':v['role'],'Allowed':'Composite score','Scoring':v['aggregation']+', all items required, four decimal places'})
-    for v in s['demographics']:rows.append({'Column':v['code'],'Meaning':v['name'],'Role':'demographic','Allowed':json.dumps(v['categories']),'Scoring':'Fixed category code'})
+    for v in s['demographics']:rows.append({'Column':v['code'],'Meaning':v['name'],'Role':'demographic','Allowed':', '.join(f'{k} = {x}' for k,x in v['categories'].items()),'Scoring':'Fixed category code'})
     return rows
 
 def template(s,kind):

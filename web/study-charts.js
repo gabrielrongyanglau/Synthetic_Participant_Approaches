@@ -6,8 +6,8 @@ const StudyCharts=(()=>{
   const NS='http://www.w3.org/2000/svg';
   const short={1:'Persona prompted',2:'Direct generation',3:'Population guided',4:'Quota matched',5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographic-only profiles',8:'Demographics + psychology *'};
   const definitions={
-    wasserstein:{axis:'Normalized Wasserstein distance · lower is closer',meaning:'Wasserstein distance compares the full score distributions, expressed in human standard deviations. Zero means identical distributions. Values are averaged across the 38 psychological predictors.'},
-    smd:{axis:'Absolute standardized mean difference · lower is closer',meaning:'Standardized mean error measures gaps between simulated and human average scores relative to their pooled score variability. Zero means equal averages. Absolute errors are averaged across 38 predictors.'},
+    wasserstein:{axis:'Normalised Wasserstein distance · lower is closer',meaning:'Wasserstein distance compares the full score distributions, expressed in human standard deviations. Zero means identical distributions. Values are averaged across the 38 psychological predictors.'},
+    smd:{axis:'Absolute standardised mean difference · lower is closer',meaning:'Standardised mean error measures gaps between simulated and human average scores relative to their pooled score variability. Zero means equal averages. Absolute errors are averaged across 38 predictors.'},
     sd_error:{axis:'Absolute SD-ratio error · lower is closer',meaning:'The standard deviation (SD) describes variation between people. This measure averages the absolute gaps between the simulated-to-human SD ratio and its target of 1. Zero means equal variability for all 38 predictors.'}
   };
   const series=[{metric:'pattern_r',name:'Pearson pattern r',color:'#815397',dy:-9},{metric:'icc',name:'ICC(A,1)',color:'#245f86',dy:0},{metric:'ccc',name:'Lin’s CCC',color:'#257e73',dy:9}];
@@ -114,7 +114,7 @@ const StudyCharts=(()=>{
     const distributions=dataFor(source,metric,0),water=dataFor(source,'wasserstein',0),relationships=dataFor(source,'correlation_mae',wave);
     const get=(rows,m)=>rows.find(r=>r.method===m),m5=get(water,5),m6=get(relationships,6),m8=get(relationships,8);
     document.getElementById('studyTakeaways').replaceChildren(
-      takeaway('SPA5 · Closest generated score distributions',fmt(m5.mean),'Normalized Wasserstein distance','The lowest distribution error among approaches that generate psychological scores.','takeaway-m5'),
+      takeaway('SPA5 · Closest generated score distributions',fmt(m5.mean),'Normalised Wasserstein distance','The lowest distribution error among approaches that generate psychological scores.','takeaway-m5'),
       takeaway('SPA6 · Closest relationships from generated scores',fmt(m6.mean),`Correlation error · MIDUS ${wave}`,'The lowest relationship error among approaches that generate psychological scores.','takeaway-m6'),
       takeaway('SPA8 · Closest relationships overall',fmt(m8.mean),`Correlation error · MIDUS ${wave}`,'Actual demographics and psychological predictors are supplied, and the model generates the outcomes.','takeaway-spa8'));
     document.getElementById('distributionMeaning').textContent=definitions[metric].meaning;
