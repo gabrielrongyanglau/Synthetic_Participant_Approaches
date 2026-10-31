@@ -77,8 +77,9 @@ def build(columns,method,study=None):
             if code=='participant_id':result.append(identifier);continue
             v=s['variables'][s['outcomes'].get(code,code)];ds=code in s['demographic_covariates'];out=code in OUTCOMES
             fixed=method in (4,7,8) and ds or method==8 and not out
-            name=v['label'] if not out else 'Life satisfaction at MIDUS '+('2' if code==OUTCOMES[0] else '3')
-            result.append(dict(column=code,name=name,definition=DEFINITIONS[code],role='demographic' if ds else 'outcome' if out else 'psychological predictor',assessment='MIDUS 3' if code==OUTCOMES[1] else 'MIDUS 2',allowed_values=json.dumps(v['categories'],ensure_ascii=False) if v['kind']=='category' else f"{v['minimum']} to {v['maximum']}",scoring=plain(v['scoring']),missing_values='Blank means missing or not applicable. Zero is a score when within the valid range. Source missing codes: '+json.dumps(v['missing_codes']),source='MIDUS source score, codebook page '+str(v.get('source_codebook_page','not specified')),provenance='Constructed locally to match demographic proportions' if method==4 and fixed else 'Retained from supplied profiles' if fixed else 'Generated'))
+            from .selection import LABELS
+            name=LABELS.get(code,v['label']) if not out else 'Life satisfaction at MIDUS '+('2' if code==OUTCOMES[0] else '3')
+            result.append(dict(column=code,name=name,definition=DEFINITIONS[code],role='demographic' if ds else 'outcome' if out else 'psychological predictor',assessment='MIDUS 3' if code==OUTCOMES[1] else 'MIDUS 2',allowed_values=', '.join(f'{k} = {x}' for k,x in v['categories'].items()) if v['kind']=='category' else f"{v['minimum']} to {v['maximum']}",scoring=plain(v['scoring']),missing_values='Blank means missing or not applicable. Zero is a score when within the valid range. Source missing codes: '+json.dumps(v['missing_codes']),source='MIDUS source score, codebook page '+str(v.get('source_codebook_page','not specified')),provenance='Constructed locally to match demographic proportions' if method==4 and fixed else 'Retained from supplied profiles' if fixed else 'Generated'))
     return result
 
 def csv(rows):return '\ufeff'+pd.DataFrame(rows).to_csv(index=False)

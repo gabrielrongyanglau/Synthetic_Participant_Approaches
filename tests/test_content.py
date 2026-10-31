@@ -7,7 +7,8 @@ from spa.study import PROJECT_ROOT,selected_fields
 from spa.analysis import load_bundle
 
 def test_readable_record_display_preserves_raw_export(study):
-    raw=pd.read_csv(PROJECT_ROOT/'data/examples/SPA1_R0001.csv',float_precision='round_trip')
+    from conftest import local_rows
+    raw=pd.DataFrame(local_rows(1)['SPA1_R0001'])
     before=raw.copy(deep=True);display=readable_records(raw,study)
     pd.testing.assert_frame_equal(raw,before)
     assert len(display)==100 and display.shape==raw.shape

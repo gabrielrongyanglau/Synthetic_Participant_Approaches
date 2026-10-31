@@ -115,7 +115,7 @@ def fake(s,n=1000,seed=7):
     for v in s['variables']:
         for c in item_fields(v):
             x=rng.uniform(v['minimum'],v['maximum'],n)
-            data[c]=np.round(x) if v['responseType']=='integer' else x.round(4)
+            data[c]=np.round(x).astype(int) if v['responseType']=='integer' else x.round(4)
     for v in s['demographics']:data[v['code']]=rng.choice([int(k) for k in v['categories']],n)
     return scored(pd.DataFrame(data),s)
 

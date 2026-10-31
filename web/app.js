@@ -32,9 +32,8 @@ function options(node,values){node.replaceChildren();Object.entries(values).forE
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const minutes=since=>Math.max(0,Math.floor((Date.now()-since)/60000));
 
-const PAGE_ALIAS={choose:'goal',prepare:'study',generate:'run'};
 function page(id){
-  id=PAGE_ALIAS[id]||id;if(!$(id)||!$(id).classList.contains('page'))id='overview';
+  if(!$(id)||!$(id).classList.contains('page'))id='overview';
   if(typeof Console!=='undefined'&&!Console.available(id))id='study';
   notice('');
   document.querySelectorAll('.page').forEach(e=>e.hidden=e.id!==id);
@@ -154,14 +153,13 @@ function inputs(){
   $('n').value='100';$('repetitions').value='1';
   const m=[...selected][0],custom=Research.custom(),needs=!!uploadMap[m];
   $('populationLabel').hidden=!selected.has(3);
-  $('csvHelp').hidden=!custom||!needs;
+  $('csvHelp').hidden=!custom||!needs;$('guideHelp').hidden=!needs;
   $('variableGuideLink').hidden=custom;
-  Research.demographicState(m);
   const own={};$('uploads').querySelectorAll('input').forEach(x=>own[x.dataset.asset]=x);
   $('uploads').replaceChildren();
   $('dataHeading').textContent=m?`Data for ${Research.methodLabel(m)}`:'Data for this approach';
   const name=m?`SPA${m}`:'This approach';let summary,blocked=false;
-  if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description':''}.`;
+  if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description below':''}. Choose Next: check and generate to continue.`;
   else if(!custom&&[4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs at least one demographic characteristic. Tick some under Questionnaire.`;blocked=true}
   else if(!custom){summary=`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
   else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Continue, then return here.`;blocked=true}
@@ -401,7 +399,7 @@ async function init(){
   $('intro').textContent=cfg.intro;$('scope').textContent=cfg.scope;
   options($('n'),{'100':'100 participants'});
   table(cfg.variable_guide,$('guideTable'));
-  $('serviceEstimate').textContent=cfg.service.estimate_note+(cfg.service.estimated_minutes!=='60'?` The team's current planning estimate is ${cfg.service.estimated_minutes} minutes.`:'');
+  $('serviceEstimate').textContent=cfg.service.estimated_minutes!=='60'?`The team's current planning estimate is ${cfg.service.estimated_minutes} minutes.`:'';
   $('serviceFunding').textContent=cfg.service.funding;$('serviceFuture').textContent=cfg.service.future;$('serviceContact').textContent=cfg.service.contact.text;
   Object.entries(cfg.terms).forEach(([title,text])=>{const d=el('details');d.append(el('summary',title),el('p',text));$('terms').append(d)});
   Object.values(cfg.metrics).forEach(([title,meaning,formula])=>{const d=el('details');d.append(el('summary',title),el('p',meaning),el('p',formula,'subtle'));$('metricGuide').append(d)});

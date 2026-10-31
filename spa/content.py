@@ -11,13 +11,13 @@ def plain(text):
 INTRO='A synthetic participant approach (SPA) is a way of asking an artificial intelligence (AI) model to create participant records intended to resemble human responses. This toolkit lets you choose among eight approaches, prepare their inputs and create datasets.'
 SCOPE='The MIDUS study includes 38 psychological measures, six demographic characteristics and life satisfaction at a first and a later assessment. Its variables, scales and eligible population are already set up.'
 METHODS={
- 1:dict(input='The study’s variable definitions and rules for who is included. No participant data are needed.',
+ 1:dict(input='The study’s variable definitions. No participant data are needed.',
         procedure='The AI is instructed to imagine a different person for each row and then create that person’s values.',
         output='Demographic values, psychological scores and life-satisfaction scores at both assessments.'),
- 2:dict(input='The study’s variable definitions and rules for who is included. No participant data are needed.',
-        procedure='The AI creates participant rows directly from the study instructions. Generated records are synthetic, so population estimates from them need checking against human data.',
+ 2:dict(input='The study’s variable definitions. No participant data are needed.',
+        procedure='The AI creates participant rows directly from the study instructions, without imagining each person first.',
         output='Demographic values, psychological scores and life-satisfaction scores at both assessments.'),
- 3:dict(input='The study definitions and a written description of the people you want to simulate, within the study’s eligibility rules.',
+ 3:dict(input='The study definitions and a written description of the people you want to simulate.',
         procedure='The AI uses the population description to guide the kinds of people it generates. No numerical demographic targets are supplied.',
         output='Demographic values, psychological scores and life-satisfaction scores at both assessments.'),
  4:dict(input='Target proportions for each demographic category, such as the share in each age group. No participant data are needed.',

@@ -28,6 +28,14 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 7.3: clean-up
+
+No change to the flow or behaviour. Removed an example output file used only by one test (the test now builds the same kind of dataset in memory), CSS rules for elements removed in earlier versions (tabs, guided questions, overview figures and panels, comparison results, old study-mode controls), and two unused pieces of JavaScript (old page aliases and an empty function). Every server route is still used by the interface. All 202 tests pass.
+
+## Version 7.2: start button, matching examples, clarity review
+
+The Overview button reads Start. The completed examples on the Inputs step are generated from the questionnaire the user set up, so with the questionnaire's completed example (sex, marital status, optimism and life satisfaction) every Inputs example has those same columns, now with whole-number item responses. Every page was read in order for both study paths. Changes from that review: plainer wording on the Overview and the own-study questionnaire; no approach numbers on the Questionnaire step; measures labelled as predictors and outcomes; the MIDUS Information options and approach cards no longer describe the supplied examples as actual or human data or as something the user provides; approach descriptions no longer mention eligibility rules that own studies do not have; recommendation reasons say supplied in place of real; the variable guide is hidden when no upload is needed; duplicated timing text on Check and generate is removed; and the MIDUS codebook uses the same variable names as the Questionnaire step, with categories written as 1 = MALE, 2 = FEMALE. All 202 tests pass.
+
 ## Version 7.1: one Continue button
 
 The separate check button and its notes are removed from the Questionnaire step. The step has one **Continue** button for both study paths, and it runs every existing check: missing or invalid entries in your own study stop the step with the specific message, as before, and the MIDUS path still needs at least one psychological predictor. Continue also asks you to choose how to enter your variables and, with the upload option, to upload the CSV first. With the upload option, the on-page editor is hidden and the imported variables are listed read-only (role, name, code, and categories or items, range and scoring). All 202 tests pass.

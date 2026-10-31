@@ -25,14 +25,14 @@ def suggest(goal,information):
     rel=goal=='relationships'
     if 'psychology' in info:
         primary=8
-        reason=('SPA8 generates outcomes from each person’s real demographics and psychological scores. In the study, it came closest to human relationship strengths (average correlation error .19 at MIDUS 2 and .24 at MIDUS 3, against .63 to .72 for the other approaches), although it still overstated them.' if rel else
-                'Real psychological scores already exist for every participant, so there is nothing for Goal 1 to generate. SPA8 keeps those scores and generates the outcomes. To try generating psychological scores instead, choose a small human pilot dataset: 50 participants with every variable, outcomes included, used with SPA5.')
+        reason=('SPA8 generates outcomes from each person’s supplied demographics and psychological scores. In the study, it came closest to human relationship strengths (average correlation error .19 at MIDUS 2 and .24 at MIDUS 3, against .63 to .72 for the other approaches), although it still overstated them.' if rel else
+                'Psychological scores already exist for every participant, so there is nothing for Goal 1 to generate. SPA8 keeps those scores and generates the outcomes. To try generating psychological scores instead, choose a small human pilot dataset: 50 participants with every variable, outcomes included, used with SPA5.')
     elif 'pilot' in info:
         primary=5
         reason=('SPA5 uses the pilot records and their summary statistics. '+PATTERN+' Relationship strengths stayed inflated, and SPA6 reduced strength errors only slightly.' if rel else
                 'The proposal recommends SPA5 for a 50-person pilot. SPA6 is an alternative in which the AI analyses the pilot records itself. In the study, SPA5 produced the closest psychological scores: averages differed from human data by 0.21 standard deviations, against 0.53 to 0.58 for approaches without pilot data.')
     elif 'demographics' in info:
-        primary=7;reason='SPA7 keeps each person’s real demographics and generates their psychological scores and outcomes. In the study, real demographics did not bring scores or relationships closer to human data than SPA2.'
+        primary=7;reason='SPA7 keeps each person’s supplied demographics and generates their psychological scores and outcomes. In the study, keeping real demographics did not bring scores or relationships closer to human data than SPA2.'
     elif 'proportions' in info:
         primary=4;reason='SPA4 builds profiles that match the demographic proportions and generates the remaining scores. In the study, matching demographics did not bring scores or relationships closer to human data than SPA2.'
     elif 'description' in info:
