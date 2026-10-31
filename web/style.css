@@ -85,7 +85,9 @@ h1{font:600 24px/1.25 var(--sans);font-stretch:85%;margin:2px 0 4px;color:var(--
 #resultsTable tr.rec{background:var(--accent-soft)}
 #resultsTable tr.nofit{color:#9AA3B2}
 #resultsTable td.best{font-weight:700;color:var(--ok)}
-#resultsTable .tag{margin-left:6px}
+#resultsTable td:nth-child(2){white-space:normal;min-width:230px}
+#resultsTable .tag{margin:3px 0 0;display:table}
+#resultsTable sup{margin-left:2px}
 #resultsTable th[title]{cursor:help;text-decoration:underline dotted;text-underline-offset:3px}
 .panel #studyChoices{grid-template-columns:1fr}
 .table-note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
@@ -163,7 +165,7 @@ button.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px;bor
 .link-row{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin:10px 0;font-size:14px;font-weight:600}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}
 .page-actions{display:flex;justify-content:flex-end;gap:12px;align-items:center;position:sticky;bottom:0;z-index:5;padding:12px 0;margin-top:8px;background:var(--canvas);border-top:1px solid var(--line);box-shadow:0 -8px 16px -12px rgba(24,33,43,.25)}
-.file-button{display:inline-flex;margin:0;font-size:14px}
+.file-button{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:14px}
 .file-button input{margin:0;width:auto}
 
 /* Tags */

@@ -152,3 +152,8 @@ def test_comparison_with_human_data_is_removed(client):
     assert client.get('/api/example/reference.csv').status_code==404
     html=client.get('/').text
     assert 'id="compare"' not in html and 'humanFile' not in html
+
+def test_csv_downloads_open_correctly_in_excel(client):
+    for path in ['/api/guide.csv','/api/template/4','/api/example/SPA4_template.csv']:
+        r=client.get(path)
+        assert r.status_code==200 and r.content.startswith(b'\xef\xbb\xbf') and 'charset=utf-8' in r.headers['content-type']

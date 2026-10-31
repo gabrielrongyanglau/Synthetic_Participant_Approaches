@@ -5,7 +5,8 @@ function makeZip(files){
   const crcTable=Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0});
   const crc=b=>{let n=0xffffffff;for(const v of b)n=crcTable[(n^v)&255]^(n>>>8);return (n^0xffffffff)>>>0};
   const header=(size)=>{const a=new Uint8Array(size);return [a,new DataView(a.buffer)]};
-  for(const [filename,text] of Object.entries(files)){
+  for(let [filename,text] of Object.entries(files)){
+    if(/\.csv$/i.test(filename)&&!String(text).startsWith('\ufeff'))text='\ufeff'+text;  // so Excel reads UTF-8
     const name=enc.encode(filename),data=enc.encode(text),checksum=crc(data),[a,v]=header(30+name.length);
     v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);v.setUint32(14,checksum,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,name.length,true);a.set(name,30);
     parts.push(a,data);entries.push({name,data,checksum,offset});offset+=a.length+data.length;

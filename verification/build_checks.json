@@ -1,5 +1,5 @@
 {
-  "app_version": "6.3.0",
+  "app_version": "6.4.0",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",
@@ -14,7 +14,7 @@
   "provider_store_parameter": false,
   "provider_background_mode": true,
   "provider_cleanup": "Best effort after browser receipt; provider retention still applies",
-  "tests_passed": 211,
+  "tests_passed": 212,
   "test_seconds": 133.3,
   "live_api_calls": 0,
   "live_vercel_deployment_tested": false,
@@ -80,5 +80,6 @@
   "interface_6_0": "Design B research console: top status bar, side navigation with step statuses, separate pages for the seven steps and reference material, inspector with selections, evidence and activity log, results table of all eight approaches on the approach page; the proposal's two goals (Goal 2 merged); messages stick below the top bar with Dismiss; IBM Plex Sans self-hosted under the SIL Open Font License.",
   "interface_6_1": "Study-first flow after the supplied revised design: 1 Choose your study, 2 Research goal, 3 Questionnaire (own study), 4 Your situation, 5 Approach, 6 Inputs (own study), 7 Check and generate, 8 Datasets. The MIDUS demonstration skips steps 3 and 6 and shows its example inputs on Check and generate. Later steps stay locked until earlier ones are complete, and changing the study, goal, situation or approach asks for the approach to be confirmed again. Compare with human data is removed from the interface and the API (/api/compare, the fictional MIDUS reference and the custom comparison). Overview content and the Errors and help page are kept.",
   "interface_6_2": "Navigation statuses read to do, locked or completed. Each upload offers a blank template, a completed example with fictional values and the instructions ZIP. The Overview explains the two ways to use the toolkit (MIDUS demonstration or your own study).",
-  "interface_6_3": "Clarity review: overview without the two-ways panel and goals note, MIDUS introduced once as a study to try out, no approach numbers before the situation step, plain decision path, recommendation reasons without Table 6 references, approach descriptions generic for own studies, Inputs step stops when demographics are missing for SPA4, SPA7 or SPA8, measures restored in the Glossary."
+  "interface_6_3": "Clarity review: overview without the two-ways panel and goals note, MIDUS introduced once as a study to try out, no approach numbers before the situation step, plain decision path, recommendation reasons without Table 6 references, approach descriptions generic for own studies, Inputs step stops when demographics are missing for SPA4, SPA7 or SPA8, measures restored in the Glossary.",
+  "interface_6_4": "Overview summary figures removed, Recommended tag placed under the approach name in the results table, PDF upload aligned with its label, UTF-8 byte order mark on every CSV download (server responses and browser-built files and ZIP entries) so Excel reads non-ASCII characters correctly."
 }

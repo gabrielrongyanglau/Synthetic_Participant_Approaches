@@ -120,6 +120,11 @@ def display_results(frame,key):
 
 
 def download(content,name,typ='application/zip'):
+    # CSV files start with a UTF-8 byte order mark so Excel shows characters such as en dashes correctly.
+    if typ=='text/csv':
+        if isinstance(content,str):content=content.encode('utf-8')
+        if not content.startswith(b'\xef\xbb\xbf'):content=b'\xef\xbb\xbf'+content
+        typ='text/csv; charset=utf-8'
     return Response(content,media_type=typ,headers={'Content-Disposition':f'attachment; filename="{name}"','Cache-Control':'no-store'})
 
 @app.get('/')

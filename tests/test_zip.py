@@ -11,4 +11,8 @@ def test_browser_zip_crc_and_utf8_roundtrip():
     with zipfile.ZipFile(io.BytesIO(result.stdout)) as z:
         assert z.testzip() is None
         assert set(z.namelist())==set(expected)
-        for name,text in expected.items():assert z.read(name).decode()==text
+        for name,text in expected.items():
+            # CSV files gain a UTF-8 byte order mark so Excel reads characters such as en dashes correctly.
+            raw=z.read(name)
+            if name.endswith('.csv'):assert raw.startswith(b'\xef\xbb\xbf')
+            assert raw.decode('utf-8-sig')==text

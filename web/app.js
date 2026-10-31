@@ -67,7 +67,12 @@ function warningList(items){
 
 function invalidateReview(){reviewedRequest=null;if($('inputsConfirmed'))$('inputsConfirmed').checked=false;if($('runReview'))$('runReview').hidden=true;updateRail()}
 function csvText(rows){if(!rows.length)return '';const keys=Object.keys(rows[0]),quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';return [keys,...rows.map(r=>keys.map(k=>r[k]))].map(r=>r.map(quote).join(',')).join('\r\n')}
-function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=el('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)}
+// CSV downloads start with a UTF-8 byte order mark so Excel shows characters such as en dashes correctly.
+function saveBlob(blob,name){
+  const go=b=>{const u=URL.createObjectURL(b),a=el('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)};
+  if(!/\.csv$/i.test(name))return go(blob);
+  blob.slice(0,3).arrayBuffer().then(x=>{const u=new Uint8Array(x);go(u[0]===0xEF&&u[1]===0xBB&&u[2]===0xBF?blob:new Blob(['\ufeff',blob],{type:'text/csv;charset=utf-8'}))});
+}
 
 const ROWS={5:50,6:50,7:100,8:100};
 function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. The toolkit builds 100 demographic profiles that match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including every outcome. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}

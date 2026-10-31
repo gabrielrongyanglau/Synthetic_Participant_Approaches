@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 6.4: layout and file encoding
+
+The Overview no longer shows the four summary figures. On the Approach page, the Recommended tag sits under the approach name, so it no longer overlaps the Fits column. The PDF upload control is aligned with its label. Every CSV download, including those inside ZIP files, now starts with a UTF-8 byte order mark, so Excel shows characters such as the en dash in "18–34 years" correctly. A completed example downloaded with the mark was uploaded unchanged and passed Check inputs. All 212 tests pass.
+
 ## Version 6.3: clarity review
 
 The Overview no longer has the two-ways panel or the goals note. It introduces MIDUS once and says the toolkit can be tried out with the MIDUS study or used with your own. Every page was read in workflow order for terms used before they are explained. The research goal and questionnaire pages no longer mention approach numbers, the decision path names each approach, the pilot question explains what a pilot sample is, and recommendation reasons refer to the proposal in place of Table 6. The SPA6 alternative is described as the AI analysing the pilot records itself, since the toolkit always calculates SPA5's summaries. For Goal 1 with measured psychological scores, the reason now states plainly that there is nothing to generate for Goal 1 and how to choose SPA5. Approach descriptions for your own study refer to your outcomes, where they previously named MIDUS life satisfaction. The Inputs step stops with a clear message when SPA4, SPA7 or SPA8 is chosen without demographic categories. Upload help, the variable guide and the results-table headings use plain wording, and the Glossary again explains the measures in the results table. All 211 tests pass.

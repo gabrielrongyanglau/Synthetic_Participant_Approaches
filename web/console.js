@@ -79,7 +79,7 @@ const Console=(()=>{
    const tr=el('tr');tr.className=[fit.includes(m)?'fit':'nofit',r&&stage()&&r.primary===m?'rec':''].join(' ');
    const pick=el('input');pick.type='radio';pick.name='consoleSpa';pick.checked=chosen===m&&!!stage();pick.disabled=!fit.includes(m)||!stage();pick.setAttribute('aria-label','Choose '+Research.methodLabel(m));
    pick.addEventListener('change',()=>{const card=document.querySelector(`input[name=chosenApproach][value="${m}"]`);if(card){card.checked=true;card.dispatchEvent(new Event('change'))}});
-   const c0=el('td');c0.append(pick);const c1=el('td',Research.methodLabel(m));if(r&&stage()&&r.primary===m)c1.append(el('span','Recommended','tag tag-accent'));if(m===8)c1.append(el('sup','*'));
+   const c0=el('td');c0.append(pick);const c1=el('td',Research.methodLabel(m));if(m===8)c1.append(el('sup','*'));if(r&&stage()&&r.primary===m)c1.append(el('span','Recommended','tag tag-accent'));
    tr.append(c0,c1,el('td',fit.includes(m)?'Yes':'No'));
    for(const [k,w,,low] of cols){const v=metric(k,w,m),td=el('td',f3(v));if(low!==null&&m!==8&&v===best(k,w,low))td.className='best';else if(low===true&&k==='correlation_mae'&&m===8)td.className='best';tr.append(td)}
    body.append(tr)}
