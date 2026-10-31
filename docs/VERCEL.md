@@ -46,6 +46,6 @@ The custom questionnaire extension uses the same temporary processing and signed
 
 The visible 100-person limit conserves the team-funded budget per simulation; it is not a durable per-user or account-wide spending cap. Provider budget and usage controls remain the owner’s responsibility. Using visitor-supplied API keys is a future feature; there is no visitor key entry field.
 
-## Reviewed papers and input checks
+## Input checks
 
-`/api/extract-paper` accepts bounded base64 PDFs and extracts text in function memory without a provider call or file writes. `/api/check-inputs` validates input records and constructs the fixed request without calling OpenAI. The server rejects visitor prompt/model fields. The default MIDUS template bank is unchanged; custom measure mapping and reviewed source evidence use server-owned system instructions. Full extracted text must be reviewed in the browser. See [Prompt policy](PROMPT_POLICY.md).
+`/api/check-inputs` validates input records and constructs the fixed request without calling OpenAI. The server rejects visitor prompt/model fields. The default MIDUS template bank is unchanged; custom measure mapping uses server-owned system instructions. See [Prompt policy](PROMPT_POLICY.md).

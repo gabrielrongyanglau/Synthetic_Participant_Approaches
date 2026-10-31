@@ -29,7 +29,7 @@ def test_contexts_round_trip_exactly(method):
     assert inbound(public)==ctx and jobs.digest(inbound(public))==jobs.digest(ctx)
 
 def test_no_source_codes_in_any_page_or_download(client):
-    responses=[client.get(p) for p in ['/','/app.js','/research.js','/study-charts.js','/supporting.js','/api/config','/api/evidence','/api/guide.csv']]
+    responses=[client.get(p) for p in ['/','/app.js','/research.js','/study-charts.js','/api/config','/api/evidence','/api/guide.csv']]
     responses+=[client.get(f'/api/template/{m}') for m in (4,5,6,7,8)]
     responses+=[client.get(f'/api/example/{n}') for n in [f'SPA{m}_template.csv' for m in (4,5,6,7,8)]]
     for m in range(1,9):
@@ -96,7 +96,7 @@ def test_participant_id_is_first_for_fixed_profile_datasets(client,method):
 M_LABEL=__import__('re').compile(r'(?<![A-Za-z0-9])M[1-8](?![0-9A-Za-z])')
 
 def test_no_m_style_approach_labels_anywhere(client):
-    responses=[client.get(p) for p in ['/','/app.js','/research.js','/study-charts.js','/supporting.js','/api/config','/api/evidence','/api/guide.csv']]
+    responses=[client.get(p) for p in ['/','/app.js','/research.js','/study-charts.js','/api/config','/api/evidence','/api/guide.csv']]
     responses+=[client.get(f'/api/template/{m}') for m in (4,5,6,7,8)]+[client.get(f'/api/example/SPA{m}_template.csv') for m in (4,5,6,7,8)]
     for m in range(1,9):
         body={'methods':[m],'consent':True}

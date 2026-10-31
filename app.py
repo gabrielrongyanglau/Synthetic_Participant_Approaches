@@ -32,7 +32,6 @@ class Run(BaseModel):
     consent:bool=False
     study:dict|None=None
     goal:str="distributions"
-    supporting:dict=Field(default_factory=dict)
     sensitive_ack:bool=False
 
 @app.middleware('http')
@@ -133,8 +132,6 @@ def index():return FileResponse(ROOT/'web/index.html')
 def js():return FileResponse(ROOT/'web/app.js',media_type='text/javascript')
 @app.get('/study-charts.js')
 def study_charts_script():return FileResponse(ROOT/'web/study-charts.js',media_type='text/javascript')
-@app.get('/supporting.js')
-def supporting_script():return FileResponse(ROOT/'web/supporting.js',media_type='text/javascript')
 
 @app.get('/research.js')
 def research_script():return FileResponse(ROOT/'web/research.js',media_type='text/javascript')
@@ -281,16 +278,6 @@ async def custom_tools(request:Request):
     blank={k:(f.assign(proportion=None) if k=='proportions' else f.iloc[:0]) for k,f in tables.items()}
     return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:f.to_csv(index=False) for k,f in blank.items()})
 
-class Paper(BaseModel):
-    model_config=ConfigDict(extra='forbid')
-    filename:str=Field(max_length=300)
-    data:str=Field(max_length=2_000_004)
-
-@app.post('/api/extract-paper')
-def extract_paper(req:Paper):
-    from spa.evidence import extract_pdf
-    return extract_pdf(req.data,req.filename)
-
 @app.post('/api/check-inputs')
 def check_inputs(req:Run):
     from spa.checks import content
@@ -303,10 +290,10 @@ def check_inputs(req:Run):
     from spa.recommendations import public_label
     return dict(api_calls=0,approach=public_label(run_spa(run)),participants=req.n,
       input_source='Supplied fictional examples' if req.examples else 'Your supplied study information',
-      mode=ctx['provenance']['prompt_mode'],supporting_sources=len(ctx.get('supporting',{}).get('sources',[])),
-      prompt_policy='Fixed research-team method template with a server-controlled study and evidence layer.',
+      mode=ctx['provenance']['prompt_mode'],
+      prompt_policy='Fixed research-team method template with a server-controlled study layer.',
       generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,
-      note='Structural checks passed. Source quality and scientific validity need your own review. Review the read-only instructions if needed.',
+      note='Structural checks passed. Scientific validity needs your own review. Review the read-only instructions if needed.',
       warnings=warnings,sensitive_topics=topics)
 
 @app.get('/api/template/{method}')

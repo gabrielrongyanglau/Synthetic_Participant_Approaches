@@ -11,7 +11,7 @@ const CLIENT_ERRORS={
   network_error:{title:'The connection was interrupted',detail:'The toolkit could not reach its server.',advice:'Check your connection and try again. If generation has started, keep this tab open. Progress checks resume automatically and only read existing requests.'},
   server_timeout:{title:'The server took too long to respond',detail:'The hosting service stopped waiting for a reply ({status}).',advice:'Try again in a moment. Running batches continue, and the toolkit keeps checking them.'},
   unreadable_response:{title:'The server sent an unexpected reply',detail:'The reply could not be read ({status}).',advice:'Try again. If it continues, download any completed datasets and contact the research team.'},
-  request_too_large:{title:'The inputs are too large to send',detail:'The uploaded data and supporting text exceed the 3 MB request limit.',advice:'Use a smaller profile file (100 rows is enough), remove unused columns, or include fewer supporting excerpts.'},
+  request_too_large:{title:'The inputs are too large to send',detail:'The uploaded data exceed the 3 MB request limit.',advice:'Use a smaller profile file (100 rows is enough), or remove unused columns.'},
   wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
   file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the template, fill it with your data and choose it here, or switch to the supplied fictional examples.'},
@@ -116,7 +116,7 @@ function tables(bundle,parent){
 
 async function reviewInputs(){
   const req=await request(),result=await api('/api/check-inputs',req);reviewedRequest=JSON.stringify(req);
-  const labels={approach:'Selected approach',participants:'Participants',input_source:'Input source',mode:'Simulation type',supporting_sources:'Supporting sources',prompt_policy:'Prompt policy',generated_fields:'Values generated per participant',note:'Check result'};
+  const labels={approach:'Selected approach',participants:'Participants',input_source:'Input source',mode:'Simulation type',prompt_policy:'Prompt policy',generated_fields:'Values generated per participant',note:'Check result'};
   const rows=Object.entries(result).filter(([k])=>!['api_calls','warnings','sensitive_topics'].includes(k)).map(([k,Value])=>({Setting:labels[k]||k,Value}));
   if(result.sensitive_topics?.length)rows.push({Setting:'Sensitive topics confirmed',Value:result.sensitive_topics.join(', ')});
   const size=cfg.batch_size,count=Math.ceil(100/size);
@@ -184,7 +184,7 @@ async function request(){
     checkFile(f);
     assets[input.dataset.asset]=await f.text();
   }
-  return {sensitive_ack:$('sensitiveAck').checked,supporting:Supporting.value(),goal:Research.goal(),study:Research.study(),methods:[...selected].sort(),n:Number($('n').value),repetitions:Number($('repetitions').value),seed:Number($('seed').value),examples,population:$('population').value,assets,consent:$('consent').checked};
+  return {sensitive_ack:$('sensitiveAck').checked,goal:Research.goal(),study:Research.study(),methods:[...selected].sort(),n:Number($('n').value),repetitions:Number($('repetitions').value),seed:Number($('seed').value),examples,population:$('population').value,assets,consent:$('consent').checked};
 }
 
 function metadata(){
@@ -200,7 +200,7 @@ function metadata(){
 function downloadAll(){
   const files={};
   for(const [run,d] of Object.entries(session.details)){files[Research.runLabel(run)+'.csv']=d.csv;files['codebook.csv']=d.codebook_csv}
-  files['metadata.json']=JSON.stringify(metadata(),null,2);files['supporting_information.json']=JSON.stringify(session.brief.supporting||{},null,2);
+  files['metadata.json']=JSON.stringify(metadata(),null,2);
   saveBlob(makeZip(files),'synthetic_participant_datasets.zip');
 }
 function checkFile(f){

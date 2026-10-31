@@ -133,11 +133,6 @@ def texts_from(req):
             if isinstance(v,dict):
                 out.append(('demographic definitions',str(v.get('name',''))))
                 for lab in (v.get('categories') or {}).values():out.append(('demographic categories',str(lab)))
-    sup=getattr(req,'supporting',None) or {}
-    if isinstance(sup,dict):
-        if isinstance(sup.get('question'),str):out.append(('the research context',sup['question']))
-        for src in sup.get('sources') or []:
-            if isinstance(src,dict):out.append((f'source "{str(src.get("title",""))[:60]}"',str(src.get('title',''))+'\n'+str(src.get('text',''))))
     return out
 
 def content(req):

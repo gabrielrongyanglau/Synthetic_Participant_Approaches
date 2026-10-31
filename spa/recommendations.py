@@ -8,7 +8,7 @@ GOALS={'distributions':'Goal 1: reproduce psychological variables',
  'relationships':'Goal 2: reproduce relationships among variables'}
 # Earlier interface versions offered finer-grained choices; they map onto the proposal's two goals.
 LEGACY_GOALS={'patterns':'relationships','strengths':'relationships','outcomes':'relationships','workflow':'distributions'}
-STAGES={'none':'No participant data yet','proportions':'Target demographic proportions','pilot':'A pilot sample of 50 participants',
+STAGES={'none':'No participant data yet','description':'A general population description','proportions':'Target demographic proportions','pilot':'A pilot sample of 50 participants',
  'demographics':'Individual demographic profiles','psychology':'Individual demographic and psychological scores'}
 PATTERN='In the study, every approach reproduced the direction and overall pattern of relationships closely (pattern r .94 to .97).'
 STRENGTH='Approaches that generated psychological scores made relationships about three times stronger than in the human data (average correlation with life satisfaction about .95, against .31).'
@@ -35,6 +35,10 @@ def suggest(goal,information):
         primary=7;reason='SPA7 keeps each person’s real demographics and generates their psychological scores and outcomes. In the study, real demographics did not bring scores or relationships closer to human data than SPA2.'
     elif 'proportions' in info:
         primary=4;reason='SPA4 builds profiles that match your demographic proportions and generates the remaining scores. In the study, matching demographics did not bring scores or relationships closer to human data than SPA2.'
+    elif 'description' in info:
+        primary=3
+        reason=('SPA3 adds your population description to the instructions. In the study, it reproduced relationship patterns about as well as SPA1 and SPA2 (pattern r .94), and relationship strengths stayed inflated (correlation error .66 at MIDUS 2, against .65 for SPA2).' if rel else
+                'SPA3 uses your description of the people you want to simulate. In the study, its average scores differed from human data by 0.53 standard deviations, close to SPA1 and SPA2. A 50-person pilot with SPA5 roughly halves this.')
     else:
         primary=2
         reason=('The proposal recommends SPA2 before human data are collected. SPA1 and SPA3 are alternatives that showed no meaningful advantage. '+PATTERN+' '+STRENGTH if rel else

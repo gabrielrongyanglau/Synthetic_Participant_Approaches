@@ -8,20 +8,18 @@ The side navigation lists the steps in order, each marked to do, locked or compl
 
 1. Under **1 Choose your study**, choose **MIDUS demonstration** to use the example inputs supplied with the toolkit, with nothing to upload. MIDUS is the Midlife in the United States study used in the original evaluation.
 2. Under **2 Research goal**, choose your goal. Goal 1 is generating psychological variables that resemble human responses. Goal 2 is exploring relationships among variables, covering their patterns and strengths.
-3. Under **3 Your situation**, answer the yes/no questions about what you have so far, for example whether you have collected pilot data.
-4. Under **4 Approach**, review the recommendation from Table 6 of the proposal and the study results for all eight approaches, then choose **Continue with SPA…**. Pick another approach from the cards or the table if you prefer. One approach is used per simulation.
+3. Under **3 Available information**, choose the one option that best describes what you have: no participant data, a general population description, population demographic proportions, a small human pilot dataset, actual demographic profiles, or actual demographic and psychological scores.
+4. Under **4 Approach**, review the recommendation from Table 6 of the proposal and the study results for the approaches that fit your information, then choose **Continue with SPA…**. Pick another approach from the cards or the table if you prefer. One approach is used per simulation.
 5. Under **5 Check and generate**, tick the data-sharing confirmation, choose **Check inputs**, review the summary and tick its confirmation, then choose **Generate 100 participants with AI**.
-6. Under **6 Datasets**, choose **Download dataset and codebook (ZIP)**. It contains the CSV, variable codebook, metadata and supporting-information record. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
+6. Under **6 Datasets**, choose **Download dataset and codebook (ZIP)**. It contains the CSV, variable codebook and metadata. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
 
-Changing the study, goal, situation or approach asks you to confirm the approach again. Messages and advice appear just below the top bar, so they stay in view. To run another simulation, clear the session under *Datasets*. *Start over* in the top bar resets everything.
+Changing the study, goal, available information or approach asks you to confirm the approach again. Messages and advice appear just below the top bar, so they stay in view. To run another simulation, clear the session under *Datasets*. *Start over* in the top bar resets everything.
 
 ## Your own study
 
 Under **1 Choose your study**, select **My own study**. Your own study has two extra steps, so it runs from 1 to 8.
 
 After the research goal, **3 Questionnaire** asks for a study title, construct definitions, verified citations, all exact questionnaire items, response scales, scoring and predictor or outcome roles. Each item needs a valid response range. Mean and sum scores require every item. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. The example study is fictional and is not a validated questionnaire. Choose **Check and continue** to check the definition and move on. Editing the questionnaire later asks for a new check before the later steps open again.
-
-Optional context and papers on the same page guide a custom adaptation. Add a research question, paste relevant empirical findings, or upload a PDF. Review all extracted text, including table order and symbols, remove unwanted sources and confirm the evidence checkbox. A DOI alone is not a paper upload.
 
 After you confirm the approach, **6 Inputs** asks only for what that approach needs, such as a population description for SPA3 or a pilot sample for SPA5. There is no prompt editor. Our fixed method templates and server-controlled mapping/evidence instructions produce the request. Custom measures and literature-informed simulations have not been validated by the original MIDUS comparison.
 
@@ -53,6 +51,6 @@ Uploads are checked before anything is sent: file type, separators, column names
 
 ## Download
 
-Download before refreshing or leaving. The prototype has no saved history. The codebook explains every exported column. Metadata records settings, provenance, quality flags and whether evidence was used. The supporting-information JSON records the reviewed text, not the original PDFs.
+Download before refreshing or leaving. The prototype has no saved history. The codebook explains every exported column. Metadata records settings, provenance and quality flags.
 
 Original MIDUS findings under *Study findings* are separate from visitor simulations. The toolkit does not compare generated datasets with human data, so check a generated dataset against your own human data before relying on it.

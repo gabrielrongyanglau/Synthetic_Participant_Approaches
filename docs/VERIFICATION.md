@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 6.5: available information, no papers, fitting results only
+
+The questions on what the researcher has are replaced by one choice from six options: no participant data, a general population description, population demographic proportions, a small human pilot dataset, actual demographic profiles, or actual demographic and psychological scores. A general population description now leads to SPA3, with SPA1 and SPA2 as alternatives. The other recommendations are unchanged. Research context and supporting papers are removed from the interface, the request, the prompts, the error catalogue, the tests and the guides, together with the PDF extraction route and its dependency. The Approach page shows study results only for the approaches that fit the chosen information, and green marks the closest value among them. All 187 tests pass. The count is lower because the supporting-paper tests were removed.
+
 ## Version 6.4: layout and file encoding
 
 The Overview no longer shows the four summary figures. On the Approach page, the Recommended tag sits under the approach name, so it no longer overlaps the Fits column. The PDF upload control is aligned with its label. Every CSV download, including those inside ZIP files, now starts with a UTF-8 byte order mark, so Excel shows characters such as the en dash in "18–34 years" correctly. A completed example downloaded with the mark was uploaded unchanged and passed Check inputs. All 212 tests pass.

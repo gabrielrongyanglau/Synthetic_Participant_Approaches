@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="/style.css">
 <script src="/zip.js" defer></script>
 <script src="/study-charts.js" defer></script>
-<script src="/supporting.js" defer></script>
 <script src="/research.js" defer></script>
 <script src="/app.js" defer></script>
 <script src="/console.js" defer></script>
@@ -18,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v6.4</span>
+  <span class="chip">v6.5</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -27,7 +26,7 @@
   <button type="button" data-goto="help">Help</button>
 </header>
 <div class="shell">
-<nav id="nav" aria-label="Sections"><p class="nav-group">Workflow</p><button type="button" data-page="overview" class="active"><span>Overview</span></button><button type="button" data-page="study" data-step><span><span class="step-no"></span>Choose your study</span><small id="navStudy"></small></button><button type="button" data-page="goal" data-step><span><span class="step-no"></span>Research goal</span><small id="navGoal"></small></button><button type="button" data-page="questionnaire" data-step data-own hidden><span><span class="step-no"></span>Questionnaire</span><small id="navQuestionnaire"></small></button><button type="button" data-page="situation" data-step><span><span class="step-no"></span>Your situation</span><small id="navSituation"></small></button><button type="button" data-page="approach" data-step><span><span class="step-no"></span>Approach</span><small id="navApproach"></small></button><button type="button" data-page="inputs" data-step data-own hidden><span><span class="step-no"></span>Inputs</span><small id="navInputs"></small></button><button type="button" data-page="run" data-step><span><span class="step-no"></span>Check and generate</span><small id="navGenerate"></small></button><button type="button" data-page="datasets" data-step><span><span class="step-no"></span>Datasets</span><small id="navDatasets"></small></button><p class="nav-group">Reference</p><button type="button" data-page="evidence"><span>Study findings</span></button><button type="button" data-page="glossary"><span>Glossary</span></button><button type="button" data-page="help"><span>Errors and help</span></button></nav>
+<nav id="nav" aria-label="Sections"><p class="nav-group">Workflow</p><button type="button" data-page="overview" class="active"><span>Overview</span></button><button type="button" data-page="study" data-step><span><span class="step-no"></span>Choose your study</span><small id="navStudy"></small></button><button type="button" data-page="goal" data-step><span><span class="step-no"></span>Research goal</span><small id="navGoal"></small></button><button type="button" data-page="questionnaire" data-step data-own hidden><span><span class="step-no"></span>Questionnaire</span><small id="navQuestionnaire"></small></button><button type="button" data-page="situation" data-step><span><span class="step-no"></span>Available information</span><small id="navSituation"></small></button><button type="button" data-page="approach" data-step><span><span class="step-no"></span>Approach</span><small id="navApproach"></small></button><button type="button" data-page="inputs" data-step data-own hidden><span><span class="step-no"></span>Inputs</span><small id="navInputs"></small></button><button type="button" data-page="run" data-step><span><span class="step-no"></span>Check and generate</span><small id="navGenerate"></small></button><button type="button" data-page="datasets" data-step><span><span class="step-no"></span>Datasets</span><small id="navDatasets"></small></button><p class="nav-group">Reference</p><button type="button" data-page="evidence"><span>Study findings</span></button><button type="button" data-page="glossary"><span>Glossary</span></button><button type="button" data-page="help"><span>Errors and help</span></button></nav>
 <main id="main">
 <div id="notice" role="status" aria-live="polite"></div>
 <section id="overview" class="page">
@@ -35,7 +34,7 @@
   <p id="intro" class="lead"></p>
   <p class="sub">The proposal compared these approaches with real responses from the Midlife in the United States (MIDUS) study. You can try out the toolkit with that MIDUS study, or enter your own.</p>
   <div class="panel"><h2>How this works <small>The MIDUS demonstration skips steps 3 and 6</small></h2>
-    <ol class="how"><li>Try out the MIDUS study from the proposal, or enter your own study</li><li>Choose your research goal</li><li>For your own study, define your questionnaire</li><li>Answer up to three questions about what you have</li><li>Use the recommended approach or an alternative</li><li>For your own study, provide the inputs the approach needs</li><li>Check inputs and generate 100 participants</li><li>Download the dataset and codebook</li></ol>
+    <ol class="how"><li>Try out the MIDUS study from the proposal, or enter your own study</li><li>Choose your research goal</li><li>For your own study, define your questionnaire</li><li>Choose the information you can provide</li><li>Use the recommended approach or an alternative</li><li>For your own study, provide the inputs the approach needs</li><li>Check inputs and generate 100 participants</li><li>Download the dataset and codebook</li></ol>
   </div>
   <p class="sub">Generation uses GPT-5.6 Luna with medium reasoning. AI calls use the research team’s server-side key and its limited budget, so each simulation creates one dataset of 100 participants.</p>
   <div class="btns"><button type="button" class="btn" data-goto="study">Start with your study</button></div>
@@ -58,13 +57,13 @@
 <section id="goal" class="page" hidden>
   <header class="page-head"><p class="crumb" data-crumb="goal">Workflow</p><h1>What is your research goal?</h1><p class="sub">The proposal evaluates two goals. Your choice shapes the recommendation and its explanation.</p></header>
   <div class="panel"><div id="goalChoices" class="goal-groups" role="radiogroup" aria-label="Research goal"></div></div>
-  <div class="btns"><button type="button" class="btn" id="nextGoal">Next: your situation</button></div>
+  <div class="btns"><button type="button" class="btn" id="nextGoal">Next: available information</button></div>
 </section>
 
 <section id="questionnaire" class="page" hidden>
   <header class="page-head"><p class="crumb" data-crumb="questionnaire">Workflow</p><h1>Define your study and questionnaire</h1><p class="sub">Give every measure its definition, source, items and scoring. Participant data come later, when the approach needs them.</p></header>
   <div class="panel" id="customPanel">
-    <h2>Your study <small>measures, optional demographics and papers</small></h2>
+    <h2>Your study <small>measures and optional demographics</small></h2>
       <div id="customSetup" hidden>
         <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 measures and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
         <label>Study title<input id="studyTitle" type="text"></label>
@@ -84,24 +83,6 @@
         <p id="customStatus" class="status-line" role="status"></p>
         <p class="help">Mean and sum scores need every item observed. Reverse coding and composite scoring run in the toolkit after generation.</p>
 
-        <div id="supportingSetup" hidden>
-          <h3>Research context and supporting papers <span class="tag">Optional</span></h3>
-          <p class="help">A research question, pasted findings or PDF papers can guide a custom simulation. They are reference inputs, and the method instructions stay fixed. Literature-informed simulation is an extension beyond the MIDUS evaluation.</p>
-          <label>Research context or question <span class="label-note">up to 4,000 characters</span><textarea id="researchQuestion" maxlength="4000" rows="3" placeholder="Describe your study setting and the relationships you want to explore."></textarea></label>
-          <p class="help">A research question or hypothesis serves as context only. The simulation can produce results that differ from it.</p>
-          <div class="actions">
-            <button id="addSupportingText" class="btn-quiet" type="button">Add pasted findings or an excerpt</button>
-            <label class="file-button">Upload a PDF<input id="paperUpload" type="file" accept=".pdf,application/pdf"></label>
-          </div>
-          <details class="note">
-            <summary>Limits for supporting sources</summary>
-            <p>Up to three sources and 60,000 characters of text in total. Each PDF must be under 1.5 MB and 40 pages. Text extraction makes no AI calls. For scanned or protected files, paste the relevant text. The model reads only the text supplied here, so include the findings alongside any citation or DOI.</p>
-          </details>
-          <div id="sourceEditor"></div>
-          <p id="paperStatus" class="status-line" role="status" aria-live="polite"></p>
-          <label class="check confirm"><input id="evidenceReviewed" type="checkbox"><span>I have reviewed the research context and the full source text. They are relevant and I may share them with OpenAI.</span></label>
-          <p class="help">Only the reviewed text shown here is sent during AI generation. The PDF files are read in memory and discarded after extraction. Extraction copies text as written, so check claims, citations and tables yourself.</p>
-        </div>
       </div>
 
   </div>
@@ -109,25 +90,19 @@
 </section>
 
 <section id="situation" class="page" hidden>
-  <header class="page-head"><p class="crumb" data-crumb="situation">Workflow</p><h1>What do you have so far?</h1><p class="sub">Answer each question. The next one appears when needed.</p></header>
-  <div class="grid2">
-    <div class="panel"><div id="guideQuestions" class="guide"></div></div>
-    <div class="panel"><h2>Where your answers lead <small>from the proposal</small></h2>
-      <p class="help">Each approach is explained on the next page.</p>
-      <ul class="tree"><li>No data yet: SPA2, direct generation. If you know the demographic make-up you want: SPA4, quota matched.</li><li>A pilot sample of 50 participants: SPA5, pilot calibrated, with SPA6 as an alternative.</li><li>Only each participant’s demographic details: SPA7, demographic-only profiles.</li><li>Psychological scores measured, outcome still to come: SPA8, demographic and psychological profiles.</li></ul>
-      <div id="situationResult" class="callout blue" hidden></div>
-    </div>
+  <header class="page-head"><p class="crumb" data-crumb="situation">Workflow</p><h1>What information can you provide?</h1><p class="sub">Different approaches use different information. Choose the one option that best describes what you have now.</p></header>
+  <div class="panel"><div id="infoChoices" class="choice-grid two-up" role="radiogroup" aria-label="Available information"></div>
+    <div id="situationResult" class="callout blue" hidden></div>
   </div>
   <div class="btns"><button type="button" class="btn" id="nextSituation" data-goto="approach">Next: approach</button></div>
 </section>
 
 <section id="approach" class="page" hidden>
   <header class="page-head"><p class="crumb" data-crumb="approach">Workflow</p><h1>Recommended approach</h1></header>
-  <p id="approachNeeds" class="callout" hidden>Choose a goal and answer the questions under Your situation first.</p>
+  <p id="approachNeeds" class="callout" hidden>Choose a goal and your available information first.</p>
   <div class="panel"><div id="recommendation" class="recommendation" aria-live="polite"></div>
     <div id="methodCards" class="method-list" role="radiogroup" aria-label="Approach"></div></div>
-  <div class="panel"><h2>Results from the proposal’s study <small>1,000 datasets per approach. Green marks the closest value among approaches that generate scores.</small></h2>
-    <div class="tabs" role="tablist"><button type="button" role="tab" class="active" data-tab="all">All approaches</button><button type="button" role="tab" data-tab="fit">Only approaches that fit</button></div>
+  <div class="panel"><h2>Results from the proposal’s study <small>Approaches that fit your information. 1,000 datasets per approach. Green marks the closest value shown.</small></h2>
     <div id="resultsTable" class="wide"></div>
   </div>
   <div class="btns"><button type="button" class="btn" id="confirmApproach">Continue with this approach</button></div>
@@ -193,7 +168,7 @@
         <button id="reviewInputs" class="primary" type="button">Check inputs</button>
         <button id="preview" class="btn-quiet" type="button">Preview the AI instructions</button>
       </div>
-      <p class="help">The AI instructions are fixed by the research team. Your measures and papers are added to them automatically.</p>
+      <p class="help">The AI instructions are fixed by the research team. Your measures are added to them automatically.</p>
 
       <div id="runReview" class="review" hidden>
         <h3>Review before starting</h3>
@@ -342,7 +317,7 @@
 <aside class="inspector" aria-label="Your selections and activity">
   <div class="box"><h3>Your selections</h3><dl>
     <dt>Study</dt><dd id="selStudy"></dd><dt>Goal</dt><dd id="selGoal"></dd><dt id="selQuestionnaireLabel">Questionnaire</dt><dd id="selQuestionnaire"></dd>
-    <dt>Situation</dt><dd id="selSituation"></dd><dt>Approach</dt><dd id="selApproach"></dd><dt>Data</dt><dd id="selData"></dd><dt>Status</dt><dd id="selStatus"></dd></dl></div>
+    <dt>Information</dt><dd id="selSituation"></dd><dt>Approach</dt><dd id="selApproach"></dd><dt>Data</dt><dd id="selData"></dd><dt>Status</dt><dd id="selStatus"></dd></dl></div>
   <div class="box" id="inspEvidenceBox" hidden><h3 id="inspEvidenceTitle">Evidence</h3><p id="inspScores"></p><p id="inspRelations"></p></div>
   <div class="box"><h3>Tips</h3><ul class="tips"><li>Generated data need checking against human data.</li><li>No approach is validated for effect sizes or power.</li><li>Download results before closing the tab.</li></ul></div>
   <div class="box"><h3>Activity</h3><div id="activityLog" class="log"><div>Nothing yet.</div></div></div>

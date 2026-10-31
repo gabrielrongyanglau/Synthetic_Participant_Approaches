@@ -45,18 +45,6 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `sensitive_content` | Sensitive topics detected | Your study materials mention ‹topics› (found in ‹where›). | You can continue if your study has ethics approval, all data are de-identified, and you are allowed to send these materials to OpenAI. Tick the sensitive-topics confirmation, then check inputs again. The AI may still decline some content. If this topic affects you personally, please reach out to someone you trust or a local support service. | User action |
 | `prohibited_content` | This content cannot be processed | Your study materials include ‹topics› (found in ‹where›), which the toolkit blocks from generation. | Remove this material. If you believe this is a mistake, contact the research team.  | User action |
 
-## Supporting papers
-
-| Code | Title | Message | What the user is told to do | Automatic handling |
-| --- | --- | --- | --- | --- |
-| `pdf_too_large` | The PDF is too large | ‹name› is ‹size›. The limit is 1.5 MB. | Compress the PDF, upload only the relevant pages, or paste the key findings as text instead. | User action |
-| `not_pdf` | Upload a PDF file | ‹name› could not be opened as a PDF. | Upload a .pdf file, or paste the relevant findings as text. | User action |
-| `pdf_encrypted` | The PDF is password-protected | ‹name› is locked, so its text cannot be read. | Upload an unlocked copy, or paste the relevant findings as text. | User action |
-| `pdf_too_many_pages` | The PDF has too many pages | ‹name› has ‹pages› pages. The limit is 40. | Upload only the relevant section (for example the method and results), or paste the key findings. | User action |
-| `pdf_no_text` | No readable text in the PDF | ‹name› contains no selectable text. It is probably a scanned image. | Run text recognition (OCR) on the PDF first, or paste the relevant findings as text. | User action |
-| `pdf_too_much_text` | The PDF has too much text | ‹name› contains more than 60,000 characters of text. | Paste only the relevant excerpts, such as key results and measure descriptions. | User action |
-| `pdf_unreadable` | The PDF could not be read | Text could not be extracted from ‹name›. The file may be damaged. | Try exporting the PDF again from its source, or paste the relevant findings as text. | User action |
-
 ## Starting a run
 
 | Code | Title | Message | What the user is told to do | Automatic handling |
@@ -66,7 +54,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `run_limits` | This run is outside the trial limits | Each simulation can use one approach and create one dataset of 100 participants. | Select one approach. This research-funded trial supports one 100-person dataset per run. | User action |
 | `inputs_changed` | The inputs changed after they were prepared | The inputs sent for generation differ from the prepared, signed inputs. | Clear this session, check your inputs again and start a new run. Keep files and settings unchanged while a run is starting. | User action |
 | `handle_invalid` | This request has expired | The temporary link to an AI request is invalid or more than 24 hours old. | Download anything already received. To generate the missing participants, clear the session and start a new run. | User action |
-| `request_too_large` | The inputs are too large to send | The uploaded data and supporting text exceed the 3 MB request limit. | Use a smaller profile file (100 rows is enough), remove unused columns, or include fewer supporting excerpts. | User action |
+| `request_too_large` | The inputs are too large to send | The uploaded data exceed the 3 MB request limit. | Use a smaller profile file (100 rows is enough), or remove unused columns. | User action |
 | `blocked_request` | Request blocked | This request did not come directly from the toolkit page. | Open the toolkit website directly in a new browser tab and try again. | User action |
 
 ## AI service: submitting
@@ -78,7 +66,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `service_unavailable` | The AI service is temporarily unavailable | OpenAI returned a server error. The toolkit retried automatically without success. | Wait a few minutes and choose Retry failed batches. If this continues, check status.openai.com or contact the research team. | Server retries immediately (no charge), then the browser retries twice more after a pause |
 | `service_key_invalid` | The AI service key was rejected | OpenAI rejected the toolkit’s service key. | This must be fixed by the toolkit owner. Contact the research team. | User action |
 | `service_access_denied` | The account cannot use the AI model | OpenAI refused access to the configured model for the research team’s account. | This must be fixed by the toolkit owner. Contact the research team. | User action |
-| `inputs_too_large_for_model` | The inputs are too long for the AI model | The study definitions, pilot records and supporting text together exceed what the model can read in one request. | Shorten supporting excerpts, remove unused constructs, or set fewer participants per request (SPA_BATCH_SIZE). Contact the research team. | User action |
+| `inputs_too_large_for_model` | The inputs are too long for the AI model | The study definitions and pilot records together exceed what the model can read in one request. | Remove unused measures or set fewer participants per request (SPA_BATCH_SIZE). Contact the research team. | User action |
 | `request_rejected` | OpenAI rejected the request | OpenAI gave this reason: ‹reason› | Check your study materials for unusual content, then try again. If this repeats, contact the research team with the time of the error. | User action |
 | `submission_uncertain` | Submission status unknown | The connection to OpenAI dropped while a batch was being submitted. OpenAI may have accepted and charged it. | Wait a few minutes before retrying, so a duplicate charge is less likely. Then choose Retry failed batches, or contact the research team if you are unsure. | User action |
 
@@ -90,7 +78,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `response_expired` | A finished batch has expired | OpenAI deleted the result of this batch before the toolkit collected it, usually because the check came late. | The toolkit requests that batch again once automatically. Keep this tab open until all batches are received. | Browser resubmits the batch once automatically (paid) |
 | `generation_failed` | A batch failed to generate | OpenAI reported that the batch failed (‹reason›). | The toolkit retries the batch once automatically. If it fails again, choose Retry failed batches later or contact the research team. | Browser resubmits the batch once automatically (paid) |
 | `output_too_long` | A batch stopped before it finished | The AI reached its output length limit before generating every participant in the batch. | The toolkit retries once automatically. If this repeats, reduce the number of variables, or ask the owner to set SPA_BATCH_SIZE to 25. | Browser resubmits the batch once automatically (paid) |
-| `content_blocked` | The AI service blocked the content | OpenAI’s safety filter stopped this batch. | Review study materials for content that could be flagged (for example graphic descriptions in items or papers). Remove or rephrase it, then start a new run. | User action |
+| `content_blocked` | The AI service blocked the content | OpenAI’s safety filter stopped this batch. | Review study materials for content that could be flagged (for example graphic descriptions in items). Remove or rephrase it, then start a new run. | User action |
 | `model_refused` | The AI declined to generate this data | The model refused the request: "‹reason›" | This usually relates to sensitive study content. Rephrase or remove that content and start a new run. A retry works best after that content is changed. | User action |
 | `invalid_output` | The AI returned unusable data | The batch failed checks for participant count, identifiers, fields or value ranges (‹reason›). | The toolkit discards the batch and retries once automatically. If it fails again, choose Retry failed batches. | Browser resubmits the batch once automatically (paid) |
 | `repetitive_output` | The AI repeated participants | ‹count› of ‹size› participants in this batch were exact copies of another generated participant. | The toolkit retries the batch once automatically. If repetition continues, the batch is kept and flagged so you can decide whether to use it. | Browser resubmits the batch once automatically (paid) |

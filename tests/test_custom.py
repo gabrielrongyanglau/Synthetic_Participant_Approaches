@@ -58,6 +58,7 @@ def test_recommendations_mapping():
     for goal in ('distributions','relationships'):
         assert suggest(goal,[])['primary']==2 and suggest(goal,['psychology'])['primary']==8 and suggest(goal,['pilot'])['primary']==5
         assert suggest(goal,['demographics'])['primary']==7 and suggest(goal,['proportions'])['primary']==4
+        assert suggest(goal,['description'])['primary']==3 and suggest(goal,['description'])['feasible']==[1,2,3]
         assert suggest(goal,['pilot'])['task_supported'] and 'fidelity' not in suggest(goal,['pilot'])['reason'].lower()
     assert {5,6}<=set(suggest('distributions',['pilot'])['feasible']) and {7,8}<=set(suggest('relationships',['psychology'])['feasible'])
     assert 'SPA6' in suggest('relationships',['pilot'])['reason'] and 'SPA5' in suggest('distributions',['psychology'])['reason']
