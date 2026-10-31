@@ -31,7 +31,7 @@ class Run(BaseModel):
     assets:dict[str,str]=Field(default_factory=dict)
     consent:bool=False
     study:dict|None=None
-    goal:str="workflow"
+    goal:str="distributions"
     supporting:dict=Field(default_factory=dict)
     sensitive_ack:bool=False
 
@@ -137,6 +137,13 @@ def research_script():return FileResponse(ROOT/'web/research.js',media_type='tex
 def zip_script():return FileResponse(ROOT/'web/zip.js',media_type='text/javascript')
 @app.get('/style.css')
 def css():return FileResponse(ROOT/'web/style.css',media_type='text/css')
+@app.get('/console.js',include_in_schema=False)
+def console_script():return FileResponse(ROOT/'web/console.js',media_type='text/javascript')
+FONTS={'plexsans-var.woff2'}
+@app.get('/fonts/{name}',include_in_schema=False)
+def font(name:str):
+    if name not in FONTS:raise HTTPException(404,'Font not found.')
+    return FileResponse(ROOT/'web/fonts'/name,media_type='font/woff2',headers={'Cache-Control':'public, max-age=31536000, immutable'})
 
 @app.get('/api/config')
 def config():
@@ -287,7 +294,7 @@ def evidence():
 async def recommend(request:Request):
     from spa.recommendations import suggest
     d=await request.json()
-    return suggest(d.get('goal','workflow'),d.get('information',[]))
+    return suggest(d.get('goal','distributions'),d.get('information',[]))
 
 @app.post('/api/custom-tools')
 async def custom_tools(request:Request):

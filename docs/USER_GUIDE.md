@@ -4,15 +4,20 @@ A synthetic participant approach (SPA) asks an AI to produce hypothetical partic
 
 ## First visit
 
-1. Choose your research goal. Goal 1 is reproducing psychological scores. Goal 2 is reproducing relationships among variables: their direction and pattern, their strength, or a later outcome from baseline scores.
-2. Answer the yes/no questions about what you have so far, for example whether you have collected pilot data. The recommended approach, from Table 6 of the proposal, appears with the result behind it. Other approaches that fit are under *Other approaches that also fit your situation*. One approach is used per simulation.
-3. Choose **Continue to study and data**. Keep **MIDUS demonstration** to use the example inputs supplied with the toolkit, with nothing to upload. MIDUS is the Midlife in the United States study used in the original evaluation.
-4. Choose **Check inputs**, review the summary that appears and tick its confirmation.
-5. Tick the data-sharing confirmation, choose **Generate 100 participants with AI**, then **Download dataset and codebook (ZIP)** on *Your datasets*. It contains the CSV, variable codebook, metadata and supporting-information record. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
+The side navigation lists seven steps, each with its status. *Your selections* on the right summarises your choices, and *Activity* records what has happened.
+
+1. Under **1 Goal**, choose your research goal. Goal 1 is generating psychological variables that resemble human responses. Goal 2 is exploring relationships among variables, covering their patterns and strengths.
+2. Under **2 Your situation**, answer the yes/no questions about what you have so far, for example whether you have collected pilot data.
+3. Under **3 Approach**, review the recommendation from Table 6 of the proposal and the study results for all eight approaches, then choose **Continue with SPA…**. Pick another approach from the cards or the table if you prefer. One approach is used per simulation.
+4. Under **4 Study and data**, keep **MIDUS demonstration** to use the example inputs supplied with the toolkit, with nothing to upload. MIDUS is the Midlife in the United States study used in the original evaluation.
+5. Under **5 Check and generate**, tick the data-sharing confirmation, choose **Check inputs**, review the summary and tick its confirmation, then choose **Generate 100 participants with AI**.
+6. Under **6 Datasets**, choose **Download dataset and codebook (ZIP)**. It contains the CSV, variable codebook, metadata and supporting-information record. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
+
+Messages and advice appear just below the top bar, so they stay in view. To run another simulation, clear the session under *Datasets*. *Start over* in the top bar resets everything.
 
 ## Your own study
 
-On *Study and data*, select **My own study**. Enter a study title, construct definitions, verified citations, all exact questionnaire items, response scales, scoring and demographic categories. Each item needs a valid response range. Choose predictor/outcome roles. Mean and sum scores require every item. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. The example study is fictional and is not a validated questionnaire.
+Under **4 Study and data**, select **My own study**. Enter a study title, construct definitions, verified citations, all exact questionnaire items, response scales, scoring and demographic categories. Each item needs a valid response range. Choose predictor/outcome roles. Mean and sum scores require every item. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. The example study is fictional and is not a validated questionnaire.
 
 Optional context and papers guide a custom adaptation. Add a research question, paste relevant empirical findings, or upload a PDF. Review all extracted text, including table order and symbols, remove unwanted sources and confirm the evidence checkbox. A DOI alone is not a paper upload.
 
@@ -36,13 +41,13 @@ SPA5 receives pilot records and precomputed summaries. SPA6 receives pilot recor
 
 ## Start and wait
 
-Review the time/funding notice, authorize sharing with OpenAI for AI runs, then check inputs. Fix any reported issues before continuing. Review the summary and confirm it. Any subsequent settings/input changes require another check. One simulation creates one dataset of 100 people.
+Review the time/funding notice, authorise sharing with OpenAI for AI runs, then check inputs. Fix any reported issues before continuing. Review the summary and confirm it. Any subsequent settings/input changes require another check. One simulation creates one dataset of 100 people.
 
-Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. The 100 participants are generated as several smaller requests that run at the same time; *Your datasets* shows the status of each batch, the elapsed minutes and the last check time. The page checks existing background requests through short server calls, avoiding an hour-long Vercel function. No percentage is invented while the provider is generating.
+Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. The 100 participants are generated as several smaller requests that run at the same time. *Datasets* shows the status of each batch, the elapsed minutes and the last check time. The page checks existing background requests through short server calls, avoiding an hour-long Vercel function. No percentage is invented while the provider is generating.
 
 Keep the tab open and your device awake. The page handles common problems itself: a busy service is retried after a short wait, a lost connection pauses checking until you are back online, a failed progress check is repeated quietly, and a batch that fails, expires, stalls for more than an hour or returns unusable, repetitive or copied data is requested once more automatically. If a problem remains, each message names the problem and says what to do. If a batch still fails, you can choose **Retry failed batches** (a new paid request for those participants only) or download the participants received so far as a partial CSV. **Cancel generation** stops batches still running. If the research budget is used up, the service key is invalid or a submission is uncertain, the page stops and asks you to contact the research team rather than trying again. Zero failures cannot be guaranteed. Remaining repeated profiles and pilot matches are kept and listed under *Quality notes*.
 
-Uploads are checked before anything is sent: file type, separators, column names, required values, allowed ranges, whole-number codes, row counts, repeated participants and identifying details. Material on sensitive topics such as suicide or self-harm needs an extra confirmation; prohibited content is blocked. The full list of messages and advice is in [Errors and advice](ERRORS.md).
+Uploads are checked before anything is sent: file type, separators, column names, required values, allowed ranges, whole-number codes, row counts, repeated participants and identifying details. Material on sensitive topics such as suicide or self-harm needs an extra confirmation, and prohibited content is blocked. The full list of messages and advice is in [Errors and advice](ERRORS.md).
 
 ## Download and optional comparison
 

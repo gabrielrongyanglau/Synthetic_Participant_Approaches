@@ -1,7 +1,7 @@
 'use strict';
 // Session state lives only in this tab's memory. Nothing is written to browser storage.
 const $=id=>document.getElementById(id);
-let cfg,selected=new Set([2]),session=null,busy=false,comparisonFiles={},reviewedRequest=null,leftChoose=false;
+let cfg,selected=new Set(),session=null,busy=false,comparisonFiles={},reviewedRequest=null;
 
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
 /* ---------- Errors: every problem shows what happened and what to do ---------- */
@@ -28,24 +28,22 @@ function errorCard(err,cls='notice error'){
   if(err.advice){const a=el('p',undefined,'notice-advice');a.append(el('span','What to do: ','notice-label'),document.createTextNode(err.advice));box.append(a)}
   return box;
 }
-function notice(text,error=false){$('notice').replaceChildren();if(!text)return;if(error)$('notice').append(errorCard(typeof text==='string'?{title:'Something went wrong',message:text}:text));else $('notice').append(el('div',text,'notice'))}
+function notice(text,error=false){const box=$('notice');box.replaceChildren();if(!text)return;const card=error?errorCard(typeof text==='string'?{title:'Something went wrong',message:text}:text):el('div',text,'notice');const close=el('button','Dismiss','notice-close');close.type='button';close.addEventListener('click',()=>box.replaceChildren());card.prepend(close);box.append(card)}
 function action(fn){return async(...args)=>{try{notice('');await fn(...args)}catch(e){notice(e instanceof AppError?e:{title:'Something went wrong',message:e.message,advice:'Try again. If it continues, download any completed datasets and contact the research team.'},true);if(e.code==='sensitive_content')showSensitive(e)}}}
 function options(node,values){node.replaceChildren();Object.entries(values).forEach(([k,v])=>{const o=el('option',v);o.value=k;node.append(o)})}
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const minutes=since=>Math.max(0,Math.floor((Date.now()-since)/60000));
 
+const PAGE_ALIAS={choose:'goal',prepare:'study',generate:'run'};
 function page(id){
-  if(id!=='choose'&&!$('choose').hidden)leftChoose=true;
+  id=PAGE_ALIAS[id]||id;if(!$(id)||!$(id).classList.contains('page'))id='overview';
   notice('');
   document.querySelectorAll('.page').forEach(e=>e.hidden=e.id!==id);
-  document.querySelectorAll('nav button').forEach(e=>{
-    e.classList.toggle('active',e.dataset.page===id);
-    if(e.dataset.page===id){e.setAttribute('aria-current','page');const bar=e.closest('nav');if(bar&&bar.scrollWidth>bar.clientWidth)bar.scrollTo({left:e.offsetLeft-bar.clientWidth/2+e.offsetWidth/2})}
-    else e.removeAttribute('aria-current');
-  });
+  document.querySelectorAll('#nav button').forEach(e=>{const on=e.dataset.page===id;e.classList.toggle('active',on);if(on)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current')});
   window.scrollTo(0,0);
   const h=document.querySelector('#'+id+' h1');if(h){h.tabIndex=-1;h.focus({preventScroll:true})}
   if(id==='evidence')action(evidence)();
+  if(typeof Console!=='undefined')Console.shown(id);
 }
 
 async function api(path,body){
@@ -169,15 +167,7 @@ function inputs(){
   updateRail();
 }
 
-function updateRail(){
-  if(!cfg)return;
-  const s=session,complete=s?Object.keys(s.details).length:0,set=(id,text,state)=>{const n=$(id);n.textContent=text;n.closest('button').dataset.state=state||''};
-  const m=[...selected][0],compared=$('comparisonResults').children.length;
-  set('railChoose',m?Research.methodLabel(m):'Not chosen',m?(leftChoose?'done':'ready'):'');
-  set('railPrepare',s?.active?'Generating…':s?'Generation started':reviewedRequest?'Checked, ready to generate':'Inputs not checked',s?'done':reviewedRequest?'ready':'');
-  set('railDatasets',complete?`${complete} dataset ready`:s?.active?'In progress':s?'Not complete':'None yet',complete?'done':'');
-  set('railCompare',compared?'Results ready':'Optional',compared?'done':'');
-}
+function updateRail(){if(typeof Console!=='undefined')Console.refresh()}
 
 async function request(){
   if(Research.custom())await Research.refreshTools();
@@ -399,7 +389,9 @@ function render(){
   }
 }
 
-async function evidence(){if(!$('evidenceResults').children.length){const data=await api('/api/evidence');StudyCharts.render(data.charts);tables(data,$('evidenceResults'))}}
+let evidenceData=null;
+async function evidencePayload(){return evidenceData||(evidenceData=await api('/api/evidence'))}
+async function evidence(){if(!$('evidenceResults').children.length){const data=await evidencePayload();StudyCharts.render(data.charts);tables(data,$('evidenceResults'))}}
 
 async function compare(){
   if(!session||!Object.keys(session.details).length)throw clientError('no_dataset');
@@ -423,11 +415,10 @@ async function init(){
   $('serviceFunding').textContent=cfg.service.funding;$('serviceFuture').textContent=cfg.service.future;$('serviceContact').textContent=cfg.service.contact.text;
   Object.entries(cfg.terms).forEach(([title,text])=>{const d=el('details');d.append(el('summary',title),el('p',text));$('terms').append(d)});
   Object.values(cfg.metrics).forEach(([title,meaning,formula])=>{const d=el('details');d.append(el('summary',title),el('p',meaning),el('p',formula,'subtle'));$('metricGuide').append(d)});
-  document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
-  document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.goto)));
+  document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
+  document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();page(b.dataset.goto)}));
   $('reviewInputs').addEventListener('click',action(reviewInputs));
   ['seed','population','consent','sensitiveAck'].forEach(id=>$(id).addEventListener('input',invalidateReview));
-  $('continue').addEventListener('click',()=>{if(!selected.size){notice(new AppError({title:'Answer the questions first',detail:'The recommended approach appears once the questions in part 2 are answered.',advice:'Answer each question, then continue.'}),true);return}page('prepare')});
   $('preview').addEventListener('click',action(async()=>{notice('Preparing the instruction preview…');const d=await api('/api/preview',await request());$('systemPrompt').textContent=d.system;$('userPrompt').textContent=d.user;$('promptPanel').hidden=false;$('promptPanel').open=true;notice(d.note)}));
   $('generate').addEventListener('click',action(start));
   $('checkAgain').addEventListener('click',action(drive));
@@ -436,12 +427,11 @@ async function init(){
   $('downloadAll').addEventListener('click',downloadAll);
   $('clearResults').addEventListener('click',action(discard));
   $('compareButton').addEventListener('click',action(compare));
-  document.querySelector('.brand').addEventListener('click',e=>{e.preventDefault();page('choose')});
   window.addEventListener('beforeunload',e=>{if(session){e.preventDefault();e.returnValue=''}});
   $('statusDot').classList.toggle('on',!!cfg.configured);
   $('accountLabel').textContent=cfg.configured?'AI generation available':'AI generation not connected';
   $('notConnected').hidden=!!cfg.configured;
   if(!cfg.configured)$('generate').disabled=true;
-  Research.init();render();
+  Research.init();render();Console.init();
 }
 action(init)();

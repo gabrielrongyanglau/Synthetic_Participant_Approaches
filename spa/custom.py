@@ -142,7 +142,7 @@ def template(s,kind):
 
 def contexts(req,assets):
     s=definition(req.study);bank={}
-    if getattr(req,'goal','workflow') in ('patterns','strengths','outcomes') and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('Relationship exploration requires at least one predictor and one outcome. Pattern r needs at least three varying coefficients.')
+    if getattr(req,'goal','distributions') in ('relationships','patterns','strengths','outcomes') and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('Relationship exploration requires at least one predictor and one outcome. Pattern r needs at least three varying coefficients.')
     if 8 in req.methods and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('SPA8 generates outcomes only, so it needs at least one predictor and one outcome.')
     if req.examples and not req.study.get('fictionalExample',False):raise ValueError('The fictional example data only match the unedited fictional study. Because the study definition was changed, upload CSVs that match your measures, or load the fictional example study again.')
     for m in req.methods:

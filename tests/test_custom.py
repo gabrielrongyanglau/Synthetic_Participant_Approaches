@@ -63,14 +63,16 @@ def test_templates_and_routes(study):
 
 def test_recommendations_mapping():
     assert all(PUBLIC_ID[m]==m for m in range(1,9))
-    # Table 6: no data -> SPA2; pilot -> SPA5 (SPA6 alternative); baseline demographic and psychological scores -> SPA8
-    for goal in ('distributions','patterns','strengths','outcomes','workflow'):
-        assert suggest(goal,[])['primary']==2 and suggest(goal,['psychology'])['primary']==8
+    # Table 6 and the proposal's two goals: no data -> SPA2; pilot -> SPA5 (SPA6 alternative); baseline demographic and psychological scores -> SPA8
+    for goal in ('distributions','relationships'):
+        assert suggest(goal,[])['primary']==2 and suggest(goal,['psychology'])['primary']==8 and suggest(goal,['pilot'])['primary']==5
         assert suggest(goal,['demographics'])['primary']==7 and suggest(goal,['proportions'])['primary']==4
-    assert suggest('distributions',['pilot'])['primary']==5 and suggest('strengths',['pilot'])['primary']==6
-    assert {5,6}<=set(suggest('distributions',['pilot'])['feasible']) and {7,8}<=set(suggest('patterns',['psychology'])['feasible'])
-    assert not suggest('outcomes',[])['task_supported'] and suggest('outcomes',['psychology'])['task_supported']
-    assert all('fidelity' not in suggest(g,[s])['reason'].lower() for g in ('distributions','patterns') for s in ('pilot','psychology'))
+        assert suggest(goal,['pilot'])['task_supported'] and 'fidelity' not in suggest(goal,['pilot'])['reason'].lower()
+    assert {5,6}<=set(suggest('distributions',['pilot'])['feasible']) and {7,8}<=set(suggest('relationships',['psychology'])['feasible'])
+    assert 'SPA6' in suggest('relationships',['pilot'])['reason'] and 'SPA5' in suggest('distributions',['psychology'])['reason']
+    # Earlier interface choices still map onto the two goals
+    assert suggest('strengths',['pilot'])['goal_label']==suggest('relationships',['pilot'])['goal_label']
+    with pytest.raises(ValueError):suggest('unknown',[])
 
 def test_invalid_definition(study):
     for change in [lambda s:s['variables'][0].update(reverse=[3]),lambda s:s['variables'][0].update(code='participant_id'),lambda s:s['variables'][0].update(maximum=1),lambda s:s['variables'][0].update(items=['[Enter item]'])]:

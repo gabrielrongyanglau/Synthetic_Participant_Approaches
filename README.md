@@ -25,16 +25,23 @@ Generation time varies with the complexity of the data being generated: simple r
 | `tests/`, `pytest.ini`, `requirements-dev.txt` | Automated tests (no paid API calls) |
 | `analyse.py`, `import_r.py` | Offline reproduction of the original study results |
 | `verification/` | Build record, core-file hashes and the original workbook verification summary |
+| `web/fonts/` | IBM Plex Sans (SIL Open Font License), subset to Latin |
 | `docs/` | User guide, custom studies, data, errors and advice, prompt policy, Vercel operation and verification notes |
 | `run.py`, `.env.example` | One-command local preview and the environment-variable template |
 
-## Five pages
+## Research console
 
-1. **Goal and approach.** Following the proposal, choose a research goal first: reproduce psychological variables (Goal 1) or reproduce relationships among variables (Goal 2: direction and pattern, strength, or a later outcome from baseline scores). Then answer two or three yes/no questions about what you have so far, such as whether you have collected pilot data. The answers lead to one recommended approach from Table 6 of the proposal, with the study result behind it. Other approaches that fit are listed in a collapsed section.
-2. **Study and data.** Choose the study once. The MIDUS demonstration always uses the example inputs supplied with the toolkit, which can be viewed but are never replaced. Your own study is where you define a title and measures and upload only what the chosen approach needs, with templates and instructions for every upload. Check inputs, review the summary and confirm before generating. Prompts are read-only.
-3. **Your datasets.** Inspect progress, previews and duplication flags. Download a ZIP containing the dataset, a separate codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance. Dataset-only and codebook-only CSVs are also available. Repeated profiles are retained and flagged.
-4. **Compare with human data.** Optionally upload observed human data using the same measures. Distributions, relationship patterns and relationship strengths are evaluated separately. This reference is not sent to OpenAI.
-5. **Study findings.** Explore verified MIDUS charts and practical applications based on the proposal. The original findings are separate from your current simulation.
+The interface is a research console: a status bar along the top, side navigation with the status of each step, the current page in the middle, and an inspector on the right with your selections, the study evidence for the chosen approach, tips and an activity log.
+
+1. **Goal.** The proposal's two goals: generate psychological variables that resemble human responses (Goal 1), or explore relationships among variables, covering patterns and strengths (Goal 2).
+2. **Your situation.** Two or three yes/no questions, such as whether you have collected pilot data, beside the Table 6 decision path.
+3. **Approach.** One recommended approach with the study result behind it, the other approaches that fit, and a table of all eight approaches with their study results (switchable to only those that fit).
+4. **Study and data.** Chosen once. The MIDUS demonstration always uses the example inputs supplied with the toolkit, which can be viewed but are never replaced. Your own study is where you define a title and measures and upload only what the approach needs, with templates and instructions for every upload.
+5. **Check and generate.** Check inputs, review the summary and confirm before generating. Prompts are read-only.
+6. **Datasets.** Progress, previews and duplication flags, then a ZIP with the dataset, codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance.
+7. **Compare (optional).** Upload observed human data using the same measures. Distributions, relationship patterns and relationship strengths are evaluated separately. This reference is not sent to OpenAI.
+
+*Overview*, *Study findings*, *Glossary* and *Errors and help* are in the same navigation. Text uses IBM Plex Sans (SIL Open Font License), served from `web/fonts/` so the page makes no third-party requests.
 
 ## Study modes
 
