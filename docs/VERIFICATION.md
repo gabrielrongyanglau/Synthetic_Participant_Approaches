@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 7.0: questionnaire upload for your own study
+
+On the Questionnaire step, your own study first asks how to enter the variables: one by one on the page, or by uploading a CSV with one row per variable. The upload option provides a blank template, a completed MIDUS example (sex, marital status, optimism and life satisfaction) and a table explaining every column. The file is read in the browser, each row is checked with row-specific messages, and the variables then appear in the editor for review. Comma and semicolon separators and Excel's byte order mark are accepted. The check button is now called "Check for missing or invalid entries", with a line explaining it, and choosing My own study on the first step describes what the Questionnaire step offers. Browser QA at 1280 px and 390 px imported the completed example, rejected a file with incomplete rows, and ran SPA5 to a dataset with the imported variables. All 202 tests pass.
+
 ## Version 6.9: MIDUS examples in every field
 
 The example text in each field now comes from the MIDUS study: the optimism measure (its definition, the Life Orientation Test citation, three of its items with the second reverse-coded, and agree–disagree anchors), marital status with the MIDUS categories, and a MIDUS-style study title and population description. The citation field is now a text box so the full reference shows, and a browser check confirmed that no example text is cut off at 1280 px or 390 px. All 202 tests pass.

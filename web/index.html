@@ -17,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v6.9</span>
+  <span class="chip">v7.0</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -53,7 +53,7 @@
         <details class="note vars"><summary>Psychological predictors (38)</summary><ul id="midusPsych" class="var-list cols"></ul><p class="help">The study’s relationship comparisons used 37 of these, leaving out anxiety symptoms.</p></details>
         <details class="note vars"><summary>Outcomes (2)</summary><ul class="var-list"><li>Life satisfaction at MIDUS 2</li><li>Life satisfaction at MIDUS 3</li></ul></details>
       </div>
-      <p id="ownNext" class="callout blue" hidden>Next, choose your research goal. You then set up your questionnaire.</p>
+      <p id="ownNext" class="hint" hidden>With your own study, you set up the questionnaire yourself on the Questionnaire step: choose the demographic characteristics, then add your psychological predictors and outcomes. You can enter them one by one, or upload a CSV file that lists them, using the blank template and completed example provided. Participant data are uploaded later, only if the approach you choose needs them.</p>
   </div>
   <div class="btns"><button type="button" class="btn" id="nextStudy" data-goto="goal" disabled>Next: research goal</button></div>
 </section>
@@ -85,6 +85,32 @@
       <div id="customSetup" hidden>
         <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 measures and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
         <label>Study title<input id="studyTitle" type="text" placeholder="e.g. Optimism and life satisfaction in midlife"></label>
+        <h3>How would you like to enter your variables?</h3>
+        <div id="entryChoices" class="choice-grid two-up" role="radiogroup" aria-label="How to enter your variables"></div>
+        <div id="uploadSetup" hidden>
+          <p class="help">Fill in one row for each demographic characteristic, psychological predictor and outcome, then upload the file. The variables appear below for you to review and edit. The file describes your questionnaire. Do not put participant responses in it.</p>
+          <p class="link-row"><button type="button" class="link" id="qBlank">Blank template (CSV)</button><button type="button" class="link" id="qExample">Completed example (CSV, MIDUS optimism and life satisfaction)</button></p>
+          <details class="note" open><summary>What to put in each column</summary>
+            <div class="wide"><table class="plain">
+              <thead><tr><th>Column</th><th>What to enter</th><th>Example</th></tr></thead><tbody>
+              <tr><td>role</td><td>demographic, predictor or outcome</td><td>predictor</td></tr>
+              <tr><td>name</td><td>The name of the variable</td><td>Optimism</td></tr>
+              <tr><td>code</td><td>A short column name: lowercase letters, numbers and underscores. Leave blank to make one from the name.</td><td>optimism</td></tr>
+              <tr><td>categories</td><td>Demographics only. Numbered categories, separated by a vertical bar ( | ).</td><td>1 = Male | 2 = Female</td></tr>
+              <tr><td>definition</td><td>Predictors and outcomes. What the measure captures.</td><td>A general expectation that future events will turn out favourably.</td></tr>
+              <tr><td>citation</td><td>Predictors and outcomes. The source of the measure, which you verify.</td><td>Scheier, Carver and Bridges (1994)</td></tr>
+              <tr><td>items</td><td>Predictors and outcomes. Every survey item, separated by a vertical bar ( | ).</td><td>In uncertain times, I usually expect the best. | If something can go wrong for me, it will.</td></tr>
+              <tr><td>response_min, response_max</td><td>The lowest and highest response</td><td>1, 5</td></tr>
+              <tr><td>anchor_min, anchor_max</td><td>The labels for the lowest and highest response</td><td>Disagree a lot, Agree a lot</td></tr>
+              <tr><td>response_type</td><td>whole or decimal. Blank means whole.</td><td>whole</td></tr>
+              <tr><td>scoring</td><td>mean, sum or items (items only, with no overall score). Blank means mean.</td><td>mean</td></tr>
+              <tr><td>reverse_items</td><td>Positions of reverse-coded items, separated by commas. Blank if none.</td><td>2</td></tr>
+              </tbody></table></div>
+          </details>
+          <label>Upload your completed CSV<input id="qFile" type="file" accept=".csv,text/csv"></label>
+          <p id="qStatus" class="status-line" role="status"></p>
+        </div>
+        <div id="manualSetup" hidden>
         <h3>1. Demographic characteristics <span class="tag">Optional</span></h3>
         <p id="demographicHelp" class="help">Tick the ones you want. Each comes with numbered categories that you can edit below. Approaches that keep demographic details fixed (SPA4, SPA7 and SPA8) need at least one. Up to eight in total.</p>
         <div id="presetDemos" class="check-grid"></div>
@@ -94,10 +120,12 @@
         <div id="measureEditor"></div>
         <button id="addMeasure" class="btn-quiet" type="button">Add psychological measure</button>
         <div class="actions">
-          <button id="validateStudy" type="button">Check definition</button>
+          <button id="validateStudy" type="button">Check for missing or invalid entries</button>
         </div>
+        <p class="help">Checks every field on this page and lists anything to fix, without moving on. Check and continue runs the same check, then opens the next step.</p>
         <p id="customStatus" class="status-line" role="status"></p>
         <p class="help">Mean and sum scores need every item observed. Reverse coding and composite scoring run in the toolkit after generation.</p>
+        </div>
 
       </div>
 
