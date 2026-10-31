@@ -51,11 +51,37 @@ def prepare(req,assets):
     if getattr(req,'study',None):
         from .custom import contexts
         bank=contexts(req,assets)
-    else:bank=context_bank(load_study(),req.methods,req.n,req.repetitions,req.seed,assets,req.examples,req.population)
+    else:bank=midus_bank(req,assets)
     for ctx in bank.values():
         from .study import PROJECT_ROOT
         ctx['provenance']['method_prompt_bank_sha256']=hashlib.sha256((PROJECT_ROOT/'prompts/methods.json').read_bytes()).hexdigest()
         ctx['provenance']['prompt_mode']='Custom measurement adaptation' if ctx.get('custom') else 'Original MIDUS method template'
+    return bank
+def midus_study(ctx):
+    """The MIDUS study limited to the variables chosen for this run (stored in the signed context)."""
+    from .selection import subset
+    return subset(load_study(),ctx.get('fields'))
+def midus_bank(req,assets):
+    from .selection import parse,subset,needs_demographics
+    from .workflow import example_assets
+    full=load_study();fields=parse(getattr(req,'midus_fields',None),full);study=subset(full,fields)
+    for m in req.methods:needs_demographics(m,fields)
+    examples=req.examples
+    if fields and examples:
+        # Example files hold every MIDUS variable. Keep only the chosen ones, then pass them as the run's inputs.
+        assets={}
+        for m in req.methods:
+            if m<4:continue
+            for key,frame in example_assets(m).items():
+                if m==4:frame=frame[frame.iloc[:,0].isin(study['demographic_covariates'])].reset_index(drop=True)
+                assets[key]=frame
+        examples=False
+    bank=context_bank(study,req.methods,req.n,req.repetitions,req.seed,assets,examples,req.population)
+    for ctx in bank.values():
+        if fields:
+            ctx['fields']=fields
+            if req.examples:ctx['provenance']['source']='Invented example inputs'
+            ctx['provenance']['selected_variables']=f"{len(fields['demographics'])} of 6 demographics and {len(fields['predictors'])} of 38 psychological predictors"
     return bank
 def plan(req,assets):
     from .service import check_run
@@ -63,7 +89,7 @@ def plan(req,assets):
     bank=prepare(req,assets);config=settings(req)
     if len(json.dumps(bank,allow_nan=False).encode())>3_500_000:raise ValueError('Prepared inputs are too large for one web response. Choose fewer approaches or repetitions in this run.')
     ticket=issue(dict(kind='plan',settings=config,runs={run:digest(ctx) for run,ctx in bank.items()},nonce=secrets.token_hex(16)))
-    return dict(ticket=ticket,contexts=bank,settings=config,source='Fictional example inputs' if req.examples else 'Researcher-supplied inputs')
+    return dict(ticket=ticket,contexts=bank,settings=config,source='Fictional example inputs' if req.examples and not getattr(req,'study',None) else 'Researcher-supplied inputs')
 
 def batch(ctx,method,offset,n,size=None):
     size=size or batch_size()
@@ -72,11 +98,11 @@ def batch(ctx,method,offset,n,size=None):
         from .custom import batch as custom_batch
         system,user,schema=custom_batch(ctx,method,ids,fixed)
         return dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,background=True,store=False,text={'format':{'type':'json_schema','name':'custom_participant_batch','strict':True,'schema':schema}}),fixed,ids
-    system,user=build_prompt(load_study(),method,ids,fixed,ctx['pilot'],ctx['summary'],generated_only=True,
+    system,user=build_prompt(midus_study(ctx),method,ids,fixed,ctx['pilot'],ctx['summary'],generated_only=True,
       population_guidance=ctx['provenance'].get('population_guidance',''))
     body=dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,
       background=True,store=False,text={'format':{'type':'json_schema','name':'participant_batch','strict':True,
-      'schema':output_schema(load_study(),ids,fixed)}})
+      'schema':output_schema(midus_study(ctx),ids,fixed)}})
     return body,fixed,ids
 
 def provider():
@@ -169,12 +195,12 @@ def poll(handle,ctx,client=None):
         if ctx.get('custom'):
             from .custom import parse as custom_parse
             frame=custom_parse(data,ctx['study'],ids,fixed)
-        else:frame=parse_records(data,load_study(),ids,fixed)
+        else:frame=parse_records(data,midus_study(ctx),ids,fixed)
     except (ValueError,KeyError,TypeError) as exc:return failed('invalid_output',reason=str(exc).rstrip('.')[:120] or 'structure check failed')
     if ctx.get('custom'):
         from .custom import quality
         flags=quality(frame,ctx['study'],ctx['pilot'])
-    else:flags=quality_flags(frame,load_study(),ctx['pilot'])
+    else:flags=quality_flags(frame,midus_study(ctx),ctx['pilot'])
     generated=[c for c in frame.columns if c!='participant_id' and not (fixed and c in fixed[0])]
     repeats=int(frame[generated].round(4).duplicated().sum()) if generated else 0
     issue=None

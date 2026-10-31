@@ -14,7 +14,7 @@ const CLIENT_ERRORS={
   request_too_large:{title:'The inputs are too large to send',detail:'The uploaded data exceed the 3 MB request limit.',advice:'Use a smaller profile file (100 rows is enough), or remove unused columns.'},
   wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
   file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
-  upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the template, fill it with your data and choose it here, or switch to the supplied fictional examples.'},
+  upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the blank template, fill it with your data and choose it here.'},
   review_needed:{title:'Check your inputs first',detail:'The inputs have not been checked, or they changed after the check.',advice:'Choose Check inputs, review the summary, tick the confirmation, then generate.'},
   session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets before starting another run.'},
   not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs and preview the instructions. Contact the research team to ask when generation will be available.'}
@@ -145,9 +145,9 @@ function uploadCard(m,old){
 }
 function chosenFiles(){return [...$('uploads').querySelectorAll('input')].filter(x=>x.files&&x.files[0])}
 function usesExamples(){
-  const m=[...selected][0];if(!uploadMap[m])return Research.custom()?Research.fictionalStudy():true;
+  const m=[...selected][0];if(!uploadMap[m])return !Research.custom();
   if(!Research.custom())return !chosenFiles().length;
-  return Research.fictionalStudy()&&!chosenFiles().length;
+  return false;
 }
 function inputs(){
   invalidateReview();
@@ -162,9 +162,10 @@ function inputs(){
   $('dataHeading').textContent=m?`Data for ${Research.methodLabel(m)}`:'Data for this approach';
   const name=m?`SPA${m}`:'This approach';let summary,blocked=false;
   if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description':''}.`;
+  else if(!custom&&[4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs at least one demographic characteristic. Tick some under Questionnaire.`;blocked=true}
   else if(!custom){summary=`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
   else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Check and continue, then return here.`;blocked=true}
-  else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`+(Research.fictionalStudy()?' The fictional example study includes example data, so the upload is optional for it.':'');$('uploads').append(uploadCard(m,own))}
+  else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`;$('uploads').append(uploadCard(m,own))}
   $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;
   $('exampleLink').hidden=custom||!needs;
   $('total').textContent='';
@@ -184,7 +185,7 @@ async function request(){
     checkFile(f);
     assets[input.dataset.asset]=await f.text();
   }
-  return {sensitive_ack:$('sensitiveAck').checked,goal:Research.goal(),study:Research.study(),methods:[...selected].sort(),n:Number($('n').value),repetitions:Number($('repetitions').value),seed:Number($('seed').value),examples,population:$('population').value,assets,consent:$('consent').checked};
+  return {sensitive_ack:$('sensitiveAck').checked,goal:Research.goal(),study:Research.study(),midus_fields:Research.midusFields(),methods:[...selected].sort(),n:Number($('n').value),repetitions:Number($('repetitions').value),seed:Number($('seed').value),examples,population:$('population').value,assets,consent:$('consent').checked};
 }
 
 function metadata(){
@@ -207,7 +208,7 @@ function checkFile(f){
   if(!/\.(csv|txt)$/i.test(f.name))throw clientError('wrong_file_type',{name:f.name});
   if(f.size>2200000)throw clientError('file_too_large',{name:f.name,size:(f.size/1e6).toFixed(1)+' MB'});
 }
-async function finalise(run){const records=session.records[run];const result=await api('/api/dataset',{name:run,records,study:session.settings.study,pilot:session.contexts[run]?.pilot??null});session.details[run]={...result,count:records.length}}
+async function finalise(run){const records=session.records[run];const result=await api('/api/dataset',{name:run,records,study:session.settings.study,midus_fields:session.settings.midus_fields,pilot:session.contexts[run]?.pilot??null});session.details[run]={...result,count:records.length}}
 
 /* ---------- Parallel batched generation with automatic recovery ----------
    Free:  requests OpenAI declined (busy/server error) are retried after a pause; progress checks are repeated.
@@ -327,7 +328,7 @@ async function start(){
     if(!req.consent)throw new AppError({code:'consent_missing',title:'Confirmation needed',detail:'Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget.',advice:'Tick the data-sharing confirmation under Check and confirm, then try again.'});
     const brief=Research.snapshot();
     notice('Preparing the inputs in memory…');
-    const plan=await api('/api/prepare',req);plan.settings.study=req.study;
+    const plan=await api('/api/prepare',req);plan.settings.study=req.study;plan.settings.midus_fields=req.midus_fields;
     const order=Object.keys(plan.contexts);
     session={...plan,brief,order,records:{},details:{},chunks:Object.fromEntries(order.map(run=>[run,makeChunks(plan.settings.n,plan.settings.batch_size)])),active:false,started:Date.now(),autoRetries:0};
     busy=false;notice('');page('datasets');await drive();

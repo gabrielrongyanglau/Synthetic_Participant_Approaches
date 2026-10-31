@@ -26,19 +26,19 @@ def suggest(goal,information):
     if 'psychology' in info:
         primary=8
         reason=('SPA8 generates outcomes from each person’s real demographics and psychological scores. In the study, it came closest to human relationship strengths (average correlation error .19 at MIDUS 2 and .24 at MIDUS 3, against .63 to .72 for the other approaches), although it still overstated them.' if rel else
-                'You already have real psychological scores for every participant, so there is nothing for Goal 1 to generate. SPA8 keeps those scores and generates the outcomes. To try generating psychological scores instead, answer that you have a pilot sample: 50 participants with every variable, outcomes included, used with SPA5.')
+                'Real psychological scores already exist for every participant, so there is nothing for Goal 1 to generate. SPA8 keeps those scores and generates the outcomes. To try generating psychological scores instead, choose a small human pilot dataset: 50 participants with every variable, outcomes included, used with SPA5.')
     elif 'pilot' in info:
         primary=5
-        reason=('SPA5 uses your pilot records and their summary statistics. '+PATTERN+' Relationship strengths stayed inflated, and SPA6 reduced strength errors only slightly.' if rel else
+        reason=('SPA5 uses the pilot records and their summary statistics. '+PATTERN+' Relationship strengths stayed inflated, and SPA6 reduced strength errors only slightly.' if rel else
                 'The proposal recommends SPA5 for a 50-person pilot. SPA6 is an alternative in which the AI analyses the pilot records itself. In the study, SPA5 produced the closest psychological scores: averages differed from human data by 0.21 standard deviations, against 0.53 to 0.58 for approaches without pilot data.')
     elif 'demographics' in info:
         primary=7;reason='SPA7 keeps each person’s real demographics and generates their psychological scores and outcomes. In the study, real demographics did not bring scores or relationships closer to human data than SPA2.'
     elif 'proportions' in info:
-        primary=4;reason='SPA4 builds profiles that match your demographic proportions and generates the remaining scores. In the study, matching demographics did not bring scores or relationships closer to human data than SPA2.'
+        primary=4;reason='SPA4 builds profiles that match the demographic proportions and generates the remaining scores. In the study, matching demographics did not bring scores or relationships closer to human data than SPA2.'
     elif 'description' in info:
         primary=3
-        reason=('SPA3 adds your population description to the instructions. In the study, it reproduced relationship patterns about as well as SPA1 and SPA2 (pattern r .94), and relationship strengths stayed inflated (correlation error .66 at MIDUS 2, against .65 for SPA2).' if rel else
-                'SPA3 uses your description of the people you want to simulate. In the study, its average scores differed from human data by 0.53 standard deviations, close to SPA1 and SPA2. A 50-person pilot with SPA5 roughly halves this.')
+        reason=('SPA3 adds the population description to the instructions. In the study, it reproduced relationship patterns about as well as SPA1 and SPA2 (pattern r .94), and relationship strengths stayed inflated (correlation error .66 at MIDUS 2, against .65 for SPA2).' if rel else
+                'SPA3 uses a description of the people to simulate. In the study, its average scores differed from human data by 0.53 standard deviations, close to SPA1 and SPA2. A 50-person pilot with SPA5 roughly halves this.')
     else:
         primary=2
         reason=('The proposal recommends SPA2 before human data are collected. SPA1 and SPA3 are alternatives that showed no meaningful advantage. '+PATTERN+' '+STRENGTH if rel else

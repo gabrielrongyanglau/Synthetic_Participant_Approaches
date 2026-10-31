@@ -17,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v6.5</span>
+  <span class="chip">v6.9</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -26,15 +26,15 @@
   <button type="button" data-goto="help">Help</button>
 </header>
 <div class="shell">
-<nav id="nav" aria-label="Sections"><p class="nav-group">Workflow</p><button type="button" data-page="overview" class="active"><span>Overview</span></button><button type="button" data-page="study" data-step><span><span class="step-no"></span>Choose your study</span><small id="navStudy"></small></button><button type="button" data-page="goal" data-step><span><span class="step-no"></span>Research goal</span><small id="navGoal"></small></button><button type="button" data-page="questionnaire" data-step data-own hidden><span><span class="step-no"></span>Questionnaire</span><small id="navQuestionnaire"></small></button><button type="button" data-page="situation" data-step><span><span class="step-no"></span>Available information</span><small id="navSituation"></small></button><button type="button" data-page="approach" data-step><span><span class="step-no"></span>Approach</span><small id="navApproach"></small></button><button type="button" data-page="inputs" data-step data-own hidden><span><span class="step-no"></span>Inputs</span><small id="navInputs"></small></button><button type="button" data-page="run" data-step><span><span class="step-no"></span>Check and generate</span><small id="navGenerate"></small></button><button type="button" data-page="datasets" data-step><span><span class="step-no"></span>Datasets</span><small id="navDatasets"></small></button><p class="nav-group">Reference</p><button type="button" data-page="evidence"><span>Study findings</span></button><button type="button" data-page="glossary"><span>Glossary</span></button><button type="button" data-page="help"><span>Errors and help</span></button></nav>
+<nav id="nav" aria-label="Sections"><p class="nav-group">Workflow</p><button type="button" data-page="overview" class="active"><span>Overview</span></button><button type="button" data-page="study" data-step><span><span class="step-no"></span>Choose your study</span><small id="navStudy"></small></button><button type="button" data-page="goal" data-step><span><span class="step-no"></span>Research goal</span><small id="navGoal"></small></button><button type="button" data-page="questionnaire" data-step data-own hidden><span><span class="step-no"></span>Questionnaire</span><small id="navQuestionnaire"></small></button><button type="button" data-page="situation" data-step><span><span class="step-no"></span>Information</span><small id="navSituation"></small></button><button type="button" data-page="approach" data-step><span><span class="step-no"></span>Approach</span><small id="navApproach"></small></button><button type="button" data-page="inputs" data-step data-own hidden><span><span class="step-no"></span>Inputs</span><small id="navInputs"></small></button><button type="button" data-page="run" data-step><span><span class="step-no"></span>Check and generate</span><small id="navGenerate"></small></button><button type="button" data-page="datasets" data-step><span><span class="step-no"></span>Datasets</span><small id="navDatasets"></small></button><p class="nav-group">Reference</p><button type="button" data-page="evidence"><span>Study findings</span></button><button type="button" data-page="glossary"><span>Glossary</span></button><button type="button" data-page="help"><span>Errors and help</span></button></nav>
 <main id="main">
 <div id="notice" role="status" aria-live="polite"></div>
 <section id="overview" class="page">
   <header class="page-head"><p class="crumb">Workflow</p><h1>Overview</h1></header>
   <p id="intro" class="lead"></p>
   <p class="sub">The proposal compared these approaches with real responses from the Midlife in the United States (MIDUS) study. You can try out the toolkit with that MIDUS study, or enter your own.</p>
-  <div class="panel"><h2>How this works <small>The MIDUS demonstration skips steps 3 and 6</small></h2>
-    <ol class="how"><li>Try out the MIDUS study from the proposal, or enter your own study</li><li>Choose your research goal</li><li>For your own study, define your questionnaire</li><li>Choose the information you can provide</li><li>Use the recommended approach or an alternative</li><li>For your own study, provide the inputs the approach needs</li><li>Check inputs and generate 100 participants</li><li>Download the dataset and codebook</li></ol>
+  <div class="panel"><h2>How this works <small>The MIDUS demonstration skips step 6</small></h2>
+    <ol class="how"><li>Try out the MIDUS study from the proposal, or enter your own study</li><li>Choose your research goal</li><li>Choose the demographics, then the psychological measures</li><li>Choose the information the AI will use</li><li>Use the recommended approach or an alternative</li><li>For your own study, provide the inputs the approach needs</li><li>Check inputs and generate 100 participants</li><li>Download the dataset and codebook</li></ol>
   </div>
   <p class="sub">Generation uses GPT-5.6 Luna with medium reasoning. AI calls use the research team’s server-side key and its limited budget, so each simulation creates one dataset of 100 participants.</p>
   <div class="btns"><button type="button" class="btn" data-goto="study">Start with your study</button></div>
@@ -48,8 +48,12 @@
       <div id="studyChoices" class="choice-grid two-up" role="radiogroup" aria-label="Study"></div>
       <div id="midusSetup" class="hint" hidden>
         <p id="scope"></p>
+        <p class="help">The study compared generated data with 2,709 real MIDUS participants. Psychological measures come from MIDUS 2 (2004 to 2006), and life satisfaction from MIDUS 2 and MIDUS 3 (2013 to 2014).</p>
+        <details class="note vars"><summary>Demographic characteristics (6)</summary><ul id="midusDemo" class="var-list"></ul></details>
+        <details class="note vars"><summary>Psychological predictors (38)</summary><ul id="midusPsych" class="var-list cols"></ul><p class="help">The study’s relationship comparisons used 37 of these, leaving out anxiety symptoms.</p></details>
+        <details class="note vars"><summary>Outcomes (2)</summary><ul class="var-list"><li>Life satisfaction at MIDUS 2</li><li>Life satisfaction at MIDUS 3</li></ul></details>
       </div>
-      <p id="ownNext" class="callout blue" hidden>Next, choose your research goal. You then define your questionnaire.</p>
+      <p id="ownNext" class="callout blue" hidden>Next, choose your research goal. You then set up your questionnaire.</p>
   </div>
   <div class="btns"><button type="button" class="btn" id="nextStudy" data-goto="goal" disabled>Next: research goal</button></div>
 </section>
@@ -57,27 +61,39 @@
 <section id="goal" class="page" hidden>
   <header class="page-head"><p class="crumb" data-crumb="goal">Workflow</p><h1>What is your research goal?</h1><p class="sub">The proposal evaluates two goals. Your choice shapes the recommendation and its explanation.</p></header>
   <div class="panel"><div id="goalChoices" class="goal-groups" role="radiogroup" aria-label="Research goal"></div></div>
-  <div class="btns"><button type="button" class="btn" id="nextGoal">Next: available information</button></div>
+  <div class="btns"><button type="button" class="btn" id="nextGoal">Next: information</button></div>
 </section>
 
 <section id="questionnaire" class="page" hidden>
-  <header class="page-head"><p class="crumb" data-crumb="questionnaire">Workflow</p><h1>Define your study and questionnaire</h1><p class="sub">Give every measure its definition, source, items and scoring. Participant data come later, when the approach needs them.</p></header>
+  <header class="page-head"><p class="crumb" data-crumb="questionnaire">Workflow</p><h1 id="qTitle">Define your study and questionnaire</h1><p class="sub" id="qSub"></p></header>
+  <div id="midusQuestionnaire" hidden>
+    <div class="panel"><h2>1. Demographic characteristics <small id="midusDemoCount"></small></h2>
+      <div id="midusDemoChoices" class="check-grid"></div>
+      <p class="link-row"><button type="button" class="link" data-pick="midusDemoChoices" data-on="1">Select all</button><button type="button" class="link" data-pick="midusDemoChoices" data-on="">Clear all</button></p>
+    </div>
+    <div class="panel"><h2>2. Psychological predictors <small id="midusPredCount"></small></h2>
+      <div id="midusPredChoices" class="check-grid"></div>
+      <p class="link-row"><button type="button" class="link" data-pick="midusPredChoices" data-on="1">Select all</button><button type="button" class="link" data-pick="midusPredChoices" data-on="">Clear all</button></p>
+      <p class="help">The study’s relationship comparisons used 37 of the 38, leaving out anxiety symptoms.</p>
+    </div>
+    <div class="panel"><h2>3. Outcomes <small>always included</small></h2>
+      <ul class="var-list"><li>Life satisfaction at MIDUS 2</li><li>Life satisfaction at MIDUS 3</li></ul>
+    </div>
+    <p class="callout">The proposal used every demographic characteristic and psychological predictor. Choosing fewer changes what the AI receives, so results can differ from those in the proposal.</p>
+  </div>
   <div class="panel" id="customPanel">
-    <h2>Your study <small>measures and optional demographics</small></h2>
       <div id="customSetup" hidden>
         <p class="hint">Define every item and its scoring. The toolkit checks structure and ranges, and you verify sources and wording. Up to 30 measures and 60 item and demographic fields. Custom questionnaires extend the evaluated MIDUS setup and need their own validation.</p>
-        <label>Study title<input id="studyTitle" type="text"></label>
-        <h3>Psychological measures</h3>
+        <label>Study title<input id="studyTitle" type="text" placeholder="e.g. Optimism and life satisfaction in midlife"></label>
+        <h3>1. Demographic characteristics <span class="tag">Optional</span></h3>
+        <p id="demographicHelp" class="help">Tick the ones you want. Each comes with numbered categories that you can edit below. Approaches that keep demographic details fixed (SPA4, SPA7 and SPA8) need at least one. Up to eight in total.</p>
+        <div id="presetDemos" class="check-grid"></div>
+        <div id="demographicEditor"></div>
+        <button id="addDemographic" class="btn-quiet" type="button">Add your own demographic</button>
+        <h3>2. Psychological measures</h3>
         <div id="measureEditor"></div>
         <button id="addMeasure" class="btn-quiet" type="button">Add psychological measure</button>
-        <details id="demographicSection" class="note">
-          <summary id="demographicSummary">Demographic categories (optional)</summary>
-          <p id="demographicHelp" class="help">Add these if you know the demographic make-up you want to simulate, or have each participant’s demographic details. Approaches that use this information need them. Define up to eight, such as age group or employment arrangement, using numeric categories.</p>
-          <div id="demographicEditor"></div>
-          <button id="addDemographic" class="btn-quiet" type="button">Add demographic</button>
-        </details>
         <div class="actions">
-          <button id="loadCustomExample" type="button">Load a fictional example study</button>
           <button id="validateStudy" type="button">Check definition</button>
         </div>
         <p id="customStatus" class="status-line" role="status"></p>
@@ -90,8 +106,8 @@
 </section>
 
 <section id="situation" class="page" hidden>
-  <header class="page-head"><p class="crumb" data-crumb="situation">Workflow</p><h1>What information can you provide?</h1><p class="sub">Different approaches use different information. Choose the one option that best describes what you have now.</p></header>
-  <div class="panel"><div id="infoChoices" class="choice-grid two-up" role="radiogroup" aria-label="Available information"></div>
+  <header class="page-head"><p class="crumb" data-crumb="situation">Workflow</p><h1 id="infoTitle">What information can you provide?</h1><p class="sub" id="infoSub">Different approaches use different information. Choose the one option that best describes what you have now.</p></header>
+  <div class="panel"><div id="infoChoices" class="choice-grid two-up" role="radiogroup" aria-label="Information"></div>
     <div id="situationResult" class="callout blue" hidden></div>
   </div>
   <div class="btns"><button type="button" class="btn" id="nextSituation" data-goto="approach">Next: approach</button></div>
@@ -99,10 +115,10 @@
 
 <section id="approach" class="page" hidden>
   <header class="page-head"><p class="crumb" data-crumb="approach">Workflow</p><h1>Recommended approach</h1></header>
-  <p id="approachNeeds" class="callout" hidden>Choose a goal and your available information first.</p>
+  <p id="approachNeeds" class="callout" hidden>Choose a goal and the information first.</p>
   <div class="panel"><div id="recommendation" class="recommendation" aria-live="polite"></div>
     <div id="methodCards" class="method-list" role="radiogroup" aria-label="Approach"></div></div>
-  <div class="panel"><h2>Results from the proposal’s study <small>Approaches that fit your information. 1,000 datasets per approach. Green marks the closest value shown.</small></h2>
+  <div class="panel"><h2>All eight approaches <small>Which approaches fit your information</small></h2>
     <div id="resultsTable" class="wide"></div>
   </div>
   <div class="btns"><button type="button" class="btn" id="confirmApproach">Continue with this approach</button></div>
@@ -113,7 +129,7 @@
     <div class="panel">
       <h2 id="dataHeading">Data for this approach</h2>
       <p id="dataSummary" class="data-summary"></p>
-      <label id="populationLabel">Who are the participants? (used by SPA3)<textarea id="population" rows="2">Middle-aged and older adults in the specified US longitudinal cohort.</textarea></label>
+      <label id="populationLabel">Who are the participants? (used by SPA3)<textarea id="population" rows="2" placeholder="e.g. Middle-aged and older adults in the United States who took part in a long-term study of health and well-being.">Middle-aged and older adults in the specified US longitudinal cohort.</textarea></label>
       <div id="uploads" class="uploads"></div>
       <p id="exampleLink" class="help" hidden><a id="exampleFile" download>View the example input (CSV)</a></p>
       <div class="sr-only"><select id="n" aria-hidden="true" tabindex="-1"></select><select id="repetitions" aria-hidden="true" tabindex="-1"><option>1</option></select></div>

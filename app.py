@@ -31,6 +31,7 @@ class Run(BaseModel):
     assets:dict[str,str]=Field(default_factory=dict)
     consent:bool=False
     study:dict|None=None
+    midus_fields:dict|None=None
     goal:str="distributions"
     sensitive_ack:bool=False
 
@@ -154,7 +155,7 @@ def config():
     from spa.service import service_info
     return dict(service=service_info(),public_ids=PUBLIC_ID,public_names=PUBLIC_NAMES,intro=INTRO,scope=SCOPE,methods={m:dict(name=NAMES[m],**METHODS[m]) for m in NAMES},
       purpose_help={k:purpose_guidance(k,list(NAMES)) for k in PURPOSES},purposes=PURPOSES,information=INFORMATION,compatible=METHODS_BY_INFORMATION,terms=TERMS,metrics=METRICS,
-      variable_guide=json_records(variable_guide(study)),model=jobs.MODEL,reasoning='medium',batch_size=jobs.batch_size(),
+      variable_guide=json_records(variable_guide(study)),midus_choices=__import__('spa.selection',fromlist=['choices']).choices(study),model=jobs.MODEL,reasoning='medium',batch_size=jobs.batch_size(),
       configured=bool(os.environ.get('OPENAI_API_KEY','').strip()))
 
 @app.get('/api/guide.csv')
@@ -230,25 +231,28 @@ async def dataset_details(request:Request):
         generated=[r['column'] for r in book if r['provenance'] not in ('Retained from supplied profiles','Assigned locally','Constructed locally to match demographic proportions')]
         return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(frame.head(10).rename(columns={r['column']:r['name']+' ['+r['column']+']' for r in book})),quality=q,
           warnings=checks.dataset_warnings(frame,q,generated,checks.custom_specs(s)))
-    frame=clean_dataset(names.inbound(data.get('records')))
+    from spa.selection import parse,subset
+    study=subset(load_study(),parse(data.get('midus_fields'),load_study()))
+    frame=clean_dataset(names.inbound(data.get('records')),study)
     pilot=names.inbound(data.get('pilot'))
     if pilot is not None:
         if not isinstance(pilot,list) or len(pilot)!=50:raise ValueError('Expected 50 pilot records.')
-        pilot=json_records(clean_frame(pd.DataFrame(pilot),load_study(),expected_n=50))
+        pilot=json_records(clean_frame(pd.DataFrame(pilot),study,expected_n=50))
     from spa.simulation import quality_flags
     from spa.codebook import build,csv
     book=build(list(frame.columns),run_spa(name))
-    q=quality_flags(frame,load_study(),pilot);from spa import checks
+    q=quality_flags(frame,study,pilot);from spa import checks
     generated=[r['column'] for r in book if r['provenance']=='Generated']
-    return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(readable_records(frame.head(10),load_study())),
-                quality=q,warnings=checks.dataset_warnings(frame,q,generated,checks.midus_specs(load_study())))
+    return dict(name=name,csv=frame.to_csv(index=False),codebook=book,codebook_csv=csv(book),preview=json_records(readable_records(frame.head(10),study)),
+                quality=q,warnings=checks.dataset_warnings(frame,q,generated,checks.midus_specs(study)))
 
-def clean_dataset(rows):
+def clean_dataset(rows,study=None):
     from spa.study import clean_frame
+    study=study or load_study()
     if not isinstance(rows,list) or len(rows) not in range(100,1001,100):raise ValueError('Provide 100–1,000 records in steps of 100.')
-    frame=clean_frame(pd.DataFrame(rows),load_study(),expected_n=len(rows))
+    frame=clean_frame(pd.DataFrame(rows),study,expected_n=len(rows))
     if frame.participant_id.tolist()!=list(range(1,len(rows)+1)):raise ValueError('Participant identifiers must run from 1 to the dataset size, in order.')
-    order=['participant_id']+[f for f in selected_fields(load_study()) if f in frame]
+    order=['participant_id']+[f for f in selected_fields(study) if f in frame]
     return frame[order+[c for c in frame.columns if c not in order]]
 
 @app.get('/api/evidence')
@@ -289,7 +293,7 @@ def check_inputs(req:Run):
     # Schema/prompt construction is checked here without calling any provider.
     from spa.recommendations import public_label
     return dict(api_calls=0,approach=public_label(run_spa(run)),participants=req.n,
-      input_source='Supplied fictional examples' if req.examples else 'Your supplied study information',
+      input_source='Supplied fictional examples' if req.examples and not req.study else 'Your supplied study information',
       mode=ctx['provenance']['prompt_mode'],
       prompt_policy='Fixed research-team method template with a server-controlled study layer.',
       generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,

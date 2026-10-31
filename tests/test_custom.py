@@ -10,7 +10,19 @@ from spa.recommendations import suggest,PUBLIC_ID
 HEAD={'X-SPA-Request':'1'}
 @pytest.fixture
 def study():
-    return dict(title='Fictional test',population='Adults',fictionalExample=True,demographics=[dict(code='group',name='Group',categories={'1':'A','2':'B'})],variables=[dict(code=c,name=c,role='outcome' if c=='outcome' else 'predictor',definition='Fictional test measure',citation='Fictional test; not a validated scale',items=['Item one','Item two'],minimum=1,maximum=5,responseType='integer',anchorLow='Low',anchorHigh='High',aggregation='mean',reverse=[2]) for c in ['a','b','c','outcome']])
+    return dict(title='Fictional test',population='Adults',demographics=[dict(code='group',name='Group',categories={'1':'A','2':'B'})],variables=[dict(code=c,name=c,role='outcome' if c=='outcome' else 'predictor',definition='Fictional test measure',citation='Fictional test; not a validated scale',items=['Item one','Item two'],minimum=1,maximum=5,responseType='integer',anchorLow='Low',anchorHigh='High',aggregation='mean',reverse=[2]) for c in ['a','b','c','outcome']])
+
+def own_assets(study,m):
+    """The researcher's own upload for approaches that need one, built from the completed example template."""
+    if m<4:return {}
+    s=custom.definition(study);kind={4:'proportions',5:'pilot',6:'pilot',7:'demographics',8:'psychology'}[m]
+    key={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'}[m]
+    return {key:custom.template(s,kind)}
+
+def test_own_study_needs_own_data(study):
+    for m in (4,5,6,7,8):
+        with pytest.raises(ValueError,match='uses your own data'):public_jobs.prepare(Run(study=study,methods=[m],examples=True),{})
+    assert public_jobs.prepare(Run(study=study,methods=[2],examples=True),{})['SPA2_R0001']['provenance']['source']=='Researcher-supplied inputs'
 
 def test_scoring_reverse_missing_and_sum(study):
     s=custom.definition(study);f=custom.fake(s,5)
@@ -23,8 +35,8 @@ def test_scoring_reverse_missing_and_sum(study):
 def test_all_methods_schema_and_fixed_inputs(study):
     bank={}
     for m in range(1,9):
-        req=Run(study=study,methods=[m],examples=True,population='Adults')
-        bank.update(public_jobs.prepare(req,{}))
+        req=Run(study=study,methods=[m],examples=False,population='Adults')
+        bank.update(public_jobs.prepare(req,own_assets(study,m)))
     for run,ctx in bank.items():
         m=int(run[3]);f=custom.demo(ctx,m,100,9)
         assert len(f)==100
@@ -44,7 +56,7 @@ def test_templates_and_routes(study):
     r=c.post('/api/custom-tools',json={'study':study},headers=HEAD);assert r.status_code==200
     assert len(r.json()['guide'])==13
     assert c.post('/api/demo',json=dict(study=study,methods=[5],examples=True),headers=HEAD).status_code==404
-    ctx=public_jobs.prepare(Run(study=study,methods=[5],examples=True),{})['SPA5_R0001']
+    ctx=public_jobs.prepare(Run(study=study,methods=[5],examples=False),own_assets(study,5))['SPA5_R0001']
     rows=json.loads(custom.demo(ctx,5,100,9).to_json(orient='records'))
     r=c.post('/api/dataset',json=dict(study=study,name='SPA5_R0001',records=rows),headers=HEAD);assert r.status_code==200,r.text
     bad=copy.deepcopy(rows);bad[0]['a']=9
@@ -112,8 +124,8 @@ def test_display_mapping_attaches_correct_results():
 
 def test_custom_codebook_tracks_items_scores_and_fixed_demographics(study):
     from spa.codebook import build,csv
-    req=Run(study=study,methods=[8],examples=True)
-    ctx=public_jobs.prepare(req,{})['SPA8_R0001'];f=custom.demo(ctx,8,100,1)
+    req=Run(study=study,methods=[8],examples=False)
+    ctx=public_jobs.prepare(req,own_assets(study,8))['SPA8_R0001'];f=custom.demo(ctx,8,100,1)
     book=build(list(f),8,ctx['study']);lookup={r['column']:r for r in book}
     assert list(f)==[r['column'] for r in book]
     assert lookup['group']['provenance']=='Retained from supplied profiles'
@@ -127,9 +139,9 @@ def test_custom_codebook_tracks_items_scores_and_fixed_demographics(study):
 def test_demographics_are_optional_except_for_profile_and_quota_approaches(study):
     study['demographics']=[];s=custom.definition(study)
     assert custom.demographics(s)==[]
-    for m in (1,2,5,6):assert public_jobs.prepare(Run(study=study,methods=[m],examples=True,population='Adults'),{})
+    for m in (1,2,5,6):assert public_jobs.prepare(Run(study=study,methods=[m],examples=False,population='Adults'),own_assets(study,m))
     for m in (4,7,8):
-        with pytest.raises(ValueError,match='need demographic categories'):public_jobs.prepare(Run(study=study,methods=[m],examples=True),{})
+        with pytest.raises(ValueError,match='need demographic categories'):public_jobs.prepare(Run(study=study,methods=[m],examples=False),{})
 
 
 def test_custom_pilot_accepts_items_or_construct_scores_and_needs_fifty(study):

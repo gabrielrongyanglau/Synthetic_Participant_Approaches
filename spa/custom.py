@@ -141,14 +141,15 @@ def contexts(req,assets):
     s=definition(req.study);bank={}
     if getattr(req,'goal','distributions') in ('relationships','patterns','strengths','outcomes') and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('Relationship exploration requires at least one predictor and one outcome. Pattern r needs at least three varying coefficients.')
     if 8 in req.methods and (not predictor_fields(s) or not outcome_fields(s)):raise ValueError('SPA8 generates outcomes only, so it needs at least one predictor and one outcome.')
-    if req.examples and not req.study.get('fictionalExample',False):raise ValueError('The fictional example data only match the unedited fictional study. Because the study definition was changed, upload CSVs that match your measures, or load the fictional example study again.')
     for m in req.methods:
-        if m in (4,7,8) and not demographics(s):raise ValueError('SPA4, SPA7 and SPA8 keep demographic information fixed, so they need demographic categories. Add them under Demographic categories in Study and data.')
+        if m in (4,7,8) and not demographics(s):raise ValueError('SPA4, SPA7 and SPA8 keep demographic information fixed, so they need demographic categories. Tick or add them on the Questionnaire step.')
+        # Your own study always uses your own data. Example inputs exist only for the MIDUS demonstration.
+        if m>=4 and req.examples:raise ValueError(f'SPA{m} uses your own data. Upload the file for this approach on the Inputs step.')
         if m==3 and not req.population.strip():raise ValueError('Population guidance is required.')
         for rep in range(1,req.repetitions+1):
-            rng=np.random.default_rng(np.random.SeedSequence([req.seed,m,rep]));ctx=dict(custom=True,study=s,fixed=None,pilot=None,summary=None,provenance=dict(method=m,repetition=rep,population_guidance=req.population if m==3 else '',source='Fictional examples' if req.examples else 'Researcher-supplied inputs'))
+            rng=np.random.default_rng(np.random.SeedSequence([req.seed,m,rep]));ctx=dict(custom=True,study=s,fixed=None,pilot=None,summary=None,provenance=dict(method=m,repetition=rep,population_guidance=req.population if m==3 else '',source='Researcher-supplied inputs'))
             if m in (5,6):
-                f=template(s,'pilot') if req.examples else assets.get(f'pilot_SPA{m}')
+                f=assets.get(f'pilot_SPA{m}')
                 if f is None:raise ValueError(f'SPA{m} needs a pilot sample: one row per participant, one column per item or construct score.')
                 if len(f)!=SAMPLE_N:raise ValueError(f'SPA{m} needs a pilot sample of exactly {SAMPLE_N} participants, one row each. This file has {len(f)} rows.')
                 f,cols=construct_columns(f,s,s['variables']);fields=demographics(s)+cols
@@ -158,7 +159,7 @@ def contexts(req,assets):
                 ctx['provenance'].update(pilot_input_rows=list(range(1,SAMPLE_N+1)),pilot_n=SAMPLE_N,pilot_columns='Items and locally computed scores' if set(all_items(s))<=set(cols) else 'Mix of item columns and construct scores, as supplied')
                 if m==5:ctx['summary']={'descriptive':json_records(f.describe().T.reset_index()),'correlations':json_records(f.corr().reset_index()),'covariances':json_records(f.cov().reset_index())}
             if m in (7,8):
-                kind='psychology' if m==8 else 'demographics';f=template(s,kind) if req.examples else assets.get(f'profiles_SPA{m}')
+                kind='psychology' if m==8 else 'demographics';f=assets.get(f'profiles_SPA{m}')
                 if f is None or len(f)<req.n:raise ValueError(f'SPA{m} needs at least {req.n} participant profiles (one row each), one for every synthetic participant.')
                 if m==8:
                     f=f.copy()
@@ -169,7 +170,7 @@ def contexts(req,assets):
                 idx=np.arange(req.n) if len(f)==req.n else rng.choice(len(f),req.n,replace=False);f=f.iloc[idx]
                 ctx['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(f))];ctx['provenance']['input_rows_in_output_order']=(idx+1).tolist()
             if m==4:
-                table=template(s,'proportions') if req.examples else assets.get('proportions_SPA4');data={}
+                table=assets.get('proportions_SPA4');data={}
                 if table is None:raise ValueError('SPA4 needs a target proportions file: one row per demographic category.')
                 table=table.rename(columns={'field':'variable'})
                 for v in s['demographics']:

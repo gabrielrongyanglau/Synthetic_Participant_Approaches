@@ -28,6 +28,22 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 6.9: MIDUS examples in every field
+
+The example text in each field now comes from the MIDUS study: the optimism measure (its definition, the Life Orientation Test citation, three of its items with the second reverse-coded, and agree–disagree anchors), marital status with the MIDUS categories, and a MIDUS-style study title and population description. The citation field is now a text box so the full reference shows, and a browser check confirmed that no example text is cut off at 1280 px or 390 px. All 202 tests pass.
+
+## Version 6.8: no fictional study, examples in every field
+
+The fictional example study is removed from the interface and the custom-study engine. Your own study now always uses your own uploaded data for SPA4 to SPA8, and a request that asks for example inputs for your own study is refused with advice to upload on the Inputs step. The completed-example CSV for each upload stays. Every text field on the questionnaire and inputs steps shows an example of how to fill it in, and new measures and demographics start empty so the examples are visible. Custom-study tests now upload their own files. All 202 tests pass.
+
+## Version 6.7: questionnaire step for both paths
+
+The MIDUS demonstration now has its own Questionnaire step, where visitors tick which of the 6 demographic characteristics and 38 psychological predictors to include. All start ticked, which is the setup evaluated in the proposal and runs exactly as before. A smaller selection is applied by giving the preserved engine a copy of the study with shorter variable lists (`spa/selection.py`), so method templates, scoring and output checks are unchanged in form. Both life-satisfaction outcomes are always generated. The selection is held in the signed context, and the dataset, codebook and quality checks cover only the chosen variables. SPA4, SPA7 and SPA8 need at least one demographic characteristic. For your own study, the Questionnaire step lists demographics first, with common characteristics to tick (age group, gender, highest education, marital status, employment status), each with editable categories, then the psychological measures. New tests cover the selection for every approach, the signed context and the dataset download. All 201 tests pass.
+
+## Version 6.6: information step for both paths, approach fit list, MIDUS variables
+
+The Approach page lists all eight approaches with whether each fits the chosen information, and no longer shows study results there. Results for every approach stay under Study findings. The Information step asks "What information can you provide?" for your own study and "Which information should the simulation use?" for the MIDUS demonstration, whose option descriptions refer to the example information supplied with the toolkit. Recommendation reasons are worded so they suit both paths. Choosing the MIDUS demonstration shows expandable lists of its 6 demographic characteristics, 38 psychological predictors and 2 outcomes. All 187 tests pass.
+
 ## Version 6.5: available information, no papers, fitting results only
 
 The questions on what the researcher has are replaced by one choice from six options: no participant data, a general population description, population demographic proportions, a small human pilot dataset, actual demographic profiles, or actual demographic and psychological scores. A general population description now leads to SPA3, with SPA1 and SPA2 as alternatives. The other recommendations are unchanged. Research context and supporting papers are removed from the interface, the request, the prompts, the error catalogue, the tests and the guides, together with the PDF extraction route and its dependency. The Approach page shows study results only for the approaches that fit the chosen information, and green marks the closest value among them. All 187 tests pass. The count is lower because the supporting-paper tests were removed.

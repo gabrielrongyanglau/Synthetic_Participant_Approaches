@@ -74,7 +74,7 @@ def test_upload_warnings_do_not_block(client):
 def custom_study(item='I feel positive about my day.'):
     return dict(title='T',population='Adults',variables=[dict(code='mood',name='Mood',role='predictor',definition='Mood.',citation='Fictional.',items=[item,'I feel calm.'],minimum=1,maximum=5,anchorLow='Low',anchorHigh='High',responseType='integer',aggregation='mean',reverse=[]),
       dict(code='wellbeing',name='Wellbeing',role='outcome',definition='Wellbeing.',citation='Fictional.',items=['Life is good.','I am content.'],minimum=1,maximum=5,anchorLow='Low',anchorHigh='High',responseType='integer',aggregation='mean',reverse=[])],
-      demographics=[dict(code='group',name='Group',categories={'1':'A','2':'B'})],fictionalExample=True)
+      demographics=[dict(code='group',name='Group',categories={'1':'A','2':'B'})])
 
 def test_sensitive_topics_need_confirmation_and_prohibited_content_is_blocked(client):
     s=custom_study('I have thought about suicide in the past month.')
