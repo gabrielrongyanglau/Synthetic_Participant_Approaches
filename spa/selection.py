@@ -10,8 +10,9 @@ from .public import PUBLIC,CODE
 
 # Plain names shown on the Questionnaire step, in the study's order.
 LABELS={
- 'B1PRAGE_2019':'Age','B1PRSEX':'Sex','B1PB1':'Highest educational attainment','B1PB19':'Current marital status',
- 'B1PF7A':'Racial origin','B1SN1A':'Religious preference',
+ # Demographic names follow the MIDUS 2 codebook labels.
+ 'B1PRAGE_2019':'Age at MIDUS 2','B1PRSEX':'Sex','B1PB1':'Highest level of education completed','B1PB19':'Current marital status',
+ 'B1PF7A':'Racial origin (first reported)','B1SN1A':'Religious preference (first choice)',
  'B1SORIEN':'Optimism (Life Orientation Test)','B1SPESSI':'Pessimism','B1SMASTE':'Personal mastery','B1SCONST':'Perceived constraints',
  'B1SCTRL':'Overall sense of control','B1SESTEE':'Self-esteem','B1SEXTRA':'Extraversion','B1SOPEN':'Openness to experience',
  'B1SCONS2':'Conscientiousness','B1SAGREE':'Agreeableness','B1SNEURO':'Neuroticism','B1SACTIV':'Active coping','B1SPLAN':'Planning',

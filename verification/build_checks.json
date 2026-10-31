@@ -1,5 +1,5 @@
 {
-  "app_version": "7.3.0",
+  "app_version": "7.4.0",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",
@@ -85,5 +85,6 @@
   "interface_7_0": "Own-study Questionnaire step starts with a choice: enter variables one by one, or upload a questionnaire CSV (blank template, completed MIDUS example, column table, browser-side parsing with row-specific errors, imported variables shown for review). Check button renamed with an explanation. Own-study description on Choose your study.",
   "interface_7_1": "Questionnaire step: separate check button and its notes removed; one Continue button runs all existing checks and blocks with the specific message. Upload option hides the editor and lists imported variables read-only; Continue requires an entry choice and, for upload, an imported file.",
   "interface_7_2": "Start button; Inputs examples follow the user's questionnaire with whole-number items; clarity review of every page for both paths; MIDUS codebook names and categories readable.",
-  "interface_7_3": "Clean-up only: unused test data file, dead CSS and unused JavaScript removed; behaviour unchanged."
+  "interface_7_3": "Clean-up only: unused test data file, dead CSS and unused JavaScript removed; behaviour unchanged.",
+  "interface_7_4": "Own-study demographic presets add ethnic group and household income (seven in total). MIDUS demographic names aligned with MIDUS 2 codebook labels."
 }

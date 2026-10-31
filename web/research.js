@@ -24,7 +24,9 @@ const Research=(()=>{
    ['gender','Gender',{1:'Woman',2:'Man',3:'Another gender identity'}],
    ['education','Highest education',{1:'Secondary school or less',2:'Vocational or other post-secondary',3:'Bachelor’s degree',4:'Postgraduate degree'}],
    ['marital_status','Marital status',{1:'Single, never married',2:'Married or in a civil partnership',3:'Living with a partner',4:'Separated or divorced',5:'Widowed'}],
-   ['employment','Employment status',{1:'Full-time',2:'Part-time',3:'Self-employed',4:'Not in paid work',5:'Student',6:'Retired'}]];
+   ['employment','Employment status',{1:'Full-time',2:'Part-time',3:'Self-employed',4:'Not in paid work',5:'Student',6:'Retired'}],
+   ['ethnic_group','Ethnic group',{1:'Asian',2:'Black',3:'Mixed or multiple ethnic groups',4:'White',5:'Another ethnic group'}],
+   ['household_income','Household income',{1:'Lowest fifth',2:'Second fifth',3:'Middle fifth',4:'Fourth fifth',5:'Highest fifth'}]];
  function presetEntry(key){const [code,name,categories]=PRESETS.find(p=>p[0]===key);return {code,name,categories:{...categories},preset:key}}
  function presets(){const host=$('presetDemos');host.replaceChildren();for(const [key,name] of PRESETS){const l=el('label',undefined,'check'),x=el('input');x.type='checkbox';x.checked=demos.some(d=>d.preset===key);x.onchange=()=>{if(x.checked){if(demos.length>=8){x.checked=false;notice({title:'Up to eight demographics',message:'This study already has eight demographic characteristics.',advice:'Remove one before adding another.'},true);return}demos.push(presetEntry(key))}else demos=demos.filter(d=>d.preset!==key);draw();invalidate()};l.append(x,el('span',name));host.append(l)}}
  // MIDUS demonstration: tick the demographics and psychological predictors to include. All start ticked, as in the proposal.
@@ -119,7 +121,7 @@ const Research=(()=>{
  function situation(){const st=stage();return st?(custom()?SITUATION[st]:(MIDUS_TITLES[st]||SITUATION[st])):''}
  const MIDUS_TITLES={pilot:'A small pilot dataset',demographics:'Demographic profiles',psychology:'Demographic and psychological scores'};
  function stages(){const was=stage();$('infoChoices').replaceChildren();radios($('infoChoices'),'information',OPTIONS.map(([k,t,own,midus])=>[k,custom()?t:(MIDUS_TITLES[k]||t),custom()?own:midus,k===was]),recommend)}
- const MIDUS_DEMO=['Age','Sex','Highest educational attainment','Current marital status','Racial origin','Religious preference'];
+ const MIDUS_DEMO=['Age at MIDUS 2','Sex','Highest level of education completed','Current marital status','Racial origin (first reported)','Religious preference (first choice)'];
  const MIDUS_PSYCH=['Optimism (Life Orientation Test)','Pessimism','Personal mastery','Perceived constraints','Overall sense of control','Self-esteem','Extraversion','Openness to experience','Conscientiousness','Agreeableness','Neuroticism','Active coping','Planning','Positive reinterpretation and growth','Problem-focused coping (overall)','Denial','Behavioural disengagement','Use of food to cope','Positive affect','Negative affect','Anxiety symptoms','Support from family','Support from friends','Support from spouse or partner','Strain from family','Strain from friends','Strain from spouse or partner','Generativity','Meaningfulness of society','Social integration','Acceptance of others','Social contribution','Social actualisation','Daily discrimination','Negative work-to-family spillover','Negative family-to-work spillover','Purpose in life','Self-acceptance'];
  function midusLists(){for(const [id,items] of [['midusDemo',MIDUS_DEMO],['midusPsych',MIDUS_PSYCH]])$(id).replaceChildren(...items.map(x=>el('li',x)))}
  function studies(){options($('studyMode'),{midus:'MIDUS demonstration',custom:'My own study'});radios($('studyChoices'),'study',[

@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 7.4: demographics
+
+Your own study offers two more demographics to tick: ethnic group (Asian, Black, Mixed or multiple ethnic groups, White, Another ethnic group) and household income (fifths, from lowest to highest), each with editable categories. The MIDUS demographic names now follow the MIDUS 2 codebook labels: Age at MIDUS 2, Sex, Highest level of education completed, Current marital status, Racial origin (first reported) and Religious preference (first choice). All 202 tests pass.
+
 ## Version 7.3: clean-up
 
 No change to the flow or behaviour. Removed an example output file used only by one test (the test now builds the same kind of dataset in memory), CSS rules for elements removed in earlier versions (tabs, guided questions, overview figures and panels, comparison results, old study-mode controls), and two unused pieces of JavaScript (old page aliases and an empty function). Every server route is still used by the interface. All 202 tests pass.
