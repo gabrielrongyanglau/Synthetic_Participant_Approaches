@@ -182,11 +182,6 @@ CATALOGUE={
    advice='The toolkit cancels it and requests that batch again once automatically. If it stalls again, check status.openai.com and try later.'),
  'cancelled':dict(title='Batch cancelled',status=200,auto='none',
    message='This batch was cancelled before it finished.',advice='Choose Retry failed batches to generate the missing participants (a new paid request).'),
- # ---------------- Comparison
- 'reference_unusable':dict(title='The human reference cannot be used',status=400,auto='none',
-   message='{detail}',advice='Upload observed human data with the same variable columns as the generated dataset (see the variable guide). Each psychological variable needs at least two different observed values.'),
- 'no_dataset':dict(title='No dataset to compare yet',status=400,auto='none',
-   message='This tab has no completed dataset yet.',advice='Generate a dataset first, then return to Compare with human data.'),
 }
 
 # Dataset and upload warnings: shown with the result, never block the user.
@@ -241,8 +236,7 @@ GROUPS=[('Uploaded files',['file_empty','not_csv','wrong_delimiter','ragged_rows
  ('Supporting papers',['pdf_too_large','not_pdf','pdf_encrypted','pdf_too_many_pages','pdf_no_text','pdf_too_much_text','pdf_unreadable']),
  ('Starting a run',['not_configured','consent_missing','run_limits','inputs_changed','handle_invalid','request_too_large','blocked_request']),
  ('AI service: submitting',['budget_exhausted','service_busy','service_unavailable','service_key_invalid','service_access_denied','inputs_too_large_for_model','request_rejected','submission_uncertain']),
- ('AI service: progress and output',['progress_check_failed','response_expired','generation_failed','output_too_long','content_blocked','model_refused','invalid_output','repetitive_output','copied_pilot','batch_stalled','cancelled']),
- ('Comparison with human data',['reference_unusable','no_dataset'])]
+ ('AI service: progress and output',['progress_check_failed','response_expired','generation_failed','output_too_long','content_blocked','model_refused','invalid_output','repetitive_output','copied_pilot','batch_stalled','cancelled'])]
 
 def catalogue_markdown():
     fill=lambda t:t.replace('{team}','Contact the research team.').replace('{','‹').replace('}','›')

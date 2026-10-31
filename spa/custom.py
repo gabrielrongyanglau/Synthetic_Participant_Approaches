@@ -1,12 +1,10 @@
 """Request-scoped custom questionnaires. No storage or provider access.
 Original MIDUS engines remain unchanged; this is an explicitly unvalidated extension.
 """
-import itertools,json,re
+import json,re
 import numpy as np
 import pandas as pd
-from scipy.stats import wasserstein_distance
 from .study import json_records
-from .metrics import safe_cor,relationship,mean_ci,welch,DIST,REL
 from .quotas import apportion
 from .numbering import run_name,run_spa,SPA_TO_ORIGINAL
 SAMPLE_N=50  # custom pilot samples have exactly 50 participants
@@ -137,7 +135,6 @@ def template(s,kind):
         return example_table(f,custom_spec(s))
     if kind=='demographics':return f[demographics(s)].head(100)
     if kind=='psychology':return f[demographics(s)+predictor_fields(s)].head(100)
-    if kind=='reference':return f
     raise ValueError('Unknown template.')
 
 def contexts(req,assets):
@@ -262,45 +259,3 @@ def demo(ctx,m,n,seed):
     s=ctx['study'];f=fake(s,n,seed+m);fixed=ctx['fixed'];ids=list(range(1,n+1));_,_,schema=batch(ctx,m,ids,fixed)
     fields=list(schema['properties']['participants']['items']['required']);f['participant_id']=ids
     return parse({'participants':json_records(f[fields])},s,ids,fixed)
-
-def comparison(datasets,human,s,methods):
-    # Humans may supply composite scores alone or all raw items. Demographics are not needed.
-    h=human.copy();scores=[f for v in s['variables'] for f in score_fields(v)]
-    for v in s['variables']:
-        if v['aggregation']!='individual' and v['code'] not in h:
-            x=numeric(h,s,item_fields(v))
-            for i in v['reverse']:x.iloc[:,i-1]=v['minimum']+v['maximum']-x.iloc[:,i-1]
-            h[v['code']]=(x.mean(axis=1) if v['aggregation']=='mean' else x.sum(axis=1)).where(x.notna().all(axis=1)).round(4)
-    h=numeric(h,s,scores);ps=predictor_fields(s);os=outcome_fields(s);distcodes=ps or scores;details=[];runstats=[]
-    for run,rows in datasets.items():
-        m=run_spa(run);f=clean_dataset(rows,s,m)
-        vals={}
-        for c in distcodes:
-            x=f[c].dropna().to_numpy(float);y=h[c].dropna().to_numpy(float)
-            if len(y)<2 or y.std(ddof=1)==0:raise ValueError('Human reference needs at least two varying scores for '+c)
-            d=dict.fromkeys(DIST,np.nan)
-            if len(x)>=2:
-                sx,sy=x.std(ddof=1),y.std(ddof=1);d=dict(smd=abs(x.mean()-y.mean())/np.sqrt((sx*sx+sy*sy)/2),sd_ratio=sx/sy,sd_error=abs(sx/sy-1),wasserstein=wasserstein_distance(x,y)/sy)
-            details.append(dict(run=run,variable=c,comparison='distribution',**d))
-        ds=details[-len(distcodes):]
-        vals.update({('distribution','',k):np.mean([d[k] for d in ds]) for k in DIST})
-        for o in os:
-            hr=[safe_cor(h[c],h[o]) for c in ps];sr=[safe_cor(f[c],f[o]) for c in ps]
-            for c,a,b in zip(ps,hr,sr):details.append(dict(run=run,variable=c,outcome=o,comparison='relationship',human_r=a,synthetic_r=b,absolute_error=abs(a-b),same_sign=bool(np.sign(a)==np.sign(b)) if np.isfinite(a+b) else None))
-            valid=bool(ps) and np.isfinite(hr).all() and np.isfinite(sr).all()
-            rel=relationship(hr,sr) if len(ps)>=2 else dict.fromkeys(REL,np.nan)
-            rel['correlation_mae']=float(np.mean(abs(np.array(hr)-sr))) if valid else np.nan
-            # With only two coefficients pattern r is mechanically +1/-1; suppress as uninformative.
-            if len(ps)<3:rel['pattern_r']=np.nan
-            rel['sign_agreement']=float(np.mean(np.sign(hr)==np.sign(sr))) if valid else np.nan
-            vals.update({('relationship',o,k):v for k,v in rel.items()})
-        runstats.append((run,m,vals))
-    summary=[];pairs=[];family=max(1,len(methods)*(len(methods)-1)//2)
-    keys=sorted(set(k for _,_,v in runstats for k in v))
-    for domain,outcome,metric in keys:
-        by={m:[v.get((domain,outcome,metric),np.nan) for _,mm,v in runstats if mm==m] for m in methods}
-        for m,v in by.items():summary.append(dict(method=m,domain=domain,outcome=outcome,metric=metric,**mean_ci(v)))
-        for a,b in itertools.combinations(methods,2):
-            p=welch(by[a],by[b],family)
-            if p:pairs.append(dict(first=a,second=b,domain=domain,outcome=outcome,metric=metric,**p))
-    return pd.DataFrame(summary),pd.DataFrame(pairs),pd.DataFrame(details)

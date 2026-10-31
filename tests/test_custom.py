@@ -39,15 +39,6 @@ def test_all_methods_schema_and_fixed_inputs(study):
         if m==8:assert 'a__i1' not in props and 'outcome__i1' in props
         if m==7:assert 'a__i1' in props and 'group' not in props
 
-def test_identical_reference_zero_errors_and_perfect_agreement(study):
-    s=custom.definition(study);f=custom.fake(s,100);f.insert(0,'participant_id',range(1,101))
-    summary,pairs,variables=custom.comparison({'SPA2_R0001':json.loads(f.to_json(orient='records'))},f,s,[2])
-    for metric in ['smd','sd_error','wasserstein','correlation_mae']:
-        assert np.allclose(summary.loc[summary.metric==metric,'mean'],0,atol=1e-12)
-    for metric in ['icc','ccc','pattern_r','sign_agreement']:
-        assert np.allclose(summary.loc[summary.metric==metric,'mean'],1,atol=1e-12)
-    assert summary.lower.isna().all() and pairs.empty
-
 def test_templates_and_routes(study):
     c=TestClient(app)
     r=c.post('/api/custom-tools',json={'study':study},headers=HEAD);assert r.status_code==200
@@ -103,18 +94,6 @@ def test_background_custom_submission_poll_and_unchanged_fixed_values(study,monk
     assert 'a__i1' not in result['records'][0]
     bad=copy.deepcopy(ctx);bad['study']['title']='Tampered'
     with pytest.raises(ValueError):public_jobs.poll(submitted['handle'],bad,client)
-
-
-def test_custom_reference_score_only_and_mixed_items(study):
-    s=custom.definition(study);f=custom.fake(s,100);f['participant_id']=range(1,101)
-    rows=json.loads(f.to_json(orient='records'))
-    for reference in [f[['a','b','c','outcome']],f.drop(columns=['a','group'])]:
-        summary,_,_=custom.comparison({'SPA2_R0001':rows},reference,s,[2])
-        assert summary.loc[summary.metric=='wasserstein','mean'].iloc[0]==0
-    # Two coefficients do not support informative Pearson pattern correspondence.
-    s['variables']=[v for v in s['variables'] if v['code']!='c'];rows=[{k:v for k,v in r.items() if not k.startswith('c')} for r in rows]
-    summary,_,_=custom.comparison({'SPA2_R0001':rows},f,s,[2])
-    assert summary.loc[summary.metric=='pattern_r','mean'].isna().all()
 
 
 def test_relationship_requires_declared_predictor_and_outcome(study):

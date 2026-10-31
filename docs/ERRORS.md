@@ -98,13 +98,6 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `batch_stalled` | A batch took too long | One batch has been generating for more than ‹minutes› minutes, much longer than usual. | The toolkit cancels it and requests that batch again once automatically. If it stalls again, check status.openai.com and try later. | Browser resubmits the batch once automatically (paid) |
 | `cancelled` | Batch cancelled | This batch was cancelled before it finished. | Choose Retry failed batches to generate the missing participants (a new paid request). | User action |
 
-## Comparison with human data
-
-| Code | Title | Message | What the user is told to do | Automatic handling |
-| --- | --- | --- | --- | --- |
-| `reference_unusable` | The human reference cannot be used | ‹detail› | Upload observed human data with the same variable columns as the generated dataset (see the variable guide). Each psychological variable needs at least two different observed values. | User action |
-| `no_dataset` | No dataset to compare yet | This tab has no completed dataset yet. | Generate a dataset first, then return to Compare with human data. | User action |
-
 ## Warnings (shown with results, download stays available)
 
 | Code | Title | Message | Advice |

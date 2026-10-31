@@ -33,13 +33,16 @@ Generation time varies with the complexity of the data being generated: simple r
 
 The interface is a research console: a status bar along the top, side navigation with the status of each step, the current page in the middle, and an inspector on the right with your selections, the study evidence for the chosen approach, tips and an activity log.
 
-1. **Goal.** The proposal's two goals: generate psychological variables that resemble human responses (Goal 1), or explore relationships among variables, covering patterns and strengths (Goal 2).
-2. **Your situation.** Two or three yes/no questions, such as whether you have collected pilot data, beside the Table 6 decision path.
-3. **Approach.** One recommended approach with the study result behind it, the other approaches that fit, and a table of all eight approaches with their study results (switchable to only those that fit).
-4. **Study and data.** Chosen once. The MIDUS demonstration always uses the example inputs supplied with the toolkit, which can be viewed but are never replaced. Your own study is where you define a title and measures and upload only what the approach needs, with templates and instructions for every upload.
-5. **Check and generate.** Check inputs, review the summary and confirm before generating. Prompts are read-only.
-6. **Datasets.** Progress, previews and duplication flags, then a ZIP with the dataset, codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance.
-7. **Compare (optional).** Upload observed human data using the same measures. Distributions, relationship patterns and relationship strengths are evaluated separately. This reference is not sent to OpenAI.
+The steps come in this order. The MIDUS demonstration skips steps 3 and 6, and later steps stay locked until the earlier ones are complete.
+
+1. **Choose your study.** The MIDUS demonstration, which always uses the example inputs supplied with the toolkit, or your own study.
+2. **Research goal.** The proposal's two goals: generate psychological variables that resemble human responses (Goal 1), or explore relationships among variables, covering patterns and strengths (Goal 2).
+3. **Questionnaire** (own study). A title, measures with definitions, sources, every item and scoring, optional demographic categories, and optional research context and papers. The definition is checked before you continue, and editing it later asks for a new check.
+4. **Your situation.** Two or three yes/no questions, such as whether you have collected pilot data, beside the Table 6 decision path.
+5. **Approach.** One recommended approach with the study result behind it, the other approaches that fit, and a table of all eight approaches with their study results (switchable to only those that fit).
+6. **Inputs** (own study). Only what the chosen approach needs, with templates and instructions for every upload.
+7. **Check and generate.** Check inputs, review the summary and confirm before generating. Prompts are read-only. For the MIDUS demonstration, this page also links to the example input and the variable guide.
+8. **Datasets.** Progress, previews and duplication flags, then a ZIP with the dataset, codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance.
 
 *Overview*, *Study findings*, *Glossary* and *Errors and help* are in the same navigation. Text uses IBM Plex Sans (SIL Open Font License), served from `web/fonts/` so the page makes no third-party requests.
 

@@ -178,12 +178,6 @@ def test_unexpected_server_errors_still_give_advice(client,monkeypatch):
     r=client.post('/api/check-inputs',json={'methods':[2]},headers=H)
     assert r.status_code==503 and r.json()['code']=='server_error' and r.json()['advice'] and 'internal' not in r.text
 
-def test_reference_errors(client):
-    rows=local_rows(2)
-    for text,code in [('', 'file_empty'),('a,b\n1,2\n','reference_unusable')]:
-        assert client.post('/api/compare',json={'csv':text,'datasets':rows},headers=H).json()['code']==code
-    assert client.post('/api/compare',json={'csv':'a,b\n1,2\n','datasets':{}},headers=H).json()['code'] in ('no_dataset','reference_unusable')
-
 def proportions(client):return pd.read_csv(io.StringIO(client.get('/api/example/SPA4_template.csv').text),dtype={'category':str})
 
 @pytest.mark.parametrize('case,expected',[

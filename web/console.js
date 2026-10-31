@@ -1,45 +1,73 @@
 'use strict';
-// Research console (design B): side navigation with step statuses, an inspector with the current
+// Research console (design B): side navigation with numbered, locked steps, an inspector with the current
 // selections, evidence and an activity log, and the full study results table on the approach page.
-// Reads state owned by app.js and research.js. Owns only the table filter and the log.
+// Step order: study, goal, questionnaire (own study), situation, approach, inputs (own study), check and generate, datasets.
+// Reads state owned by app.js and research.js. Owns the step confirmations, the table filter and the log.
 const Console=(()=>{
- let tab='all',results=null,last={},logItems=[];
+ let tab='all',results=null,last={},logItems=[],studyChosen=false,confirmed=false,inputsDone=false;
  const spa=()=>[...selected][0];
  const stage=()=>Research.situation();
+ const own=()=>Research.custom();
  const complete=()=>session?Object.keys(session.details||{}).length:0;
- const studyLabel=()=>Research.custom()?(Research.study()?.title||'My own study'):'MIDUS demonstration';
- function dataLabel(){const m=spa();if(!m)return '';if(!uploadMap[m])return 'None needed';if(!Research.custom())return 'Example inputs supplied with the toolkit';
+ const studyLabel=()=>!studyChosen?'':own()?(Research.study()?.title||'My own study'):'MIDUS demonstration';
+ function steps(){return ['study','goal',...(own()?['questionnaire']:[]),'situation','approach',...(own()?['inputs']:[]),'run','datasets']}
+ function available(id){
+  switch(id){
+   case 'goal':return studyChosen;
+   case 'questionnaire':return studyChosen&&own()&&!!Research.goal();
+   case 'situation':return studyChosen&&!!Research.goal()&&(!own()||Research.ready());
+   case 'approach':return available('situation')&&!!stage();
+   case 'inputs':return own()&&confirmed&&available('approach');
+   case 'run':return confirmed&&available('approach')&&(!own()||inputsDone);
+   case 'datasets':return !!session;
+   default:return true;
+  }
+ }
+ function dataLabel(){const m=spa();if(!m)return '';if(!uploadMap[m])return 'None needed';if(!own())return 'Example inputs supplied with the toolkit';
   const f=chosenFiles()[0]?.files[0];return f?f.name:Research.fictionalStudy()?'Fictional example data':'Not uploaded yet'}
  function status(){if(session)return complete()?`${complete()} dataset ready`:session.failed?'Needs attention':'Generating';return reviewedRequest?'Inputs checked, ready to generate':'Not started'}
  const metric=(k,w,m)=>results?.[`${k}_${w}`]?.[m];
  const f2=v=>v==null?'':v.toFixed(2),f3=v=>v==null?'':v.toFixed(3);
  function log(text){logItems.unshift([new Date().toLocaleTimeString('en-GB'),text]);logItems=logItems.slice(0,40);const box=$('activityLog');box.replaceChildren(...logItems.map(([t,x])=>{const d=el('div');d.append(el('time',t),document.createTextNode(x));return d}))}
  function track(){
-  const now={goal:Research.goal(),stage:stage(),spa:spa(),study:Research.custom()?'own':'midus',checked:!!reviewedRequest,run:session?(complete()?'ready':session.failed?'attention':'running'):'none',compared:$('comparisonResults').children.length>0};
+  const now={chosen:studyChosen,study:own()?'own':'midus',goal:Research.goal(),ready:own()&&Research.ready(),stage:stage(),spa:spa(),checked:!!reviewedRequest,run:session?(complete()?'ready':session.failed?'attention':'running'):'none'};
+  const changed=k=>last[k]!==undefined&&now[k]!==last[k];
+  if(changed('study')||changed('goal')||changed('stage')||changed('spa')){confirmed=false;inputsDone=false}
+  if(now.chosen&&(!last.chosen||changed('study')))log('Study: '+studyLabel());
   if(now.goal&&now.goal!==last.goal)log('Goal: '+Research.goalTitle());
+  if(now.ready&&!last.ready)log('Questionnaire checked');
   if(now.stage&&now.stage!==last.stage)log('Situation: '+now.stage);
   if(now.spa&&now.spa!==last.spa&&now.goal&&now.stage)log('Approach: '+Research.methodLabel(now.spa));
-  if(last.study&&now.study!==last.study)log('Study: '+studyLabel());
   if(now.checked&&!last.checked)log('Inputs checked');
   if(now.run!==last.run&&now.run!=='none')log({running:'Generation started',ready:'Dataset ready: 100 participants',attention:'Generation needs attention'}[now.run]);
   if(now.run==='none'&&last.run&&last.run!=='none')log('Session cleared');
-  if(now.compared&&!last.compared)log('Comparison complete');
   last=now;
  }
  function nav(){
-  const set=(id,text,ok)=>{const n=$(id);if(!n)return;n.textContent=text;n.classList.toggle('ok',!!ok)};
+  const order=steps();
+  document.querySelectorAll('#nav button[data-step]').forEach(b=>{
+   const id=b.dataset.page,n=order.indexOf(id);b.hidden=n<0;if(n<0)return;
+   b.querySelector('.step-no').textContent=(n+1)+' ';
+   const open=available(id);b.disabled=!open;b.title=open?'':'Complete the earlier steps first';
+  });
+  document.querySelectorAll('[data-crumb]').forEach(c=>{const n=order.indexOf(c.dataset.crumb);c.textContent=n<0?'Workflow':'Workflow / '+(n+1)});
+  const set=(id,text,ok)=>{const node=$(id);if(!node)return;const open=available(node.closest('button').dataset.page);node.textContent=open?text:'locked';node.classList.toggle('ok',open&&!!ok)};
+  set('navStudy',studyChosen?(own()?'own':'MIDUS'):'to do',studyChosen);
   set('navGoal',Research.goal()?'set':'to do',Research.goal());
+  set('navQuestionnaire',Research.ready()?'checked':'to do',Research.ready());
   set('navSituation',stage()?'answered':'to do',stage());
-  set('navApproach',spa()&&stage()?'SPA'+spa():'',spa()&&stage());
-  set('navStudy',Research.custom()?'own':'MIDUS',true);
+  set('navApproach',spa()&&stage()?'SPA'+spa():'',confirmed);
+  set('navInputs',inputsDone?'ready':'to do',inputsDone);
   set('navGenerate',session?'started':reviewedRequest?'checked':'',session||reviewedRequest);
   set('navDatasets',session?(complete()?'1 ready':session.failed?'attention':'running'):'none',complete());
-  set('navCompare',$('comparisonResults').children.length?'done':'optional',$('comparisonResults').children.length);
  }
  function inspector(){
   const set=(id,text)=>{$(id).textContent=text||'Not chosen yet';$(id).classList.toggle('unset',!text)};
-  set('selGoal',Research.goalTitle());set('selSituation',stage());set('selApproach',spa()&&stage()?Research.methodLabel(spa()):'');
-  set('selStudy',studyLabel());set('selData',spa()&&stage()?dataLabel():'');$('selStatus').textContent=status();
+  set('selStudy',studyLabel());set('selGoal',Research.goalTitle());
+  const q=$('selQuestionnaire');q.hidden=$('selQuestionnaireLabel').hidden=!studyChosen;
+  if(studyChosen){const n=own()?(Research.study()?.variables.length||0):0;q.textContent=!own()?'MIDUS measures provided':Research.ready()?`${n} measure${n===1?'':'s'} checked`:'Not checked yet';q.classList.toggle('unset',own()&&!Research.ready())}
+  set('selSituation',stage());set('selApproach',spa()&&stage()?Research.methodLabel(spa()):'');
+  set('selData',spa()&&stage()?dataLabel():'');$('selStatus').textContent=status();
   const m=spa(),box=$('inspEvidenceBox');box.hidden=!(m&&stage()&&results);
   if(!box.hidden){$('inspEvidenceTitle').textContent='Evidence for SPA'+m;
    $('inspScores').textContent=m===8?'Goal 1: keeps your supplied scores, so its score results describe your inputs.':`Goal 1: averages ${f2(metric('smd',0,m))} SD from human data. Distribution distance ${f2(metric('wasserstein',0,m))}.`;
@@ -61,24 +89,33 @@ const Console=(()=>{
    body.append(tr)}
   t.append(body);host.replaceChildren(t,el('p','Goal 1 columns: |SMD|, distance and SD ratio. Goal 2 columns: errors at MIDUS 2 and 3, pattern r and ICC. * SPA8 keeps the supplied psychological scores, so its Goal 1 columns describe its inputs. Hover over a heading for its meaning.','table-note'));
  }
- function refresh(){
-  if(!cfg)return;track();nav();inspector();
-  $('customPanel').hidden=!Research.custom();
-  $('nextGoal').disabled=!Research.goal();
+ function buttons(){
+  $('nextStudy').disabled=!studyChosen;
+  $('ownNext').hidden=!(studyChosen&&own());
+  $('nextGoal').disabled=!Research.goal();$('nextGoal').textContent=own()?'Next: define your questionnaire':'Next: your situation';
   $('nextSituation').disabled=!stage();
   const res=$('situationResult');res.hidden=!stage();if(stage())res.textContent='Your situation: '+stage()+'.';
   const ready=!!(Research.goal()&&stage()&&spa());$('approachNeeds').hidden=ready;
   $('confirmApproach').disabled=!ready;$('confirmApproach').textContent=ready?`Continue with SPA${spa()}`:'Continue with this approach';
+  const midus=!own()&&!!spa();$('midusInputs').hidden=!midus;
+  if(midus){$('midusInputText').textContent=$('dataSummary').textContent;const ex=$('midusExample');ex.hidden=$('exampleLink').hidden;ex.href=$('exampleFile').href;ex.download=$('exampleFile').download}
+ }
+ function refresh(){
+  if(!cfg)return;track();nav();inspector();buttons();
   if(!$('approach').hidden)table();
  }
  async function load(){if(results)return;try{const d=await evidencePayload();results={};for(const r of d.charts.summary)(results[`${r.metric}_${r.wave}`]??={})[r.method]=r.mean;refresh();table()}catch(e){$('resultsTable').replaceChildren(el('p','The study results could not be loaded. They are also under Study findings.','help'))}}
  function shown(id){if(id==='approach'){table();load()}refresh()}
  function init(){
   document.querySelectorAll('#approach .tabs button').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;document.querySelectorAll('#approach .tabs button').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',x===b)});table()}));
-  $('confirmApproach').addEventListener('click',()=>{if(!spa())return;inputs();page('study')});
+  $('studyChoices').addEventListener('change',()=>{studyChosen=true;refresh()});
+  $('nextGoal').addEventListener('click',()=>page(own()?'questionnaire':'situation'));
+  $('confirmStudy').addEventListener('click',action(async()=>{await Research.checkDefinition();refresh();page('situation')}));
+  $('confirmApproach').addEventListener('click',()=>{if(!spa())return;inputs();confirmed=true;log('Confirmed '+Research.methodLabel(spa()));refresh();page(own()?'inputs':'run')});
+  $('confirmInputs').addEventListener('click',()=>{inputsDone=true;log('Inputs ready');refresh();page('run')});
   $('startOver').addEventListener('click',()=>{if(session&&!confirm('Start over? Datasets in this tab that you have not downloaded will be lost.'))return;session=null;location.reload()});
   const original=notice;notice=function(text,error){original(text,error);if(error&&text)log('Message: '+(typeof text==='string'?text:text.title||'Something went wrong'))};
   load();refresh();
  }
- return {init,refresh,shown};
+ return {init,refresh,shown,available};
 })();

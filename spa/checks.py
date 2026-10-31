@@ -6,7 +6,7 @@ import pandas as pd
 from .errors import AppError,warning
 
 LABELS={'proportions_SPA4':'The SPA4 proportions file','pilot_SPA5':'The SPA5 pilot sample','pilot_SPA6':'The SPA6 pilot sample',
-        'profiles_SPA7':'The SPA7 profile file','profiles_SPA8':'The SPA8 profile file','reference':'The human reference file'}
+        'profiles_SPA7':'The SPA7 profile file','profiles_SPA8':'The SPA8 profile file'}
 IDENTIFIER_COLUMN=re.compile(r'(^|_|\b)(first_?name|last_?name|surname|full_?name|name|e-?mail|email_?address|phone|mobile|telephone|address|street|postcode|post_code|zip_?code|nric|ssn|social_security|passport|national_id|date_?of_?birth|dob|birth_?date|ip_?address)(_|\b|$)',re.I)
 EMAIL=re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
 PHONE=re.compile(r'^\+?[\d\s()-]{9,}$')
@@ -198,14 +198,14 @@ def check_upload(key,text,custom=None):
         reason='Both life-satisfaction outcomes must be observed for every pilot participant.'
     else:
         demo=demographics(custom);required=[c for c in header if c in specs]
-        missing=[c for c in demo if c not in header] if key!='reference' else []
+        missing=[c for c in demo if c not in header]
         if missing:raise AppError('missing_columns',label=label,count=len(missing),columns=', '.join(missing))
         complete=[c for c in required if key.startswith('pilot')];reason='Every cell of a custom pilot sample needs a value.'
     # Missing columns are reported before cell values, so the most important problem comes first.
     missing=[c for c in required if c not in header]
     if missing:raise AppError('missing_columns',label=label,count=len(missing),columns=', '.join(public(c) for c in missing[:12])+(' …' if len(missing)>12 else ''))
     warn=values(rows,label,{c:specs[c] for c in required if c in specs},public)
-    mode='demographic' if key=='profiles_SPA7' else 'none' if key=='reference' else 'strict'
+    mode='demographic' if key=='profiles_SPA7' else 'strict'
     warn+=structure(rows,label,required,public,complete,reason,mode) if required else []
     out=io.StringIO();csv.writer(out,lineterminator='\n').writerows(rows)
     return warn,out.getvalue()

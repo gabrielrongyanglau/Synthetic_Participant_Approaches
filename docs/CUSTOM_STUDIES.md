@@ -6,26 +6,21 @@ Custom-study generation extends the original score-level MIDUS prototype. It sup
 
 Enter a unique lowercase CSV code for each construct. Double underscores are reserved for generated item column codes, such as `support__i1`. Enter the construct definition, source, every item, numeric endpoints, scale anchors, integer/decimal response type, reverse-coded item positions and mean, sum or item-only scoring. Sources and exact item wording must be verified by the user.
 
-A mean/sum score is calculated only when every item is observed. Reverse coding is `minimum + maximum - raw response`. Scores are rounded to four decimal places after aggregation. The same rules apply to human raw items used for comparisons. Item-only measures remain separate items in the comparison; they are not silently combined into composites.
+A mean/sum score is calculated only when every item is observed. Reverse coding is `minimum + maximum - raw response`. Scores are rounded to four decimal places after aggregation. Item-only measures stay as separate items and are never combined into composites.
 
-Define demographic information for every custom study so the delivered dataset contains demographics as well as the requested psychological variables. Define categories with numeric codes. Continuous demographic fields are not supported in this extension; define meaningful categories, such as age bands, where suitable.
+Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. Define up to eight, with numeric codes. Continuous demographic fields are not supported in this extension. Define meaningful categories, such as age bands, where suitable.
 
 ## Inputs
 
-Use **Check definition and prepare templates** to validate the structure and create examples matching the declared columns. Download examples on Study and data. These records are invented numerical examples, not human observations.
+Use **Check definition** or **Check and continue** on the Questionnaire step to validate the structure and create examples matching the declared columns. Download examples on the Inputs step. These records are invented numerical examples, not human observations.
 
 - **Pilot input:** exactly 50 participants, one row each, with every demographic and, for each construct, either all of its item columns or one construct-score column. Scores are computed from items when items are supplied. SPA5 receives the records plus descriptive statistics, correlations and covariances calculated by the toolkit. SPA6 receives only records and is instructed to analyze them itself.
 - **SPA7 profiles:** at least n demographic rows. Items and scores are generated.
 - **SPA8 profiles:** at least n rows with demographics and observed predictor scores. Predictor scores may be supplied directly or as their item columns (scored by the toolkit). For item-only predictors, supply their item columns. Outcomes are withheld. No predictor items are invented when only a composite was supplied.
 - **SPA4 target proportions:** one row per declared demographic category, with `variable`, `category`, `category_label` and `proportion`. Proportions add up to 1 within each demographic. The toolkit matches each demographic's proportions separately, so combinations across demographics are random.
-- **Human reference:** predictor/outcome scores or the raw items needed to calculate them. Demographics are not needed. Use all intended reference records and report whether this reference overlaps generation inputs.
 
 CSV headers must match the guide. Missing fixed predictor values remain missing; nulls are not imputed. Generated items are required to be observed. Repeated generated profiles and pilot matches are flagged and retained.
 
-## Analysis
+## Evaluation
 
-Distribution errors use the declared predictor scores; if there are no predictors, they use the defined measure scores. Correlations compare each predictor with each outcome. Distribution statistics average required variable-level errors within each dataset. Relationship MAE and sign agreement require every declared predictor–outcome correlation for that outcome to be calculable. ICC(A,1) and CCC need at least two coefficients. Pattern r needs at least three coefficients with variation. Undefined results remain blank.
-
-Means and approximate 95% intervals use the available dataset-level statistics and the original Monte Carlo mean-interval formula. Welch comparisons use Bonferroni correction for the selected method pairs within each metric/outcome. The current trial permits only one run, so user-run confidence intervals and method comparisons are unavailable. The reusable analysis engine retains these calculations for offline use. Results are conditional on the supplied reference and the generated runs.
-
-A custom questionnaire's fidelity is not established by the original MIDUS findings. Item-level generation, different outcomes and populations require separate empirical evaluation.
+The toolkit generates and documents custom datasets. It does not compare them with human data. The original MIDUS findings do not show how closely a custom questionnaire, item-level generation, a different outcome or a different population is reproduced, so each needs its own check against human data.

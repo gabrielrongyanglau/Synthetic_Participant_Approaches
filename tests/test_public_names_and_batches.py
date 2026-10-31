@@ -37,8 +37,6 @@ def test_no_source_codes_in_any_page_or_download(client):
         responses+=[client.post('/api/preview',json=body,headers=H),client.post('/api/check-inputs',json=body,headers=H),client.post('/api/prepare',json=body,headers=H)]
     rows=local_rows(5)['SPA5_R0001']
     responses.append(client.post('/api/dataset',json={'name':'SPA5_R0001','records':rows},headers=H))
-    from spa.simulation import invent_reference
-    responses.append(client.post('/api/compare',json={'csv':invent_reference(load_study()).to_csv(index=False),'datasets':local_rows(1)},headers=H))
     for r in responses:
         assert r.status_code==200,(r.request.url,r.text[:200])
         assert not contains_code(r.text),(r.request.url,next(m for m in PUBLIC if m in r.text))
@@ -148,9 +146,9 @@ def test_uploaded_inputs_survive_browser_number_serialisation(client,monkeypatch
     assert r.status_code==200,r.text
     assert client.post('/api/poll',json={'handle':r.json()['handle'],'context':ctx},headers=H).json()['status']=='completed'
 
-def test_fictional_midus_reference_supports_the_comparison_step(client):
-    ref=client.get('/api/example/reference.csv')
-    assert ref.status_code==200 and not contains_code(ref.text) and len(ref.content)<2_200_000
-    from conftest import local_rows
-    r=client.post('/api/compare',json={'csv':ref.text,'datasets':local_rows(5)},headers=H)
-    assert r.status_code==200,r.text
+
+def test_comparison_with_human_data_is_removed(client):
+    assert client.post('/api/compare',json={'csv':'a\n1\n','datasets':{}},headers=H).status_code in (404,405)
+    assert client.get('/api/example/reference.csv').status_code==404
+    html=client.get('/').text
+    assert 'id="compare"' not in html and 'humanFile' not in html

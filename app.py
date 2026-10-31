@@ -10,7 +10,7 @@ from pydantic import BaseModel,ConfigDict,Field
 from dotenv import load_dotenv
 from spa.study import load_study,NAMES,json_records,selected_fields,clean_frame
 from spa.content import INTRO,SCOPE,METHODS,TERMS,METRICS,variable_guide,readable_results,readable_records
-from spa.workflow import PURPOSES,INFORMATION,METHODS_BY_INFORMATION,purpose_guidance,evaluation_reference
+from spa.workflow import PURPOSES,INFORMATION,METHODS_BY_INFORMATION,purpose_guidance
 from spa.io import read_csv
 from spa import public_jobs as jobs
 from spa import public as names
@@ -162,10 +162,6 @@ def guide():return download(variable_guide(load_study()).to_csv(index=False),'va
 def example(name:str):
     from spa.workflow import EXAMPLE_FILES
     allowed={f'SPA{m}_template.csv':'examples/'+f for m,f in EXAMPLE_FILES.items()}
-    if name=='reference.csv':
-        from spa.simulation import invent_reference
-        study=load_study();cols=selected_fields(study)
-        return download(invent_reference(study)[cols].to_csv(index=False),'fictional_MIDUS_reference.csv','text/csv')
     if name not in allowed:raise HTTPException(404,'Example not found.')
     return download((ROOT/'data'/allowed[name]).read_bytes(),name,'text/csv')
 
@@ -253,30 +249,6 @@ def clean_dataset(rows):
     order=['participant_id']+[f for f in selected_fields(load_study()) if f in frame]
     return frame[order+[c for c in frame.columns if c not in order]]
 
-@app.post('/api/compare')
-async def compare(request:Request):
-    from spa.analysis import analyse
-    import re
-    data=await request.json()
-    if data.get('study'):return compare_custom(data)
-    text=names.inbound_csv(str(data.get('csv','')))
-    from spa import checks
-    _,text=checks.check_upload('reference',text)
-    try:human=evaluation_reference(read_csv(text.lstrip('\ufeff').encode()),load_study())
-    except AppError:raise
-    except (ValueError,KeyError,TypeError) as exc:raise AppError('reference_unusable',detail=names.text(str(exc))) from None
-    raw=names.inbound(data.get('datasets',{}))
-    if not raw:raise AppError('no_dataset')
-    if not isinstance(raw,dict) or not 1<=len(raw)<=40:raise ValueError('Provide 1–40 completed datasets.')
-    entries=[]
-    for run,rows in raw.items():
-        m,r=run_parts(run);frame=clean_dataset(rows);entries.append((m,r,lambda f=frame:f))
-    try:b=analyse(entries,human,load_study())
-    except AppError:raise
-    except ValueError as exc:raise AppError('reference_unusable',detail=names.text(str(exc))) from None
-    return {**{k:json_records(display_results(b[k],k)) for k in ['summary','comparisons','variables','human']},
-      'metadata':b['metadata'],'csv_exports':{k:b[k].to_csv(index=False) for k in ['summary','comparisons','variables','human','runs']}}
-
 @app.get('/api/evidence')
 def evidence():
     # Source files use the original study's numbering; relabel to SPA numbering (SPA7 demographic-only, SPA8 with psychology).
@@ -300,31 +272,9 @@ async def recommend(request:Request):
 async def custom_tools(request:Request):
     from spa.custom import definition,guide,template
     d=await request.json();s=definition(d.get('study'))
-    tables={k:template(s,k) for k in ['pilot','proportions','demographics','psychology','reference']}
+    tables={k:template(s,k) for k in ['pilot','proportions','demographics','psychology']}
     blank={k:(f.assign(proportion=None) if k=='proportions' else f.iloc[:0]) for k,f in tables.items()}
     return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:f.to_csv(index=False) for k,f in blank.items()})
-
-def compare_custom(data):
-    import re
-    from spa.custom import definition,comparison
-    from spa.recommendations import public_label,public_run
-    s=definition(data['study']);datasets=data.get('datasets',{})
-    if not isinstance(datasets,dict) or not 1<=len(datasets)<=40 or any(not re.fullmatch(RUN_PATTERN,r) for r in datasets):raise ValueError('Provide 1–40 completed datasets with valid names.')
-    from spa import checks
-    _,text=checks.check_upload('reference',str(data.get('csv','')),s)
-    human=read_csv(text.encode());methods=sorted({run_spa(r) for r in datasets})
-    try:summary,pairs,variables=comparison(datasets,human,s,methods)
-    except AppError:raise
-    except (ValueError,KeyError) as exc:raise AppError('reference_unusable',detail=str(exc)) from None
-    if 'run' in variables:variables['run']=variables['run'].map(public_run)
-    for frame in (summary,pairs):
-        if 'metric' in frame:frame['metric']=frame['metric'].map(lambda m:METRICS[m][0] if m in METRICS else 'Proportion of matching correlation signs')
-        if 'domain' in frame:frame['domain']=frame['domain'].map({'distribution':'Score distributions','relationship':'Psychological relationships'})
-        for key in ('method','first','second'):
-            if key in frame:frame[key]=frame[key].map(public_label)
-    return dict(summary=json_records(summary),comparisons=json_records(pairs),variables=json_records(variables),
-      metadata=dict(datasets=len(datasets),human_n=len(human),note='Custom-study extension. Scores use the declared rules and include every defined predictor. Pattern r requires at least three varying paired coefficients. Undefined statistics remain blank. Intervals describe mean performance across available runs against the fixed supplied reference.'),
-      csv_exports={k:f.to_csv(index=False) for k,f in [('summary',summary),('comparisons',pairs),('variables',variables)]})
 
 class Paper(BaseModel):
     model_config=ConfigDict(extra='forbid')

@@ -133,13 +133,6 @@ def test_no_writes_during_request(client,monkeypatch):
         r=client.post('/api/poll',json={'handle':h,'context':ctx},headers=H);assert r.json()['status']=='completed'
         assert client.post('/api/dataset',json={'name':'SPA6_R0001','records':r.json()['records'],'pilot':ctx['pilot']},headers=H).status_code==200
 
-def test_comparison_uses_browser_rows_not_database(client,reference):
-    rows=local_rows(1)
-    result=client.post('/api/compare',json={'csv':reference.to_csv(index=False),'datasets':rows},headers=H)
-    assert result.status_code==200,result.text
-    assert result.json()['metadata']['human_n']==2709 and result.json()['metadata']['datasets']==1
-    assert result.json()['csv_exports']['summary']
-
 def test_browser_uses_only_volatile_memory():
     root=Path(__file__).parents[1]
     js=(root/'web/app.js').read_text()

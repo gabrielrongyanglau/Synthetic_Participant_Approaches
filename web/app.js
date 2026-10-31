@@ -1,7 +1,7 @@
 'use strict';
 // Session state lives only in this tab's memory. Nothing is written to browser storage.
 const $=id=>document.getElementById(id);
-let cfg,selected=new Set(),session=null,busy=false,comparisonFiles={},reviewedRequest=null;
+let cfg,selected=new Set(),session=null,busy=false,reviewedRequest=null;
 
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
 /* ---------- Errors: every problem shows what happened and what to do ---------- */
@@ -16,9 +16,7 @@ const CLIENT_ERRORS={
   file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the template, fill it with your data and choose it here, or switch to the supplied fictional examples.'},
   review_needed:{title:'Check your inputs first',detail:'The inputs have not been checked, or they changed after the check.',advice:'Choose Check inputs, review the summary, tick the confirmation, then generate.'},
-  session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session on Your datasets before starting another run.'},
-  no_dataset:{title:'No dataset to compare yet',detail:'There is no completed dataset in this tab.',advice:'Generate a dataset first, then return to Compare with human data.'},
-  reference_missing:{title:'Choose a human reference file',detail:'No human reference CSV has been selected.',advice:'Choose a CSV of observed human data with the same variables as the generated dataset (see the variable guide).'},
+  session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets before starting another run.'},
   not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs and preview the instructions. Contact the research team to ask when generation will be available.'}
 };
 function clientError(code,params={}){const t=CLIENT_ERRORS[code],fill=s=>String(s).replace(/\{(\w+)\}/g,(_,k)=>params[k]??'');return new AppError({code,title:t.title,detail:fill(t.detail),advice:fill(t.advice)})}
@@ -37,6 +35,7 @@ const minutes=since=>Math.max(0,Math.floor((Date.now()-since)/60000));
 const PAGE_ALIAS={choose:'goal',prepare:'study',generate:'run'};
 function page(id){
   id=PAGE_ALIAS[id]||id;if(!$(id)||!$(id).classList.contains('page'))id='overview';
+  if(typeof Console!=='undefined'&&!Console.available(id))id='study';
   notice('');
   document.querySelectorAll('.page').forEach(e=>e.hidden=e.id!==id);
   document.querySelectorAll('#nav button').forEach(e=>{const on=e.dataset.page===id;e.classList.toggle('active',on);if(on)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current')});
@@ -108,8 +107,6 @@ function table(rows,parent){
 function tables(bundle,parent){
   parent.replaceChildren();
   [['summary','Method-level results'],['comparisons','Pairwise method comparisons'],['variables','Results by psychological variable'],['human','Human reference statistics']].forEach(([key,title])=>{if(!bundle[key])return;const d=el('details');d.append(el('summary',title));const box=el('div');table(bundle[key],box);d.append(box);parent.append(d)});
-  if(bundle.metadata?.note)parent.append(el('p',bundle.metadata.note,'help'));
-  if(bundle.metadata)parent.append(el('p',`${bundle.metadata.datasets} dataset${bundle.metadata.datasets===1?'':'s'} compared with ${Number(bundle.metadata.human_n).toLocaleString('en-GB')} human records. Results are conditional on that human reference.`,'help'));
 }
 
 async function reviewInputs(){
@@ -171,7 +168,7 @@ function updateRail(){if(typeof Console!=='undefined')Console.refresh()}
 
 async function request(){
   if(Research.custom())await Research.refreshTools();
-  if(!selected.size)throw new AppError({title:'Choose an approach',detail:'No approach is selected.',advice:'Go back to Goal and approach and select one approach card.'});
+  if(!selected.size)throw new AppError({title:'Choose an approach',detail:'No approach is selected.',advice:'Go back to Approach and choose one approach.'});
   const assets={};
   const examples=usesExamples();
   for(const input of $('uploads').querySelectorAll('input')){
@@ -301,7 +298,7 @@ async function retryFailed(){
   s.failed=false;s.stop=false;s.halt=null;await drive();
 }
 function clearSession(){
-  session=null;comparisonFiles={};$('comparisonResults').replaceChildren();$('humanFile').value='';
+  session=null;
   $('systemPrompt').textContent='';$('userPrompt').textContent='';$('promptPanel').hidden=true;
   $('uploads').querySelectorAll('input').forEach(f=>f.value='');
 }
@@ -352,8 +349,6 @@ function render(){
   $('checkAgain').hidden=!s||s.active||!anyPending;
   $('generate').disabled=!!s?.active||!cfg?.configured;
   $('jobDetail').replaceChildren();$('datasetList').replaceChildren();
-  $('compareMidusNote').hidden=!!(s&&s.settings.study);
-  options($('comparisonData'),{all:'All complete datasets from this session',...Object.fromEntries(Object.keys(s?.details||{}).map(run=>[run,Research.runLabel(run)]))});
   updateRail();
   if(!s)return;
   for(const run of s.order){
@@ -393,19 +388,6 @@ let evidenceData=null;
 async function evidencePayload(){return evidenceData||(evidenceData=await api('/api/evidence'))}
 async function evidence(){if(!$('evidenceResults').children.length){const data=await evidencePayload();StudyCharts.render(data.charts);tables(data,$('evidenceResults'))}}
 
-async function compare(){
-  if(!session||!Object.keys(session.details).length)throw clientError('no_dataset');
-  const f=$('humanFile').files[0];if(!f)throw clientError('reference_missing');checkFile(f);
-  const choice=$('comparisonData').value,records=Object.fromEntries(Object.keys(session.details).filter(run=>choice==='all'||run===choice).map(run=>[run,session.records[run]]));
-  notice('Calculating the comparison in memory…');
-  const d=await api('/api/compare',{csv:await f.text(),datasets:records,study:session.settings.study});
-  tables(d,$('comparisonResults'));comparisonFiles=d.csv_exports;
-  const links=el('div',undefined,'link-row');links.append(el('span','Download results:','help'));
-  for(const [name,csv] of Object.entries(comparisonFiles)){const btn=el('button',name+'.csv');btn.type='button';btn.className='link';btn.addEventListener('click',()=>saveBlob(new Blob([csv],{type:'text/csv'}),name+'.csv'));links.append(btn)}
-  $('comparisonResults').prepend(links);$('comparisonResults').prepend(el('h2','Comparison results','section-title'));
-  updateRail();notice('Comparison complete. Download any results you want to keep.');
-}
-
 async function init(){
   cfg=await api('/api/config');
   $('intro').textContent=cfg.intro;$('scope').textContent=cfg.scope;
@@ -414,7 +396,6 @@ async function init(){
   $('serviceEstimate').textContent=cfg.service.estimate_note+(cfg.service.estimated_minutes!=='60'?` The team's current planning estimate is ${cfg.service.estimated_minutes} minutes.`:'');
   $('serviceFunding').textContent=cfg.service.funding;$('serviceFuture').textContent=cfg.service.future;$('serviceContact').textContent=cfg.service.contact.text;
   Object.entries(cfg.terms).forEach(([title,text])=>{const d=el('details');d.append(el('summary',title),el('p',text));$('terms').append(d)});
-  Object.values(cfg.metrics).forEach(([title,meaning,formula])=>{const d=el('details');d.append(el('summary',title),el('p',meaning),el('p',formula,'subtle'));$('metricGuide').append(d)});
   document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();page(b.dataset.goto)}));
   $('reviewInputs').addEventListener('click',action(reviewInputs));
@@ -426,7 +407,6 @@ async function init(){
   $('stopRun').addEventListener('click',action(cancelRun));
   $('downloadAll').addEventListener('click',downloadAll);
   $('clearResults').addEventListener('click',action(discard));
-  $('compareButton').addEventListener('click',action(compare));
   window.addEventListener('beforeunload',e=>{if(session){e.preventDefault();e.returnValue=''}});
   $('statusDot').classList.toggle('on',!!cfg.configured);
   $('accountLabel').textContent=cfg.configured?'AI generation available':'AI generation not connected';
