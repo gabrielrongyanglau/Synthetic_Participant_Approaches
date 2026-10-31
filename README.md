@@ -31,9 +31,9 @@ Generation time varies with the complexity of the data being generated: simple r
 
 ## Research console
 
-The interface is a research console: a status bar along the top, side navigation with the status of each step, the current page in the middle, and an inspector on the right with your selections, the study evidence for the chosen approach, tips and an activity log.
+The interface is a research console: a status bar along the top, side navigation showing each step as to do, locked or completed, the current page in the middle, and an inspector on the right with your selections, the study evidence for the chosen approach, tips and an activity log.
 
-The steps come in this order. The MIDUS demonstration skips steps 3 and 6, and later steps stay locked until the earlier ones are complete.
+The Overview explains the two ways to use the toolkit: the MIDUS demonstration, which repeats the setup evaluated in the proposal, or your own study. The steps come in this order. The MIDUS demonstration skips steps 3 and 6, and later steps stay locked until the earlier ones are complete.
 
 1. **Choose your study.** The MIDUS demonstration, which always uses the example inputs supplied with the toolkit, or your own study.
 2. **Research goal.** The proposal's two goals: generate psychological variables that resemble human responses (Goal 1), or explore relationships among variables, covering patterns and strengths (Goal 2).
@@ -60,7 +60,7 @@ The toolkit uses SPA1–SPA8 throughout, numbered as in the revised proposal (Ta
 
 ## Upload templates
 
-Uploads apply to your own study. SPA5 to SPA8 uploads have one row per participant and one column per variable. The SPA4 upload has one row per demographic category. Each approach offers a template to revise (pre-filled with fictional examples) plus a ZIP with a blank template, variable guide and instructions:
+Uploads apply to your own study. SPA5 to SPA8 uploads have one row per participant and one column per variable. The SPA4 upload has one row per demographic category. Each approach offers a blank template, a completed example with fictional values that passes the checks as it is, and a ZIP with the variable guide and instructions:
 
 | Approach | Upload | Rows |
 | --- | --- | --- |

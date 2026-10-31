@@ -4,7 +4,7 @@ A synthetic participant approach (SPA) asks an AI to produce hypothetical partic
 
 ## First visit
 
-The side navigation lists the steps in order, each with its status. A step stays locked until the steps before it are complete. *Your selections* on the right summarises your choices, and *Activity* records what has happened.
+The side navigation lists the steps in order, each marked to do, locked or completed. A step stays locked until the steps before it are complete. *Your selections* on the right summarises your choices, and *Activity* records what has happened.
 
 1. Under **1 Choose your study**, choose **MIDUS demonstration** to use the example inputs supplied with the toolkit, with nothing to upload. MIDUS is the Midlife in the United States study used in the original evaluation.
 2. Under **2 Research goal**, choose your goal. Goal 1 is generating psychological variables that resemble human responses. Goal 2 is exploring relationships among variables, covering their patterns and strengths.
@@ -27,7 +27,7 @@ After you confirm the approach, **6 Inputs** asks only for what that approach ne
 
 ## Upload the right information
 
-SPA5 to SPA8 uploads have **one row per participant and one column per variable**. The SPA4 upload has one row per demographic category. Choose *Download the template to revise*, replace the fictional example values with your own, keep the header row, and upload it. The instructions ZIP adds a blank template, the variable guide and a READ_ME. Remove direct identifiers. Use UTF-8 comma-separated CSV, numeric codes and allowed ranges.
+SPA5 to SPA8 uploads have **one row per participant and one column per variable**. The SPA4 upload has one row per demographic category. Each upload offers a *Blank template*, a *Completed example* with fictional values and an instructions ZIP with the variable guide and a READ_ME. The completed example passes the checks as it is, so you can upload it to try the step. Then fill the blank template, or replace the example values with your own, keeping the header row. Remove direct identifiers. Use UTF-8 comma-separated CSV, numeric codes and allowed ranges.
 
 | Public approach | Participant input |
 | --- | --- |

@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 6.2: statuses, completed examples and overview
+
+Each workflow step in the side navigation now reads to do, locked or completed. Every upload on the Inputs step offers a blank template and a completed example with fictional values, and the completed example was uploaded unchanged and passed Check inputs. The Overview describes the two ways to use the toolkit: the MIDUS demonstration that repeats the proposal's setup, or your own study.
+
 ## Version 6.1: study-first flow
 
 The steps follow the supplied revised design: choose your study, research goal, questionnaire (own study), your situation, approach, inputs (own study), check and generate, and datasets. The MIDUS demonstration skips the questionnaire and inputs steps and shows its example inputs on Check and generate. A step stays locked until the steps before it are complete. Compare with human data is removed from the interface, the API, the error catalogue, the tests and the guides. The overview content and the Errors and help page are kept, with the overview's step list updated to the new order. Recommendations, generation, batching, uploads and downloads are unchanged. Browser QA with a simulated provider at 1280 px and 390 px completed a MIDUS SPA5 run and a fictional custom SPA8 run through the new steps. All 211 tests pass.

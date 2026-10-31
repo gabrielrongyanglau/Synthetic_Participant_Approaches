@@ -131,11 +131,12 @@ function uploadCard(m,old){
   f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=()=>{invalidateReview();notice('');if(f.files[0])try{checkFile(f.files[0])}catch(e){notice(e,true)}};label.append(f);
   d.append(label,el('p',inputRule(m),'help'));
   const links=el('div',undefined,'link-row');let a;
-  const what=m===4?'example proportions':`${ROWS[m]} example rows`;if(Research.custom()){a=el('button',`Download the template to revise (CSV, ${what})`);a.type='button';a.className='link';a.addEventListener('click',action(()=>Research.downloadTemplate(m)))}
-  else{a=el('a',`Download the template to revise (CSV, ${what})`);a.href=`/api/example/SPA${m}_template.csv`;a.download=`SPA${m}_template.csv`}
+  const what=m===4?'fictional proportions':`${ROWS[m]} fictional rows`;let empty;
+  if(Research.custom()){a=el('button',`Completed example (CSV, ${what})`);a.type='button';a.className='link';a.addEventListener('click',action(()=>Research.downloadTemplate(m)));empty=el('button','Blank template (CSV)');empty.type='button';empty.className='link';empty.addEventListener('click',action(()=>Research.emptyTemplate(m)))}
+  else{a=el('a',`Completed example (CSV, ${what})`);a.href=`/api/example/SPA${m}_template.csv`;a.download=`SPA${m}_completed_example.csv`;empty=el('a','Blank template (CSV)');empty.href='/api/template/'+m;empty.download=`SPA${m}_blank_template.csv`}
   const blank=el('button','Instructions and variable guide (ZIP)');blank.type='button';blank.className='link';
   blank.onclick=action(async()=>{if(Research.custom())await Research.blankTemplate(m);else{const [t,e]=await Promise.all([fetch('/api/template/'+m,{cache:'no-store'}),fetch(`/api/example/SPA${m}_template.csv`,{cache:'no-store'})]);if(!t.ok||!e.ok)throw Error('The template could not be downloaded. Try again.');saveBlob(makeZip({'template.csv':await e.text(),'blank_template.csv':await t.text(),'input_variable_guide.csv':csvText(cfg.variable_guide),'READ_ME.txt':inputInstructions(m,false)}),`SPA${m}_template_and_instructions.zip`)}});
-  links.append(a,blank);d.append(links);return d;
+  links.append(empty,a,blank);d.append(links,el('p','The completed example shows a filled template with fictional values. It passes the checks as it is, so you can upload it to try this step, then replace the values with your own data.','help'));return d;
 }
 function chosenFiles(){return [...$('uploads').querySelectorAll('input')].filter(x=>x.files&&x.files[0])}
 function usesExamples(){

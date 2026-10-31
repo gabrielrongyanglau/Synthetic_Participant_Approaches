@@ -52,14 +52,10 @@ const Console=(()=>{
   });
   document.querySelectorAll('[data-crumb]').forEach(c=>{const n=order.indexOf(c.dataset.crumb);c.textContent=n<0?'Workflow':'Workflow / '+(n+1)});
   const set=(id,text,ok)=>{const node=$(id);if(!node)return;const open=available(node.closest('button').dataset.page);node.textContent=open?text:'locked';node.classList.toggle('ok',open&&!!ok)};
-  set('navStudy',studyChosen?(own()?'own':'MIDUS'):'to do',studyChosen);
-  set('navGoal',Research.goal()?'set':'to do',Research.goal());
-  set('navQuestionnaire',Research.ready()?'checked':'to do',Research.ready());
-  set('navSituation',stage()?'answered':'to do',stage());
-  set('navApproach',spa()&&stage()?'SPA'+spa():'',confirmed);
-  set('navInputs',inputsDone?'ready':'to do',inputsDone);
-  set('navGenerate',session?'started':reviewedRequest?'checked':'',session||reviewedRequest);
-  set('navDatasets',session?(complete()?'1 ready':session.failed?'attention':'running'):'none',complete());
+  const done=(id,ok)=>set(id,ok?'completed':'to do',ok);
+  done('navStudy',studyChosen);done('navGoal',!!Research.goal());done('navQuestionnaire',Research.ready());done('navSituation',!!stage());
+  done('navApproach',confirmed);done('navInputs',inputsDone);done('navGenerate',!!session);
+  set('navDatasets',complete()?'completed':session?.failed?'attention':session?'running':'to do',complete());
  }
  function inspector(){
   const set=(id,text)=>{$(id).textContent=text||'Not chosen yet';$(id).classList.toggle('unset',!text)};
