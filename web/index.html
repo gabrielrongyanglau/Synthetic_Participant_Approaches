@@ -17,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v7.0</span>
+  <span class="chip">v7.1</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -88,7 +88,7 @@
         <h3>How would you like to enter your variables?</h3>
         <div id="entryChoices" class="choice-grid two-up" role="radiogroup" aria-label="How to enter your variables"></div>
         <div id="uploadSetup" hidden>
-          <p class="help">Fill in one row for each demographic characteristic, psychological predictor and outcome, then upload the file. The variables appear below for you to review and edit. The file describes your questionnaire. Do not put participant responses in it.</p>
+          <p class="help">Fill in one row for each demographic characteristic, psychological predictor and outcome, then upload the file. A list of the imported variables then appears for you to check. To change anything, edit the CSV and upload it again. The file describes your questionnaire. Do not put participant responses in it.</p>
           <p class="link-row"><button type="button" class="link" id="qBlank">Blank template (CSV)</button><button type="button" class="link" id="qExample">Completed example (CSV, MIDUS optimism and life satisfaction)</button></p>
           <details class="note" open><summary>What to put in each column</summary>
             <div class="wide"><table class="plain">
@@ -109,6 +109,7 @@
           </details>
           <label>Upload your completed CSV<input id="qFile" type="file" accept=".csv,text/csv"></label>
           <p id="qStatus" class="status-line" role="status"></p>
+          <div id="qSummary" class="wide"></div>
         </div>
         <div id="manualSetup" hidden>
         <h3>1. Demographic characteristics <span class="tag">Optional</span></h3>
@@ -119,18 +120,12 @@
         <h3>2. Psychological measures</h3>
         <div id="measureEditor"></div>
         <button id="addMeasure" class="btn-quiet" type="button">Add psychological measure</button>
-        <div class="actions">
-          <button id="validateStudy" type="button">Check for missing or invalid entries</button>
-        </div>
-        <p class="help">Checks every field on this page and lists anything to fix, without moving on. Check and continue runs the same check, then opens the next step.</p>
-        <p id="customStatus" class="status-line" role="status"></p>
-        <p class="help">Mean and sum scores need every item observed. Reverse coding and composite scoring run in the toolkit after generation.</p>
         </div>
 
       </div>
 
   </div>
-  <div class="btns"><button type="button" class="btn" id="confirmStudy">Check and continue</button></div>
+  <div class="btns"><button type="button" class="btn" id="confirmStudy">Continue</button></div>
 </section>
 
 <section id="situation" class="page" hidden>

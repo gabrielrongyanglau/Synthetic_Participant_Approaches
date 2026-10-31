@@ -12,7 +12,7 @@ Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. Def
 
 ## Inputs
 
-Use **Check definition** or **Check and continue** on the Questionnaire step to validate the structure and create examples matching the declared columns. Download examples on the Inputs step. These records are invented numerical examples, not human observations.
+Choosing **Continue** on the Questionnaire step checks the structure and create examples matching the declared columns. Download examples on the Inputs step. These records are invented numerical examples, not human observations.
 
 - **Pilot input:** exactly 50 participants, one row each, with every demographic and, for each construct, either all of its item columns or one construct-score column. Scores are computed from items when items are supplied. SPA5 receives the records plus descriptive statistics, correlations and covariances calculated by the toolkit. SPA6 receives only records and is instructed to analyze them itself.
 - **SPA7 profiles:** at least n demographic rows. Items and scores are generated.

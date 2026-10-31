@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 7.1: one Continue button
+
+The separate check button and its notes are removed from the Questionnaire step. The step has one **Continue** button for both study paths, and it runs every existing check: missing or invalid entries in your own study stop the step with the specific message, as before, and the MIDUS path still needs at least one psychological predictor. Continue also asks you to choose how to enter your variables and, with the upload option, to upload the CSV first. With the upload option, the on-page editor is hidden and the imported variables are listed read-only (role, name, code, and categories or items, range and scoring). All 202 tests pass.
+
 ## Version 7.0: questionnaire upload for your own study
 
 On the Questionnaire step, your own study first asks how to enter the variables: one by one on the page, or by uploading a CSV with one row per variable. The upload option provides a blank template, a completed MIDUS example (sex, marital status, optimism and life satisfaction) and a table explaining every column. The file is read in the browser, each row is checked with row-specific messages, and the variables then appear in the editor for review. Comma and semicolon separators and Excel's byte order mark are accepted. The check button is now called "Check for missing or invalid entries", with a line explaining it, and choosing My own study on the first step describes what the Questionnaire step offers. Browser QA at 1280 px and 390 px imported the completed example, rejected a file with incomplete rows, and ran SPA5 to a dataset with the imported variables. All 202 tests pass.

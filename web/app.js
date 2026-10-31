@@ -164,7 +164,7 @@ function inputs(){
   if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description':''}.`;
   else if(!custom&&[4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs at least one demographic characteristic. Tick some under Questionnaire.`;blocked=true}
   else if(!custom){summary=`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
-  else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Check and continue, then return here.`;blocked=true}
+  else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Continue, then return here.`;blocked=true}
   else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`;$('uploads').append(uploadCard(m,own))}
   $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;
   $('exampleLink').hidden=custom||!needs;

@@ -88,7 +88,7 @@ const Console=(()=>{
   $('midusQuestionnaire').hidden=own();$('customPanel').hidden=!own();
   $('qTitle').textContent=own()?'Define your study and questionnaire':'Choose the MIDUS measures';
   $('qSub').textContent=own()?'Choose how to enter your variables: one by one on this page, or by uploading a CSV that lists them. Either way, you give the demographic characteristics, then the psychological measures with their definitions, sources, items and scoring. Participant data come later, when the approach needs them.':'Choose the demographic characteristics, then the psychological predictors to include. All are ticked to start with, as in the proposal.';
-  $('confirmStudy').textContent=own()?'Check and continue':'Continue with these measures';
+  $('confirmStudy').textContent='Continue';
   $('nextSituation').disabled=!stage();
   const res=$('situationResult');res.hidden=!stage();if(stage())res.textContent=(own()?'Your available information: ':'The simulation will use: ')+stage()+'.';
   $('infoTitle').textContent=own()?'What information can you provide?':'Which information should the simulation use?';
