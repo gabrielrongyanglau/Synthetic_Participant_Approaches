@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.0: wording from Prof Kim's review
+
+Text changes only. On the Questionnaire step for your own study, the demographics introduction now explains that demographic information shapes how SPA1–SPA7 generate participants, and that SPA8 generates outcomes only. On the Check and generate step, the MIDUS demonstration describes the SPA5 and SPA6 pilot sample: the proposal randomly selected 50 MIDUS participants, and the demonstration provides an invented sample of 50 in the same format. SPA5 uses the records with summary statistics, and SPA6 asks the AI to analyse the records itself. All 202 tests pass.
+
 ## Version 7.4: demographics
 
 Your own study offers two more demographics to tick: ethnic group (Asian, Black, Mixed or multiple ethnic groups, White, Another ethnic group) and household income (fifths, from lowest to highest), each with editable categories. The MIDUS demographic names now follow the MIDUS 2 codebook labels: Age at MIDUS 2, Sex, Highest level of education completed, Current marital status, Racial origin (first reported) and Religious preference (first choice). All 202 tests pass.

@@ -129,6 +129,10 @@ async function reviewInputs(){
 }
 
 const uploadMap={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'};
+// MIDUS pilot wording for SPA5 and SPA6 (Prof Kim's text). The supplied 50 rows are invented, in the format of the proposal's random draw.
+const PILOT_SOURCE='In the proposal, 50 participants were randomly selected from the MIDUS dataset to create a pilot sample. This demonstration provides an invented pilot sample of 50 participants in the same format. ';
+const PILOT_TEXT={5:PILOT_SOURCE+'SPA5 uses their demographic information, psychological scores and life-satisfaction outcomes, together with summary statistics calculated from these records, to generate synthetic participants. This pilot sample is already provided, so no upload is required.',
+ 6:PILOT_SOURCE+'SPA6 gives the AI their demographic information, psychological scores and life-satisfaction outcomes, and asks it to analyse these records itself before generating synthetic participants. This pilot sample is already provided, so no upload is required.'};
 const EXAMPLE_TEXT={4:'the example target proportions',5:'the example pilot sample of 50 participants',6:'the example pilot sample of 50 participants',7:'100 example demographic profiles',8:'100 example demographic and psychological profiles'};
 function uploadCard(m,old){
   const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'target proportions (one row per category)':(m<7?'pilot sample':'participant profiles')+` (${ROWS[m]} rows)`}`),f=old[key]||el('input');
@@ -161,7 +165,7 @@ function inputs(){
   const name=m?`SPA${m}`:'This approach';let summary,blocked=false;
   if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description below':''}. Choose Next: check and generate to continue.`;
   else if(!custom&&[4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs at least one demographic characteristic. Tick some under Questionnaire.`;blocked=true}
-  else if(!custom){summary=`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
+  else if(!custom){summary=PILOT_TEXT[m]||`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
   else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Continue, then return here.`;blocked=true}
   else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`;$('uploads').append(uploadCard(m,own))}
   $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;
