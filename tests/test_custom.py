@@ -66,14 +66,16 @@ def test_templates_and_routes(study):
 
 def test_recommendations_mapping():
     assert all(PUBLIC_ID[m]==m for m in range(1,9))
-    # Table 6 and the proposal's two goals: no data -> SPA2; pilot -> SPA5 (SPA6 alternative); baseline demographic and psychological scores -> SPA8
+    # Table 3 and the proposal's two goals: no data -> SPA2; pilot -> SPA5 (SPA6 alternative); baseline demographic and psychological scores -> SPA8
     for goal in ('distributions','relationships'):
         assert suggest(goal,[])['primary']==2 and suggest(goal,['psychology'])['primary']==8 and suggest(goal,['pilot'])['primary']==5
         assert suggest(goal,['demographics'])['primary']==7 and suggest(goal,['proportions'])['primary']==4
         assert suggest(goal,['description'])['primary']==3 and suggest(goal,['description'])['feasible']==[1,2,3]
         assert suggest(goal,['pilot'])['task_supported'] and 'fidelity' not in suggest(goal,['pilot'])['reason'].lower()
     assert {5,6}<=set(suggest('distributions',['pilot'])['feasible']) and {7,8}<=set(suggest('relationships',['psychology'])['feasible'])
-    assert 'SPA6' in suggest('relationships',['pilot'])['reason'] and 'SPA5' in suggest('distributions',['psychology'])['reason']
+    assert 'SPA6' in suggest('relationships',['pilot'])['reason']
+    goal1=suggest('distributions',['psychology']);assert goal1['primary']==8 and 'psychological outcomes (Goal 1)' in goal1['reason']
+    assert suggest('relationships',['psychology'])['reason'].startswith('SPA8 generates outcomes from each person’s supplied demographics and psychological scores.')
     # Earlier interface choices still map onto the two goals
     assert suggest('strengths',['pilot'])['goal_label']==suggest('relationships',['pilot'])['goal_label']
     with pytest.raises(ValueError):suggest('unknown',[])

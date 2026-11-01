@@ -17,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v8.0</span>
+  <span class="chip">v8.1</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -47,10 +47,11 @@
       <select id="studyMode" hidden aria-hidden="true"></select>
       <div id="studyChoices" class="choice-grid two-up" role="radiogroup" aria-label="Study"></div>
       <div id="midusSetup" class="hint" hidden>
-        <p id="scope"></p>
-        <p class="help">The study compared generated data with 2,709 real MIDUS participants. Psychological measures come from MIDUS 2 (2004 to 2006), and life satisfaction from MIDUS 2 and MIDUS 3 (2013 to 2014). On the Questionnaire step, you choose which demographic characteristics and psychological predictors to include.</p>
-        <details class="note vars"><summary>Demographic characteristics (6)</summary><ul id="midusDemo" class="var-list"></ul></details>
-        <details class="note vars"><summary>Psychological predictors (38)</summary><ul id="midusPsych" class="var-list cols"></ul><p class="help">The study’s relationship comparisons used 37 of these, leaving out anxiety symptoms.</p></details>
+        <p>This demonstration allows you to explore the eight synthetic participant approaches (SPAs) presented in our <em>Organization Science</em> special-issue proposal.</p>
+        <p>You will select the demographic characteristics and psychological variables you want to examine, choose an SPA, and generate a synthetic dataset using that approach. You can also review our original research findings to understand how each SPA performed in reproducing human psychological variables and relationships among them.</p>
+        <p>Our research evaluated the eight SPAs using data from 2,709 participants in the Midlife in the United States (MIDUS) study.</p>
+        <details class="note vars"><summary>Demographic characteristics (6, measured at MIDUS 2)</summary><ul id="midusDemo" class="var-list"></ul></details>
+        <details class="note vars"><summary>Psychological predictors (38, measured at MIDUS 2)</summary><ul id="midusPsych" class="var-list cols"></ul><p class="help">The study’s relationship comparisons used 37 of these, leaving out anxiety symptoms.</p></details>
         <details class="note vars"><summary>Outcomes (2)</summary><ul class="var-list"><li>Life satisfaction at MIDUS 2</li><li>Life satisfaction at MIDUS 3</li></ul></details>
       </div>
       <p id="ownNext" class="hint" hidden>With your own study, you set up the questionnaire yourself on the Questionnaire step: choose the demographic characteristics, then add your psychological predictors and outcomes. You can enter them one by one, or upload a CSV file that lists them, using the blank template and completed example provided. Participant data are uploaded later, only if the approach you choose needs them.</p>
@@ -83,7 +84,7 @@
   </div>
   <div class="panel" id="customPanel">
       <div id="customSetup" hidden>
-        <p class="hint">You can define up to 30 measures, with up to 60 survey items and demographics in total. Check that every source and item wording is accurate. Results for your own questionnaire go beyond the proposal’s evaluation and need their own check against human data.</p>
+        <p class="hint">You can define up to 30 psychological measures (predictors and outcomes together), each with up to 30 survey items, and up to eight demographic characteristics. The survey items across all measures, plus one for each demographic characteristic, can total at most 60. Check that every source and item wording is accurate. Results for your own questionnaire go beyond the proposal’s evaluation and need their own check against human data.</p>
         <label>Study title<input id="studyTitle" type="text" placeholder="e.g. Optimism and life satisfaction in midlife"></label>
         <h3>How would you like to enter your variables?</h3>
         <div id="entryChoices" class="choice-grid two-up" role="radiogroup" aria-label="How to enter your variables"></div>
@@ -185,7 +186,7 @@
     <div><span class="fact-label">Paid by</span><span class="fact-value">Research team’s API budget</span></div>
   </div>
   <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes. Runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
-  <div id="notConnected" class="banner warn" hidden><strong>AI generation is offline.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs and preview the AI instructions.</div>
+  <div id="notConnected" class="banner warn" hidden><strong>AI generation is offline.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs.</div>
   <details class="note">
     <summary>About the research-funded trial</summary>
     <p>To conserve a limited API budget, repetitions and larger datasets are unavailable.</p>
@@ -204,25 +205,16 @@
         <label class="check confirm"><input id="sensitiveAck" type="checkbox"><span>This study has ethics approval for these topics, all data are de-identified, and I may send these materials to OpenAI.</span></label>
       </div>
       <div class="actions">
-        <button id="reviewInputs" class="primary" type="button">Check inputs</button>
-        <button id="preview" class="btn-quiet" type="button">Preview the AI instructions</button>
+        <button id="generate" class="primary" type="button">Generate 100 participants with AI</button>
+        <button id="reviewInputs" class="btn-quiet" type="button">Check inputs</button>
       </div>
-      <p class="help">The AI instructions are fixed by the research team. The measures you chose are added to them automatically.</p>
+      <p class="help">Check inputs is optional. It shows a summary of the settings and any problems with your inputs, without an AI call or cost. The same checks run automatically when you generate. The AI instructions are fixed by the research team, and the measures you chose are added to them automatically.</p>
 
       <div id="runReview" class="review" hidden>
         <h3>Review before starting</h3>
         <div id="reviewTable"></div>
         <div id="reviewWarnings" class="review-warnings"></div>
-        <label class="check confirm"><input id="inputsConfirmed" type="checkbox"><span>I have reviewed these settings and inputs.</span></label>
-        <div class="actions"><button id="generate" class="primary" type="button">Generate 100 participants with AI</button></div>
       </div>
-
-      <details id="promptPanel" class="note" hidden>
-        <summary>AI instructions for the first batch</summary>
-        <p>Read-only preview. Treat previews that contain real participant records as private.</p>
-        <h3>System instructions</h3><pre id="systemPrompt"></pre>
-        <h3>User prompt</h3><pre id="userPrompt"></pre>
-      </details>
   </div>
 </section>
 
@@ -304,7 +296,7 @@
   <details class="note"><summary>What each approach receives</summary><div id="studyMethodGuide"></div></details>
 
   <h2 class="section-title">How might researchers use these approaches?</h2>
-  <p class="help">From Table 6 of the proposal. The study evaluated distributions and correlations. Effects on research decisions need separate study.</p>
+  <p class="help">From Table 3 of the proposal. The study evaluated distributions and correlations. Effects on research decisions need separate study.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Research situation</th><th>Possible starting point</th><th>Interpretation</th></tr></thead>
     <tbody>
@@ -357,7 +349,6 @@
   <div class="box"><h3>Your selections</h3><dl>
     <dt>Study</dt><dd id="selStudy"></dd><dt>Goal</dt><dd id="selGoal"></dd><dt id="selQuestionnaireLabel">Questionnaire</dt><dd id="selQuestionnaire"></dd>
     <dt>Information</dt><dd id="selSituation"></dd><dt>Approach</dt><dd id="selApproach"></dd><dt>Data</dt><dd id="selData"></dd><dt>Status</dt><dd id="selStatus"></dd></dl></div>
-  <div class="box" id="inspEvidenceBox" hidden><h3 id="inspEvidenceTitle">Evidence</h3><p id="inspScores"></p><p id="inspRelations"></p></div>
   <div class="box"><h3>Tips</h3><ul class="tips"><li>Generated data need checking against human data.</li><li>No approach is validated for effect sizes or power.</li><li>Download results before closing the tab.</li></ul></div>
   <div class="box"><h3>Activity</h3><div id="activityLog" class="log"><div>Nothing yet.</div></div></div>
 </aside>

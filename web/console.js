@@ -1,10 +1,10 @@
 'use strict';
 // Research console (design B): side navigation with numbered, locked steps, an inspector with the current
-// selections, evidence and an activity log, and the full study results table on the approach page.
+// selections and an activity log, and the table of all eight approaches on the approach page.
 // Step order: study, goal, questionnaire, information, approach, inputs (own study), check and generate, datasets.
 // Reads state owned by app.js and research.js. Owns the step confirmations, the table filter and the log.
 const Console=(()=>{
- let results=null,last={},logItems=[],studyChosen=false,confirmed=false,inputsDone=false;
+ let last={},logItems=[],studyChosen=false,confirmed=false,inputsDone=false;
  const spa=()=>[...selected][0];
  const stage=()=>Research.situation();
  const own=()=>Research.custom();
@@ -26,8 +26,6 @@ const Console=(()=>{
  function dataLabel(){const m=spa();if(!m)return '';if(!uploadMap[m])return 'None needed';if(!own())return 'Example inputs supplied with the toolkit';
   const f=chosenFiles()[0]?.files[0];return f?f.name:'Not uploaded yet'}
  function status(){if(session)return complete()?`${complete()} dataset ready`:session.failed?'Needs attention':'Generating';return reviewedRequest?'Inputs checked, ready to generate':'Not started'}
- const metric=(k,w,m)=>results?.[`${k}_${w}`]?.[m];
- const f2=v=>v==null?'':v.toFixed(2),f3=v=>v==null?'':v.toFixed(3);
  function log(text){logItems.unshift([new Date().toLocaleTimeString('en-GB'),text]);logItems=logItems.slice(0,40);const box=$('activityLog');box.replaceChildren(...logItems.map(([t,x])=>{const d=el('div');d.append(el('time',t),document.createTextNode(x));return d}))}
  function track(){
   const now={chosen:studyChosen,study:own()?'own':'midus',goal:Research.goal(),ready:Research.ready(),stage:stage(),spa:spa(),checked:!!reviewedRequest,run:session?(complete()?'ready':session.failed?'attention':'running'):'none'};
@@ -64,10 +62,6 @@ const Console=(()=>{
   if(studyChosen){const n=own()?(Research.study()?.variables.length||0):0,[d,p]=own()?[0,0]:Research.midusCounts();q.textContent=!Research.ready()?(own()?'Not checked yet':'Not confirmed yet'):own()?`${n} measure${n===1?'':'s'} checked`:`${d} demographic${d===1?'':'s'}, ${p} predictor${p===1?'':'s'}`;q.classList.toggle('unset',!Research.ready())}
   set('selSituation',stage());set('selApproach',spa()&&stage()?Research.methodLabel(spa()):'');
   set('selData',spa()&&stage()?dataLabel():'');$('selStatus').textContent=status();
-  const m=spa(),box=$('inspEvidenceBox');box.hidden=!(m&&stage()&&results);
-  if(!box.hidden){$('inspEvidenceTitle').textContent='Evidence for SPA'+m;
-   $('inspScores').textContent=m===8?'Goal 1: keeps your supplied scores, so its score results describe your inputs.':`Goal 1: averages ${f2(metric('smd',0,m))} SD from human data. Distribution distance ${f2(metric('wasserstein',0,m))}.`;
-   $('inspRelations').textContent=`Goal 2: correlation error ${f2(metric('correlation_mae',2,m))} at MIDUS 2 (lower is closer). Pattern r ${f2(metric('pattern_r',2,m))}.`}
  }
  // All eight approaches with whether each fits the chosen information. Study results are under Study findings.
  function table(){
@@ -102,7 +96,6 @@ const Console=(()=>{
   if(!cfg)return;track();nav();inspector();buttons();
   if(!$('approach').hidden)table();
  }
- async function load(){if(results)return;try{const d=await evidencePayload();results={};for(const r of d.charts.summary)(results[`${r.metric}_${r.wave}`]??={})[r.method]=r.mean;refresh();table()}catch(e){$('resultsTable').replaceChildren(el('p','The study results could not be loaded. They are also under Study findings.','help'))}}
  function shown(id){if(id==='approach')table();refresh()}
  function init(){
   $('studyChoices').addEventListener('change',()=>{studyChosen=true;refresh()});
@@ -112,7 +105,7 @@ const Console=(()=>{
   $('confirmInputs').addEventListener('click',()=>{inputsDone=true;log('Inputs ready');refresh();page('run')});
   $('startOver').addEventListener('click',()=>{if(session&&!confirm('Start over? Datasets in this tab that you have not downloaded will be lost.'))return;session=null;location.reload()});
   const original=notice;notice=function(text,error){original(text,error);if(error&&text)log('Message: '+(typeof text==='string'?text:text.title||'Something went wrong'))};
-  load();refresh();
+  refresh();
  }
  return {init,refresh,shown,available};
 })();

@@ -10,8 +10,8 @@ The side navigation lists the steps in order, each marked to do, locked or compl
 2. Under **2 Research goal**, choose your goal. Goal 1 is generating psychological variables that resemble human responses. Goal 2 is exploring relationships among variables, covering their patterns and strengths.
 3. Under **3 Questionnaire**, tick the demographic characteristics, then the psychological predictors, to include. All 6 and all 38 start ticked, as in the proposal. Both life-satisfaction outcomes are always included. Choosing fewer changes what the AI receives, so results can differ from the proposal's. SPA4, SPA7 and SPA8 need at least one demographic characteristic. Choose **Continue**.
 4. Under **4 Information**, choose which information the simulation uses. The MIDUS demonstration has example information of every kind, so any option works: no participant data, a general population description, population demographic proportions, a small human pilot dataset, actual demographic profiles, or actual demographic and psychological scores. For your own study, choose what you have.
-5. Under **5 Approach**, review the recommendation from Table 6 of the proposal and which of the eight approaches fit your information, then choose **Continue with SPA…**. Pick another approach from the cards or the table if you prefer. One approach is used per simulation.
-6. Under **6 Check and generate**, tick the data-sharing confirmation, choose **Check inputs**, review the summary and tick its confirmation, then choose **Generate 100 participants with AI**.
+5. Under **5 Approach**, review the recommendation from Table 3 of the proposal and which of the eight approaches fit your information, then choose **Continue with SPA…**. Pick another approach from the cards or the table if you prefer. One approach is used per simulation.
+6. Under **6 Check and generate**, tick the data-sharing confirmation, then choose **Generate 100 participants with AI**. **Check inputs** is optional: it shows a summary of the settings and any problems, without an AI call. The same checks run when you generate.
 7. Under **7 Datasets**, choose **Download dataset and codebook (ZIP)**. It contains the CSV, variable codebook and metadata, with only the variables you chose. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
 
 Changing the study, goal, information or approach asks you to confirm the approach again, and changing the questionnaire asks you to confirm it again. Messages and advice appear just below the top bar, so they stay in view. To run another simulation, clear the session under *Datasets*. *Start over* in the top bar resets everything.
@@ -42,7 +42,7 @@ SPA5 receives pilot records and precomputed summaries. SPA6 receives pilot recor
 
 ## Start and wait
 
-Review the time/funding notice, authorise sharing with OpenAI for AI runs, then check inputs. Fix any reported issues before continuing. Review the summary and confirm it. Any subsequent settings/input changes require another check. One simulation creates one dataset of 100 people.
+Review the time/funding notice, authorise sharing with OpenAI for AI runs, then generate. Check inputs first if you want to see the summary. Any reported issues need fixing before generation starts. One simulation creates one dataset of 100 people.
 
 Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. The 100 participants are generated as several smaller requests that run at the same time. *Datasets* shows the status of each batch, the elapsed minutes and the last check time. The page checks existing background requests through short server calls, avoiding an hour-long Vercel function. No percentage is invented while the provider is generating.
 

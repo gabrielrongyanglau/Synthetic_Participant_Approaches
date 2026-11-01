@@ -94,7 +94,7 @@ CATALOGUE={
  # ---------------- Run setup
  'not_configured':dict(title='AI generation is offline',status=503,auto='none',
    message='The toolkit owner still needs to add the AI service key.',
-   advice='You can still check inputs and preview the instructions. '+'{team}'),
+   advice='You can still check inputs. '+'{team}'),
  'consent_missing':dict(title='Confirmation needed',status=400,auto='none',
    message='Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget.',
    advice='Tick the data-sharing confirmation under Check and confirm, then try again.'),

@@ -17,7 +17,7 @@ const CLIENT_ERRORS={
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the blank template, fill it with your data and choose it here.'},
   review_needed:{title:'Check your inputs first',detail:'The inputs have not been checked, or they changed after the check.',advice:'Choose Check inputs, review the summary, tick the confirmation, then generate.'},
   session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets before starting another run.'},
-  not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs and preview the instructions. Contact the research team to ask when generation will be available.'}
+  not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs. Contact the research team to ask when generation will be available.'}
 };
 function clientError(code,params={}){const t=CLIENT_ERRORS[code],fill=s=>String(s).replace(/\{(\w+)\}/g,(_,k)=>params[k]??'');return new AppError({code,title:t.title,detail:fill(t.detail),advice:fill(t.advice)})}
 function errorCard(err,cls='notice error'){
@@ -64,7 +64,7 @@ function warningList(items){
   return list;
 }
 
-function invalidateReview(){reviewedRequest=null;if($('inputsConfirmed'))$('inputsConfirmed').checked=false;if($('runReview'))$('runReview').hidden=true;updateRail()}
+function invalidateReview(){reviewedRequest=null;if($('runReview'))$('runReview').hidden=true;updateRail()}
 function csvText(rows){if(!rows.length)return '';const keys=Object.keys(rows[0]),quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';return [keys,...rows.map(r=>keys.map(k=>r[k]))].map(r=>r.map(quote).join(',')).join('\r\n')}
 // CSV downloads start with a UTF-8 byte order mark so Excel shows characters such as en dashes correctly.
 function saveBlob(blob,name){
@@ -123,8 +123,8 @@ async function reviewInputs(){
   table(rows,$('reviewTable'));
   $('reviewWarnings').replaceChildren();
   if(result.warnings?.length){$('reviewWarnings').append(el('h4',`Please review ${result.warnings.length} note${result.warnings.length>1?'s':''} about your inputs`),warningList(result.warnings))}
-  $('runReview').hidden=false;$('inputsConfirmed').checked=false;updateRail();
-  notice('Inputs checked without an AI call. Review the summary below and confirm to generate.');
+  $('runReview').hidden=false;updateRail();
+  notice('Inputs checked without an AI call. Review the summary below, then generate when ready.');
   $('runReview').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 
@@ -326,7 +326,6 @@ async function start(){
   busy=true;$('generate').disabled=true;
   try{
     const req=await request();
-    if(!reviewedRequest||reviewedRequest!==JSON.stringify(req)||!$('inputsConfirmed').checked)throw clientError('review_needed');
     if(!req.consent)throw new AppError({code:'consent_missing',title:'Confirmation needed',detail:'Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget.',advice:'Tick the data-sharing confirmation under Check and confirm, then try again.'});
     const brief=Research.snapshot();
     notice('Preparing the inputs in memory…');
@@ -400,7 +399,7 @@ async function evidence(){if(!$('evidenceResults').children.length){const data=a
 
 async function init(){
   cfg=await api('/api/config');
-  $('intro').textContent=cfg.intro;$('scope').textContent=cfg.scope;
+  $('intro').textContent=cfg.intro;
   options($('n'),{'100':'100 participants'});
   table(cfg.variable_guide,$('guideTable'));
   $('serviceEstimate').textContent=cfg.service.estimated_minutes!=='60'?`The team's current planning estimate is ${cfg.service.estimated_minutes} minutes.`:'';
@@ -411,7 +410,6 @@ async function init(){
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();page(b.dataset.goto)}));
   $('reviewInputs').addEventListener('click',action(reviewInputs));
   ['seed','population','consent','sensitiveAck'].forEach(id=>$(id).addEventListener('input',invalidateReview));
-  $('preview').addEventListener('click',action(async()=>{notice('Preparing the instruction preview…');const d=await api('/api/preview',await request());$('systemPrompt').textContent=d.system;$('userPrompt').textContent=d.user;$('promptPanel').hidden=false;$('promptPanel').open=true;notice(d.note)}));
   $('generate').addEventListener('click',action(start));
   $('checkAgain').addEventListener('click',action(drive));
   $('retryRun').addEventListener('click',action(retryFailed));

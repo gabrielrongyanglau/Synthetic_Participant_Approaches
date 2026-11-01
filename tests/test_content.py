@@ -46,5 +46,5 @@ def test_method_and_measure_explanations():
     assert 'synthetic participant approach (SPA)' in INTRO
     assert set(METHODS)==set(range(1,9))
     assert all(all(item.get(k) for k in ('input','procedure','output')) for item in METHODS.values())
-    assert 'toolkit' in METHODS[5]['procedure'] and 'itself' in METHODS[6]['procedure']
+    assert 'are calculated from all 50 records' in METHODS[5]['procedure'] and 'itself' in METHODS[6]['procedure']
     assert len(METRICS)==8 and all(len(item)==3 and all(item) for item in METRICS.values())

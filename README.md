@@ -31,7 +31,7 @@ Generation time varies with the complexity of the data being generated: simple r
 
 ## Research console
 
-The interface is a research console: a status bar along the top, side navigation showing each step as to do, locked or completed, the current page in the middle, and an inspector on the right with your selections, the study evidence for the chosen approach, tips and an activity log.
+The interface is a research console: a status bar along the top, side navigation showing each step as to do, locked or completed, the current page in the middle, and an inspector on the right with your selections, tips and an activity log.
 
 You can try out the toolkit with the MIDUS study used in the proposal, where everything is already set up, or enter your own study. The steps come in this order. The MIDUS demonstration skips step 6, and later steps stay locked until the earlier ones are complete.
 
@@ -41,7 +41,7 @@ You can try out the toolkit with the MIDUS study used in the proposal, where eve
 4. **Information.** One choice from six: no participant data, a general population description, population demographic proportions, a small human pilot dataset, actual demographic profiles, or actual demographic and psychological scores. For your own study this is the information you have. The MIDUS demonstration has example information of every kind, so you choose which the simulation uses.
 5. **Approach.** One recommended approach with the study result behind it, the other approaches that fit, and a list of all eight approaches showing which fit your information. Study results for every approach are under Study findings.
 6. **Inputs** (own study). Only what the chosen approach needs, with templates and instructions for every upload.
-7. **Check and generate.** Check inputs, review the summary and confirm before generating. Prompts are read-only. For the MIDUS demonstration, this page also links to the example input and the variable guide.
+7. **Check and generate.** Confirm data sharing, then generate. Check inputs is optional: it shows a summary and any problems without an AI call, and the same checks run when you generate. Prompts are fixed by the research team. For the MIDUS demonstration, this page also links to the example input and the variable guide.
 8. **Datasets.** Progress, previews and duplication flags, then a ZIP with the dataset, codebook and metadata. The codebook maps every exported column to its full name, definition, scoring, allowed values and provenance.
 
 *Overview*, *Study findings*, *Glossary* and *Errors and help* are in the same navigation. Text uses IBM Plex Sans (SIL Open Font License), served from `web/fonts/` so the page makes no third-party requests.
@@ -50,7 +50,7 @@ You can try out the toolkit with the MIDUS study used in the proposal, where eve
 
 **MIDUS study** preserves the original representative prompts, score definitions and statistical engine. It uses 38 psychological scores, six demographics and life satisfaction at MIDUS 2 and MIDUS 3. The original study benchmark contains 2,709 eligible people. Only invented example records and aggregate study results are distributed.
 
-**My own study** accepts construct definitions, source citations, exact items, response ranges and anchors, reverse coding, predictor/outcome roles and mean, sum or item-only scoring. Define up to 30 constructs and 60 item/demographic fields. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. They use numeric category codes. Every text field shows an example of how to fill it in. Generated raw items are scored locally, and mean and sum scores require all items. Your own study always uses your own uploaded data for SPA4 to SPA8. Custom studies are a functional extension, not an empirically validated result of the MIDUS study. Sources and measurement validity are not automatically verified. See [Custom studies](docs/CUSTOM_STUDIES.md).
+**My own study** accepts construct definitions, source citations, exact items, response ranges and anchors, reverse coding, predictor/outcome roles and mean, sum or item-only scoring. Define up to 30 psychological measures (each with up to 30 items) and up to eight demographics, with at most 60 item and demographic fields in total. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. They use numeric category codes. Every text field shows an example of how to fill it in. Generated raw items are scored locally, and mean and sum scores require all items. Your own study always uses your own uploaded data for SPA4 to SPA8. Custom studies are a functional extension, not an empirically validated result of the MIDUS study. Sources and measurement validity are not automatically verified. See [Custom studies](docs/CUSTOM_STUDIES.md).
 
 Visitors cannot edit prompts. `prompts/methods.json` is unchanged from the original study. MIDUS runs use the established templates. Custom runs fill those templates with declared data and apply a server-controlled system layer to map historical wave/outcome wording to the custom measures. These custom adaptations do not reproduce the evaluated MIDUS protocol. See [Prompt policy](docs/PROMPT_POLICY.md).
 

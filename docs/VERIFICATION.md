@@ -28,6 +28,17 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.1: changes from Prof Kim's response to Luna's comments
+
+- Choose your study: the MIDUS option reads "Explore the eight SPAs examined in our research proposal." The panel below it uses Prof Kim's three paragraphs (the *Organization Science* special-issue proposal, what you select and generate, and the 2,709 MIDUS participants). The lists note that demographics and predictors were measured at MIDUS 2.
+- The "Evidence for SPA…" box is removed from the right-hand panel. Study results stay under Study findings.
+- Recommendations say "In our proposal" in place of "In the study", and cite Table 3 of the proposal. SPA4 and SPA5 descriptions no longer say "The toolkit". They say that rows are constructed and that summaries are calculated, because this is done in code before the AI receives them.
+- Check and generate: the Preview the AI instructions button and the review confirmation tick are removed. Generate 100 participants with AI is available straight away. Check inputs stays as an optional step, and every check also runs when you generate.
+- Goal 1 with demographic and psychological scores still recommends SPA8, with Prof Kim's Goal 1 description. The Goal 2 description of SPA8 is unchanged.
+- Your own study: the limits text states the actual rules (up to 30 psychological measures, each with up to 30 items, up to eight demographics, and at most 60 items plus demographics in total).
+
+All tests pass.
+
 ## Version 8.0: wording from Prof Kim's review
 
 Text changes only. On the Questionnaire step for your own study, the demographics introduction now explains that demographic information shapes how SPA1–SPA7 generate participants, and that SPA8 generates outcomes only. On the Check and generate step, the MIDUS demonstration describes the SPA5 and SPA6 pilot sample: the proposal randomly selected 50 MIDUS participants, and the demonstration provides an invented sample of 50 in the same format. SPA5 uses the records with summary statistics, and SPA6 asks the AI to analyse the records itself. All 202 tests pass.

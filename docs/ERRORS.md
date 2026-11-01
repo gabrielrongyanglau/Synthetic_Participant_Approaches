@@ -49,7 +49,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 
 | Code | Title | Message | What the user is told to do | Automatic handling |
 | --- | --- | --- | --- | --- |
-| `not_configured` | AI generation is offline | The toolkit owner still needs to add the AI service key. | You can still check inputs and preview the instructions. Contact the research team. | User action |
+| `not_configured` | AI generation is offline | The toolkit owner still needs to add the AI service key. | You can still check inputs. Contact the research team. | User action |
 | `consent_missing` | Confirmation needed | Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget. | Tick the data-sharing confirmation under Check and confirm, then try again. | User action |
 | `run_limits` | This run is outside the trial limits | Each simulation can use one approach and create one dataset of 100 participants. | Select one approach. This research-funded trial supports one 100-person dataset per run. | User action |
 | `inputs_changed` | The inputs changed after they were prepared | The inputs sent for generation differ from the prepared, signed inputs. | Clear this session, check your inputs again and start a new run. Keep files and settings unchanged while a run is starting. | User action |
