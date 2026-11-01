@@ -9,32 +9,31 @@ def plain(text):
     return re.sub(r';\s+(\w)',lambda m:'. '+m.group(1).upper(),text)
 
 INTRO='A synthetic participant approach (SPA) is a way of asking an artificial intelligence (AI) model to create participant records intended to resemble human responses. This toolkit lets you choose among eight approaches, prepare their inputs and create datasets.'
-SCOPE='The MIDUS study includes 38 psychological measures, six demographic characteristics and life satisfaction at a first and a later assessment. Its variables, scales and eligible population are already set up.'
 METHODS={
  1:dict(input='The study’s variable definitions. No participant data are needed.',
         procedure='The AI is instructed to imagine a different person for each row and then create that person’s values.',
-        output='Demographic values, psychological scores and life-satisfaction scores at both assessments.'),
+        output='Demographic values, psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3.'),
  2:dict(input='The study’s variable definitions. No participant data are needed.',
         procedure='The AI creates participant rows directly from the study instructions, without imagining each person first.',
-        output='Demographic values, psychological scores and life-satisfaction scores at both assessments.'),
+        output='Demographic values, psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3.'),
  3:dict(input='The study definitions and a written description of the people you want to simulate.',
         procedure='The AI uses the population description to guide the kinds of people it generates. No numerical demographic targets are supplied.',
-        output='Demographic values, psychological scores and life-satisfaction scores at both assessments.'),
+        output='Demographic values, psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3.'),
  4:dict(input='Target proportions for each demographic category, such as the share in each age group. No participant data are needed.',
         procedure='Demographic rows are constructed to match each variable’s target proportions separately. The AI keeps those values and adds the remaining scores.',
-        output='Psychological scores and life-satisfaction scores at both assessments. The constructed demographic values stay unchanged.'),
- 5:dict(input='A pilot sample of exactly 50 people, including demographics, psychological scores and life satisfaction at both assessments.',
+        output='Psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3. The constructed demographic values stay unchanged.'),
+ 5:dict(input='A pilot sample of exactly 50 people, including demographics, psychological scores and life satisfaction at MIDUS 2 and MIDUS 3.',
         procedure='Statistical summaries, including averages, variation and relationships between variables, are calculated from all 50 records. The AI receives both the records and these summaries to generate new records.',
-        output='New demographic values, psychological scores and life-satisfaction scores at both assessments.'),
- 6:dict(input='A pilot sample of exactly 50 people, including demographics, psychological scores and life satisfaction at both assessments.',
+        output='New demographic values, psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3.'),
+ 6:dict(input='A pilot sample of exactly 50 people, including demographics, psychological scores and life satisfaction at MIDUS 2 and MIDUS 3.',
         procedure='The AI receives all 50 records, is instructed to analyse them itself and then use that analysis to generate new records. The AI receives the raw records only.',
-        output='New demographic values, psychological scores and life-satisfaction scores at both assessments.'),
+        output='New demographic values, psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3.'),
  7:dict(input='One row per person with their observed demographic values. Supply at least the number of people you want in the output.',
         procedure='The AI keeps each person’s demographic values and generates psychological and life-satisfaction scores. This method receives demographics only.',
-        output='Psychological scores and life satisfaction at both assessments. Supplied demographic values are retained.'),
+        output='Psychological scores and life satisfaction at MIDUS 2 and MIDUS 3. Supplied demographic values are retained.'),
  8:dict(input='One row per person with their observed demographics and psychological scores. Supply at least the number of people you want in the output.',
         procedure='The AI generates life-satisfaction scores for the supplied people. Their demographic and psychological values stay unchanged.',
-        output='Only life satisfaction at the two assessments. All supplied demographic and psychological values are retained.')}
+        output='Only life satisfaction at MIDUS 2 and MIDUS 3. All supplied demographic and psychological values are retained.')}
 
 TERMS={
  'Synthetic participant':'A participant record whose values are partly or wholly generated by a computer.',
@@ -45,7 +44,7 @@ TERMS={
  'Psychological score':'A numerical score for a characteristic such as personality, perceived control or social support.',
  'Pilot data':'A small dataset already collected from human participants. SPA5 and SPA6 use exactly 50 pilot records per generated dataset.',
  'Profile / fixed input':'A row of known values for a person. “Fixed” means those values are retained unchanged in the output.',
- 'Outcome':'The score being generated or studied. MIDUS uses life satisfaction at two assessments, and custom studies specify their own outcomes.',
+ 'Outcome':'The score being generated or studied. MIDUS uses life satisfaction at MIDUS 2 (2004 to 2006) and MIDUS 3 (2013 to 2014), and custom studies specify their own outcomes.',
  'MIDUS and waves':'MIDUS means Midlife in the United States. Our baseline variables come from MIDUS 2, and follow-up life satisfaction comes from MIDUS 3. The prompts call these Wave 1 and Wave 2.',
  'Dataset / record':'A dataset is a table. One row is one participant record and each column is a variable.',
  'Repetition / run':'A separate generation of a dataset. The current research-funded trial permits one dataset per simulation. The original study used 1,000 repetitions per method.',

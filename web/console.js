@@ -4,8 +4,10 @@
 // Step order: study, goal, questionnaire, information, approach, inputs (own study), check and generate, datasets.
 // Reads state owned by app.js and research.js. Owns the step confirmations, the table filter and the log.
 const Console=(()=>{
- let last={},logItems=[],studyChosen=false,confirmed=false,inputsDone=false;
+ let last={},logItems=[],studyChosen=false,confirmed=false,inputsDone=false,approachSeen=false;
  const spa=()=>[...selected][0];
+ // The approach is shown in the inspector and log only once step 5 has been opened, so it does not appear before its explanation.
+ const shownSpa=()=>approachSeen?spa():undefined;
  const stage=()=>Research.situation();
  const own=()=>Research.custom();
  const complete=()=>session?Object.keys(session.details||{}).length:0;
@@ -28,7 +30,8 @@ const Console=(()=>{
  function status(){if(session)return complete()?`${complete()} dataset ready`:session.failed?'Needs attention':'Generating';return reviewedRequest?'Inputs checked, ready to generate':'Not started'}
  function log(text){logItems.unshift([new Date().toLocaleTimeString('en-GB'),text]);logItems=logItems.slice(0,40);const box=$('activityLog');box.replaceChildren(...logItems.map(([t,x])=>{const d=el('div');d.append(el('time',t),document.createTextNode(x));return d}))}
  function track(){
-  const now={chosen:studyChosen,study:own()?'own':'midus',goal:Research.goal(),ready:Research.ready(),stage:stage(),spa:spa(),checked:!!reviewedRequest,run:session?(complete()?'ready':session.failed?'attention':'running'):'none'};
+  if(last.stage!==undefined&&(stage()!==last.stage||Research.goal()!==last.goal||(own()?'own':'midus')!==last.study))approachSeen=false;
+  const now={chosen:studyChosen,study:own()?'own':'midus',goal:Research.goal(),ready:Research.ready(),stage:stage(),spa:shownSpa(),checked:!!reviewedRequest,run:session?(complete()?'ready':session.failed?'attention':'running'):'none'};
   const changed=k=>last[k]!==undefined&&now[k]!==last[k];
   if(changed('study')||changed('goal')||changed('stage')||changed('spa')){confirmed=false;inputsDone=false}
   if(now.chosen&&(!last.chosen||changed('study')))log('Study: '+studyLabel());
@@ -60,8 +63,8 @@ const Console=(()=>{
   set('selStudy',studyLabel());set('selGoal',Research.goalTitle());
   const q=$('selQuestionnaire');q.hidden=$('selQuestionnaireLabel').hidden=!studyChosen;
   if(studyChosen){const n=own()?(Research.study()?.variables.length||0):0,[d,p]=own()?[0,0]:Research.midusCounts();q.textContent=!Research.ready()?(own()?'Not checked yet':'Not confirmed yet'):own()?`${n} measure${n===1?'':'s'} checked`:`${d} demographic${d===1?'':'s'}, ${p} predictor${p===1?'':'s'}`;q.classList.toggle('unset',!Research.ready())}
-  set('selSituation',stage());set('selApproach',spa()&&stage()?Research.methodLabel(spa()):'');
-  set('selData',spa()&&stage()?dataLabel():'');$('selStatus').textContent=status();
+  set('selSituation',stage());set('selApproach',shownSpa()&&stage()?Research.methodLabel(spa()):'');
+  set('selData',shownSpa()&&stage()?dataLabel():'');$('selStatus').textContent=status();
  }
  // All eight approaches with whether each fits the chosen information. Study results are under Study findings.
  function table(){
@@ -96,7 +99,7 @@ const Console=(()=>{
   if(!cfg)return;track();nav();inspector();buttons();
   if(!$('approach').hidden)table();
  }
- function shown(id){if(id==='approach')table();refresh()}
+ function shown(id){if(id==='approach'){approachSeen=true;table()}refresh()}
  function init(){
   $('studyChoices').addEventListener('change',()=>{studyChosen=true;refresh()});
   $('nextGoal').addEventListener('click',()=>page('questionnaire'));

@@ -43,7 +43,7 @@ const Research=(()=>{
  async function refreshTools(){if(!custom())return;tools=await api('/api/custom-tools',{study:study()});table(tools.guide,$('guideTable'));return tools}
  async function checkDefinition(){entryCheck();try{return await refreshTools()}catch(e){if(e.code==='invalid_input')e.advice='Correct the study title or variable named above, then choose Continue again.';throw e}}
  // Approach descriptions are written for MIDUS. For your own study, outcomes are your own measures.
- const GENERIC=[['Only life satisfaction at the two assessments.','Only the outcome scores.'],['Psychological scores and life satisfaction at both assessments.','Psychological and outcome scores.'],['life satisfaction at both assessments','outcomes'],['life-satisfaction scores at both assessments','outcome scores'],['psychological and life-satisfaction scores','psychological and outcome scores'],['life-satisfaction scores','outcome scores']];
+ const GENERIC=[['Only life satisfaction at MIDUS 2 and MIDUS 3.','Only the outcome scores.'],['Psychological scores and life satisfaction at MIDUS 2 and MIDUS 3.','Psychological and outcome scores.'],['life satisfaction at MIDUS 2 and MIDUS 3','outcomes'],['life-satisfaction scores at MIDUS 2 and MIDUS 3','outcome scores'],['psychological and life-satisfaction scores','psychological and outcome scores'],['life-satisfaction scores','outcome scores']];
  function generic(t){if(!custom())return t;for(const [a,b] of GENERIC)t=t.split(a).join(b);return t}
 
  // Own study: enter variables one by one, or upload a CSV that describes them (one row per variable).

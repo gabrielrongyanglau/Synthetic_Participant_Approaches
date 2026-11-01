@@ -74,7 +74,7 @@ function saveBlob(blob,name){
 }
 
 const ROWS={5:50,6:50,7:100,8:100};
-function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. The toolkit builds 100 demographic profiles that match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including every outcome. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
+function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. 100 demographic profiles are built to match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including every outcome. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
 function proportionInstructions(m,custom){return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
 
 ${inputRule(m)}

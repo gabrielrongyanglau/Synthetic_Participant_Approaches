@@ -44,7 +44,7 @@ def purpose_guidance(purpose,methods):
         return 'In our MIDUS study, these methods had substantial errors in the averages, variation or distributions of generated scores. They can help you practise the workflow. Realistic-looking output still needs comparison with human data.'
     if purpose=='relationships':return 'Treat generated relationships as exploratory. In our MIDUS study, methods that generated psychological scores substantially overstated relationship strengths. SPA8 also retained errors. Use observed human evidence to test substantive research claims.'
     if purpose=='outcomes':
-        if 8 in methods:return 'SPA8 uses each person’s observed demographics and psychological scores to generate life satisfaction at two assessments. Individual-level accuracy and the replacement of missing human responses need separate evidence.'
+        if 8 in methods:return 'SPA8 uses each person’s observed demographics and psychological scores to generate life satisfaction at MIDUS 2 and MIDUS 3. Individual-level accuracy and the replacement of missing human responses need separate evidence.'
         return 'SPA8 is the approach for generating only life satisfaction from existing psychological and demographic values. It needs both types of information. The approaches shown here generate additional values as well.'
     raise ValueError('Unknown purpose.')
 

@@ -28,6 +28,14 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.2: remaining points from Luna's comments
+
+- "Your selections" and the activity log show the approach and its data only after step 5 (Approach) has been opened, so no approach appears before its explanation. Changing the study, goal or information hides them again until step 5 is reopened.
+- MIDUS approach descriptions name the waves ("at MIDUS 2 and MIDUS 3") in place of "at both assessments". The Study findings wave choice reads MIDUS 2 (2004 to 2006) and MIDUS 3 (2013 to 2014). The unused study-scope sentence ("a first and a later assessment") is removed.
+- The SPA4 upload rule for your own study no longer says "The toolkit".
+
+All tests pass.
+
 ## Version 8.1: changes from Prof Kim's response to Luna's comments
 
 - Choose your study: the MIDUS option reads "Explore the eight SPAs examined in our research proposal." The panel below it uses Prof Kim's three paragraphs (the *Organization Science* special-issue proposal, what you select and generate, and the 2,709 MIDUS participants). The lists note that demographics and predictors were measured at MIDUS 2.

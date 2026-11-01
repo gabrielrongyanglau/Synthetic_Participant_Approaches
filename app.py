@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel,ConfigDict,Field
 from dotenv import load_dotenv
 from spa.study import load_study,NAMES,json_records,selected_fields,clean_frame
-from spa.content import INTRO,SCOPE,METHODS,TERMS,METRICS,variable_guide,readable_results,readable_records
+from spa.content import INTRO,METHODS,TERMS,METRICS,variable_guide,readable_results,readable_records
 from spa.workflow import PURPOSES,INFORMATION,METHODS_BY_INFORMATION,purpose_guidance
 from spa.io import read_csv
 from spa import public_jobs as jobs
@@ -153,7 +153,7 @@ def config():
     study=load_study()
     from spa.recommendations import PUBLIC_ID,PUBLIC_NAMES
     from spa.service import service_info
-    return dict(service=service_info(),public_ids=PUBLIC_ID,public_names=PUBLIC_NAMES,intro=INTRO,scope=SCOPE,methods={m:dict(name=NAMES[m],**METHODS[m]) for m in NAMES},
+    return dict(service=service_info(),public_ids=PUBLIC_ID,public_names=PUBLIC_NAMES,intro=INTRO,methods={m:dict(name=NAMES[m],**METHODS[m]) for m in NAMES},
       purpose_help={k:purpose_guidance(k,list(NAMES)) for k in PURPOSES},purposes=PURPOSES,information=INFORMATION,compatible=METHODS_BY_INFORMATION,terms=TERMS,metrics=METRICS,
       variable_guide=json_records(variable_guide(study)),midus_choices=__import__('spa.selection',fromlist=['choices']).choices(study),model=jobs.MODEL,reasoning='medium',batch_size=jobs.batch_size(),
       configured=bool(os.environ.get('OPENAI_API_KEY','').strip()))
