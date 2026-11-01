@@ -1,5 +1,5 @@
 {
-  "app_version": "8.5.0",
+  "app_version": "8.5.1",
   "hosting": "Vercel FastAPI",
   "access": "Public; no accounts",
   "application_storage": "Request and browser memory only",

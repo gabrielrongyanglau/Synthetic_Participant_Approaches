@@ -30,7 +30,7 @@ The interface states that generation time varies from a few minutes to up to an 
 
 ## Version 8.5: clearing keeps your inputs (Jungmin's comment)
 
-Clear this session now removes only the run's results and progress. The uploaded file and every choice (study, goal, questionnaire, information and approach) are kept, and the page returns to Check and generate, so the same inputs can be generated again without re-uploading. The confirmation and the message after clearing say this. Start over still removes everything. All tests pass.
+Clear this session now removes only the run's results and progress. The uploaded file is kept, so the same inputs can be generated again without going back to the Inputs step to upload it again. The confirmation no longer says inputs are removed. Start over still removes everything. All tests pass.
 
 ## Version 8.4.1: Clear this session fixed
 

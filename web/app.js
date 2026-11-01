@@ -15,7 +15,7 @@ const CLIENT_ERRORS={
   wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
   file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the blank template, fill it with your data and choose it here.'},
-  session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets. Your uploaded file and choices are kept, so you can generate again straight away.'},
+  session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets before starting another run.'},
   not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs. Contact the research team to ask when generation will be available.'}
 };
 function clientError(code,params={}){const t=CLIENT_ERRORS[code],fill=s=>String(s).replace(/\{(\w+)\}/g,(_,k)=>params[k]??'');return new AppError({code,title:t.title,detail:fill(t.detail),advice:fill(t.advice)})}
@@ -304,7 +304,7 @@ async function drive(){
     }
   }finally{
     s.active=false;busy=false;
-    if(s.discardAfter){clearSession()}
+    if(s.discardAfter){clearSession();notice('Session cleared.')}
     render();
   }
 }
@@ -320,15 +320,13 @@ async function retryFailed(){
   for(const run of s.order)for(const c of s.chunks[run])if(c.status==='failed'||c.status==='cancelled'){c.status='new';c.error=null;c.records=null;c.free=0}
   s.failed=false;s.stop=false;s.halt=null;await drive();
 }
-// Clearing removes the run's results and progress only. Uploaded files and every choice are kept, so the same inputs can be
-// generated again from Check and generate. Start over removes everything.
-const CLEARED='Session cleared. Your uploaded file and choices are kept. Generate again when ready, or change your choices first.';
-function clearSession(){session=null;if(typeof Console!=='undefined'&&Console.available('run'))page('run');notice(CLEARED)}
+// Clearing removes the run's results and progress. The uploaded file is kept, so the same inputs can be generated again.
+function clearSession(){session=null}
 async function discard(){
   if(!session)return;
-  if(!window.confirm('Clear this session? Download your dataset first. Results and progress will be removed. Your uploaded file and choices are kept, so you can generate again. To remove everything, choose Start over.'))return;
+  if(!window.confirm('Clear this session? Download your datasets first. Results and progress will be removed from this tab.'))return;
   if(session.active){session.stop=true;session.discardAfter=true;notice('The session will clear once the current check returns. Requests already started may still incur charges.');return}
-  clearSession();render();
+  clearSession();render();notice('Session cleared. No saved history is available.');
 }
 
 async function start(){
