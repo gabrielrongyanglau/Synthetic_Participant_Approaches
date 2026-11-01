@@ -28,6 +28,19 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.4: consistency review
+
+A full review of every page for both study paths. All eight approaches were run end to end for both goals and both study paths (32 runs, from Start to the ZIP download) with no errors.
+
+- Wording: "our proposal" throughout (in place of "the proposal" and "the study"), "approach" in place of "method" on Study findings and in the glossary, and "fictional" for the supplied MIDUS examples. Study findings is headed "What did our research find?".
+- Overview: step 7 reads "Generate 100 participants (checking inputs first is optional)".
+- Your own study: datasets, codebooks and the variable guide share one column order, as in the MIDUS datasets: participant_id, each predictor's items then its score, the demographics, then each outcome's items then its score. Measures keep the Questionnaire order. Previously own-study columns could arrive in any order.
+- Inputs step: the variable guide lists only the columns the chosen approach's file uses (demographics for SPA4 and SPA7, demographics and predictors for SPA8, everything for SPA5 and SPA6). The reverse-coding note appears only on reverse-coded items. The CSV help and the downloadable instructions say the file is checked as soon as it is chosen.
+- Study findings: the detailed results table lists SPA1 to SPA8 in order within each measure.
+- "Your selections" says "Example inputs supplied with the MIDUS demonstration" for MIDUS runs.
+
+All tests pass.
+
 ## Version 8.3: Tommy's comments, the 100-participant note and an error audit
 
 - Uploads are checked on the Inputs step (6), as soon as a file is chosen and again on Next, through `/api/check-upload`. This runs the same checks as generation without building prompts or calling the AI. Problems and notes show beside the upload, and Next stays on the step until the file passes.

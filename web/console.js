@@ -25,7 +25,7 @@ const Console=(()=>{
    default:return true;
   }
  }
- function dataLabel(){const m=spa();if(!m)return '';if(!uploadMap[m])return 'None needed';if(!own())return 'Example inputs supplied with the toolkit';
+ function dataLabel(){const m=spa();if(!m)return '';if(!uploadMap[m])return 'None needed';if(!own())return 'Example inputs supplied with the MIDUS demonstration';
   const f=chosenFiles()[0]?.files[0];return f?f.name:'Not uploaded yet'}
  function status(){if(session)return complete()?`${complete()} dataset ready`:session.failed?'Needs attention':'Generating';return reviewedRequest?'Inputs checked, ready to generate':'Not started'}
  function log(text){logItems.unshift([new Date().toLocaleTimeString('en-GB'),text]);logItems=logItems.slice(0,40);const box=$('activityLog');box.replaceChildren(...logItems.map(([t,x])=>{const d=el('div');d.append(el('time',t),document.createTextNode(x));return d}))}
@@ -84,7 +84,7 @@ const Console=(()=>{
   $('nextGoal').disabled=!Research.goal();$('nextGoal').textContent='Next: questionnaire';
   $('midusQuestionnaire').hidden=own();$('customPanel').hidden=!own();
   $('qTitle').textContent=own()?'Define your study and questionnaire':'Choose the MIDUS measures';
-  $('qSub').textContent=own()?'Choose how to enter your variables: one by one on this page, or by uploading a CSV that lists them. Either way, you give the demographic characteristics, then the psychological measures with their definitions, sources, items and scoring. Participant data come later, when the approach needs them.':'Choose the demographic characteristics, then the psychological predictors to include. All are ticked to start with, as in the proposal.';
+  $('qSub').textContent=own()?'Choose how to enter your variables: one by one on this page, or by uploading a CSV that lists them. Either way, you give the demographic characteristics, then the psychological measures with their definitions, sources, items and scoring. Participant data come later, when the approach needs them.':'Choose the demographic characteristics, then the psychological predictors to include. All are ticked to start with, as in our proposal.';
   $('confirmStudy').textContent='Continue';
   $('nextSituation').disabled=!stage();
   const res=$('situationResult');res.hidden=!stage();if(stage())res.textContent=(own()?'Your available information: ':'The simulation will use: ')+stage()+'.';

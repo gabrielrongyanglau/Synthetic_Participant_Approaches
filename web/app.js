@@ -83,7 +83,7 @@ ${inputRule(m)}
 3. Replace the example values in the proportion column with your target proportions. Within each variable they add up to 1, for example 0.48 and 0.52. Percentages that add up to 100 are converted automatically, and rounding differences of up to 0.02 are adjusted.
 4. ${custom?'Every demographic you defined needs its rows.':'Every demographic needs its rows. For age, lower and upper give each band in whole years. You can change the bands, keeping them within the eligible ages and separate from each other.'}
 5. A category you leave out counts as 0. To include participants with no recorded value, add a row with the category missing.
-6. Upload the file and choose Check inputs. Any problems are listed before a paid request is made.
+6. Upload the file on the Inputs step. It is checked straight away, and any problems are listed before anything is sent to the AI.
 The example proportions are fictional. Replace them with the targets for your population.
 `}
 function inputInstructions(m,custom){if(m===4)return proportionInstructions(m,custom);return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
@@ -92,10 +92,10 @@ ${inputRule(m)}
 
 1. Open template.csv (or the filled example). Each row is one participant, and each column is one variable.
 2. Keep the header row exactly as it is. Replace the example values with your own data, keeping exactly ${ROWS[m]} rows.
-3. ${custom?'For each psychological construct, fill either all of its item columns or a single column with its construct score (named with the construct code shown in the variable guide). Composite scores are calculated by the toolkit when items are supplied.':'Each psychological column is a construct score as defined in input_variable_guide.csv.'}
+3. ${m===7?'Fill one column per demographic, using the category codes in the variable guide.':custom?'For each '+(m===8?'psychological predictor':'psychological construct')+', fill either all of its item columns or a single column with its construct score (named with the construct code shown in the variable guide). Composite scores are calculated by the toolkit when items are supplied.':'Each psychological column is a construct score as defined in input_variable_guide.csv.'}
 4. Use numeric values and the category codes and ranges in input_variable_guide.csv. ${m<7&&m!==4?'Every cell needs a value except missing psychological predictors in the MIDUS study. Outcomes must be observed.':'Leave a cell blank only where a value is genuinely missing.'}
 5. Remove names, emails and other direct identifiers. Save as UTF-8 comma-separated CSV.
-6. Upload the file and choose Check inputs. Any problems are listed before a paid request is made.
+6. Upload the file on the Inputs step. It is checked straight away, and any problems are listed before anything is sent to the AI.
 The example values are fictional. Replace them with records you are authorised to use.
 `}
 
@@ -109,7 +109,7 @@ function table(rows,parent){
 }
 function tables(bundle,parent){
   parent.replaceChildren();
-  [['summary','Method-level results'],['comparisons','Pairwise method comparisons'],['variables','Results by psychological variable'],['human','Human reference statistics']].forEach(([key,title])=>{if(!bundle[key])return;const d=el('details');d.append(el('summary',title));const box=el('div');table(bundle[key],box);d.append(box);parent.append(d)});
+  [['summary','Approach-level results'],['comparisons','Pairwise approach comparisons'],['variables','Results by psychological variable'],['human','Human reference statistics']].forEach(([key,title])=>{if(!bundle[key])return;const d=el('details');d.append(el('summary',title));const box=el('div');table(bundle[key],box);d.append(box);parent.append(d)});
 }
 
 async function reviewInputs(){
@@ -128,8 +128,8 @@ async function reviewInputs(){
 }
 
 const uploadMap={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'};
-// MIDUS pilot wording for SPA5 and SPA6 (Prof Kim's text). The supplied 50 rows are invented, in the format of the proposal's random draw.
-const PILOT_SOURCE='In the proposal, 50 participants were randomly selected from the MIDUS dataset to create a pilot sample. This demonstration provides an invented pilot sample of 50 participants in the same format. ';
+// MIDUS pilot wording for SPA5 and SPA6 (Prof Kim's text). The supplied 50 rows are fictional, in the format of the proposal's random draw.
+const PILOT_SOURCE='In our proposal, 50 participants were randomly selected from the MIDUS dataset to create a pilot sample. This demonstration provides a fictional pilot sample of 50 participants in the same format. ';
 const PILOT_TEXT={5:PILOT_SOURCE+'SPA5 uses their demographic information, psychological scores and life-satisfaction outcomes, together with summary statistics calculated from these records, to generate synthetic participants. This pilot sample is already provided, so no upload is required.',
  6:PILOT_SOURCE+'SPA6 gives the AI their demographic information, psychological scores and life-satisfaction outcomes, and asks it to analyse these records itself before generating synthetic participants. This pilot sample is already provided, so no upload is required.'};
 const EXAMPLE_TEXT={4:'the example target proportions',5:'the example pilot sample of 50 participants',6:'the example pilot sample of 50 participants',7:'100 example demographic profiles',8:'100 example demographic and psychological profiles'};
@@ -156,6 +156,8 @@ async function checkInputsStep(quiet=false){
     const rows=Object.values(r.rows||{})[0];showInputCheck(rows!==undefined?`File checked: ${rows} rows, ready for the next step.`:'Inputs checked, ready for the next step.',r.warnings)}
   catch(e){inputsChecked=null;showInputCheck('',null,e);if(!quiet)throw e}
 }
+const CSV_HELP=m=>'Fill the blank template, or replace the values in the completed example with your own. '+(m===5||m===6||m===8?'Each '+(m===8?'predictor':'measure')+' can be supplied either as its individual item columns or as one score column. ':'')+'Keep the header row unchanged, use the numeric codes in the variable guide, remove names and other direct identifiers, and save as UTF-8 CSV. The file is checked as soon as you choose it, and any problems are listed here before anything is sent to the AI.';
+const GUIDE_INTRO={4:'The demographic codes and categories your proportions file uses.',5:'The columns and allowed values for your pilot sample. Every item, demographic and outcome needs a value.',6:'The columns and allowed values for your pilot sample. Every item, demographic and outcome needs a value.',7:'The demographic columns and allowed values for your participant profiles. Blank cells mean missing values.',8:'The demographic and predictor columns and allowed values for your participant profiles. Blank cells mean missing values. Outcomes are generated, so leave them out.'};
 function chosenFiles(){return [...$('uploads').querySelectorAll('input')].filter(x=>x.files&&x.files[0])}
 function usesExamples(){
   const m=[...selected][0];if(!uploadMap[m])return !Research.custom();
@@ -168,6 +170,7 @@ function inputs(){
   const m=[...selected][0],custom=Research.custom(),needs=!!uploadMap[m];
   $('populationLabel').hidden=!selected.has(3);
   $('csvHelp').hidden=!custom||!needs;$('guideHelp').hidden=!needs;
+  if(custom&&needs){$('csvHelpText').textContent=CSV_HELP(m);$('guideIntro').textContent=GUIDE_INTRO[m]||GUIDE_INTRO[5];Research.showGuide()}
   $('variableGuideLink').hidden=custom;
   const own={};$('uploads').querySelectorAll('input').forEach(x=>own[x.dataset.asset]=x);
   $('uploads').replaceChildren();

@@ -12,7 +12,7 @@ STAGES={'none':'No participant data yet','description':'A general population des
  'demographics':'Individual demographic profiles','psychology':'Individual demographic and psychological scores'}
 PATTERN='In our proposal, every approach reproduced the direction and overall pattern of relationships closely (pattern r .94 to .97).'
 STRENGTH='Approaches that generated psychological scores made relationships about three times stronger than in the human data (average correlation with life satisfaction about .95, against .31).'
-CAUTION='These suggestions follow the proposal’s recommendations (Table 3), which are based on one comparison with MIDUS data. Your own measures, population and outcomes need their own check against human data. No evaluated approach is validated for effect sizes or power calculations.'
+CAUTION='These suggestions follow our proposal’s recommendations (Table 3), which are based on one comparison with MIDUS data. Your own measures, population and outcomes need their own check against human data. No evaluated approach is validated for effect sizes or power calculations.'
 
 def suggest(goal,information):
     """Recommended approach for a goal and the information a researcher has (Table 3 of the proposal)."""
@@ -30,7 +30,7 @@ def suggest(goal,information):
     elif 'pilot' in info:
         primary=5
         reason=('SPA5 uses the pilot records and their summary statistics. '+PATTERN+' Relationship strengths stayed inflated, and SPA6 reduced strength errors only slightly.' if rel else
-                'The proposal recommends SPA5 for a 50-person pilot. SPA6 is an alternative in which the AI analyses the pilot records itself. In our proposal, SPA5 produced the closest psychological scores: averages differed from human data by 0.21 standard deviations, against 0.53 to 0.58 for approaches without pilot data.')
+                'Our proposal recommends SPA5 for a 50-person pilot. SPA6 is an alternative in which the AI analyses the pilot records itself. In our proposal, SPA5 produced the closest psychological scores: averages differed from human data by 0.21 standard deviations, against 0.53 to 0.58 for approaches without pilot data.')
     elif 'demographics' in info:
         primary=7;reason='SPA7 keeps each person’s supplied demographics and generates their psychological scores and outcomes. In our proposal, keeping real demographics did not bring scores or relationships closer to human data than SPA2.'
     elif 'proportions' in info:
@@ -41,6 +41,6 @@ def suggest(goal,information):
                 'SPA3 uses a description of the people to simulate. In our proposal, its average scores differed from human data by 0.53 standard deviations, close to SPA1 and SPA2. A 50-person pilot with SPA5 roughly halves this.')
     else:
         primary=2
-        reason=('The proposal recommends SPA2 before human data are collected. SPA1 and SPA3 are alternatives that showed no meaningful advantage. '+PATTERN+' '+STRENGTH if rel else
+        reason=('Our proposal recommends SPA2 before human data are collected. SPA1 and SPA3 are alternatives that showed no meaningful advantage. '+PATTERN+' '+STRENGTH if rel else
                 'Without human data, SPA2 is the simplest starting point. In our proposal, its average scores differed from human data by about half a standard deviation. A 50-person pilot with SPA5 roughly halves this.')
     return dict(primary=primary,feasible=sorted(feasible,key=lambda m:PUBLIC_ID[m]),reason=reason,caution=CAUTION,task_supported=True,goal_label=GOALS[goal],strength_note=STRENGTH if rel else '')

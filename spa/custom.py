@@ -119,13 +119,22 @@ def fake(s,n=1000,seed=7):
     for v in s['demographics']:data[v['code']]=rng.choice([int(k) for k in v['categories']],n)
     return scored(pd.DataFrame(data),s)
 
+def column_order(s):
+    """One column order for datasets, codebooks and the variable guide, as in the MIDUS datasets: participant_id, then each
+    predictor's items followed by its score, then the demographics, then each outcome's items followed by its score.
+    Measures keep the order given on the Questionnaire step."""
+    measure=lambda v:item_fields(v)+([v['code']] if v['aggregation']!='individual' else [])
+    return (['participant_id']+[c for v in s['variables'] if v['role']=='predictor' for c in measure(v)]+demographics(s)
+            +[c for v in s['variables'] if v['role']=='outcome' for c in measure(v)])
+
 def guide(s):
-    rows=[]
+    rows={}
     for v in s['variables']:
-        for c,item in zip(item_fields(v),v['items']):rows.append({'Column':c,'Meaning':item,'Role':v['role'],'Allowed':f"{v['minimum']} to {v['maximum']} ({v['responseType']})",'Scoring':'Raw item. Reverse coding is applied by the toolkit.'})
-        if v['aggregation']!='individual':rows.append({'Column':v['code'],'Meaning':v['name'],'Role':v['role'],'Allowed':'Composite score','Scoring':v['aggregation']+', all items required, four decimal places'})
-    for v in s['demographics']:rows.append({'Column':v['code'],'Meaning':v['name'],'Role':'demographic','Allowed':', '.join(f'{k} = {x}' for k,x in v['categories'].items()),'Scoring':'Fixed category code'})
-    return rows
+        for i,(c,item) in enumerate(zip(item_fields(v),v['items']),1):
+            rows[c]={'Column':c,'Meaning':item,'Role':v['role'],'Allowed':f"{v['minimum']} to {v['maximum']} ({v['responseType']})",'Scoring':'Raw item, reverse-coded by the toolkit when the score is calculated.' if i in v['reverse'] else 'Raw item.'}
+        if v['aggregation']!='individual':rows[v['code']]={'Column':v['code'],'Meaning':v['name'],'Role':v['role'],'Allowed':'Composite score','Scoring':('Mean' if v['aggregation']=='mean' else 'Sum')+' of all items after reverse coding, four decimal places. Every item is needed.'}
+    for v in s['demographics']:rows[v['code']]={'Column':v['code'],'Meaning':v['name'],'Role':'demographic','Allowed':', '.join(f'{k} = {x}' for k,x in v['categories'].items()),'Scoring':'Fixed category code'}
+    return [rows[c] for c in column_order(s) if c in rows]
 
 def template(s,kind):
     f=fake(s,1000)
@@ -244,7 +253,7 @@ def clean_dataset(rows,s,method):
     for c in composites:
         if c in f and not (method==8 and c in predictor_fields(s)) and not np.allclose(pd.to_numeric(f[c]),computed[c],atol=1e-4,rtol=0,equal_nan=True):raise ValueError('A composite is inconsistent with its item scoring rule.')
     if computed[outcome_fields(s)].isna().any().any():raise ValueError('Generated outcome scores must be observed.')
-    return computed
+    order=column_order(s);return computed[[c for c in order if c in computed]+[c for c in computed if c not in order]]
 
 def quality(f,s,pilot=None):
     fields=[c for c in f if c!='participant_id'];base=[c for c in demographics(s)+predictor_fields(s) if c in f]

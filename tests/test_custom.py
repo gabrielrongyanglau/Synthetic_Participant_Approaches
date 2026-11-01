@@ -120,8 +120,8 @@ def test_display_mapping_attaches_correct_results():
     from spa.content import readable_results
     df=pd.DataFrame([dict(method=8,mean=.1927),dict(method=7,mean=.6574)])
     result=readable_results(df)
-    assert result.iloc[0]['Method']=='SPA8 · Demographic and psychological profiles' and result.iloc[0]['Average across datasets']==.1927
-    assert result.iloc[1]['Method']=='SPA7 · Demographic-only profiles' and result.iloc[1]['Average across datasets']==.6574
+    assert result.iloc[0]['Approach']=='SPA8 · Demographic and psychological profiles' and result.iloc[0]['Average across datasets']==.1927
+    assert result.iloc[1]['Approach']=='SPA7 · Demographic-only profiles' and result.iloc[1]['Average across datasets']==.6574
 
 
 def test_custom_codebook_tracks_items_scores_and_fixed_demographics(study):
@@ -174,3 +174,21 @@ def test_title_is_enough_without_target_population(study):
     assert s['population'].strip()
     study['title']=''
     with pytest.raises(ValueError,match='study title'):custom.definition(study)
+
+
+def test_one_column_order_for_dataset_codebook_and_guide(study):
+    # Own-study datasets follow the MIDUS layout: id, each predictor's items then score, demographics, then outcomes.
+    s=custom.definition(study);order=custom.column_order(s)
+    preds=[v for v in s['variables'] if v['role']=='predictor'];outs=[v for v in s['variables'] if v['role']=='outcome']
+    expected=['participant_id']+[c for v in preds for c in custom.item_fields(v)+[v['code']]]+custom.demographics(s)+[c for v in outs for c in custom.item_fields(v)+[v['code']]]
+    assert order==expected
+    assert [r['Column'] for r in custom.guide(s)]==order[1:]
+    rows=custom.fake(s,100).sample(frac=1,axis=1,random_state=3)  # columns shuffled, as they can arrive from the AI
+    rows.insert(0,'participant_id',range(1,101));rows=rows.loc[:,~rows.columns.duplicated()]
+    keep=['participant_id']+custom.demographics(s)+[c for v in s['variables'] for c in custom.item_fields(v)]
+    out=custom.clean_dataset(json.loads(rows[[c for c in rows if c in keep]].to_json(orient='records')),s,2)
+    assert list(out.columns)==order
+    # Reverse-coding notes appear only on reverse-coded items.
+    notes={r['Column']:r['Scoring'] for r in custom.guide(s)}
+    for v in s['variables']:
+        for i,c in enumerate(custom.item_fields(v),1):assert ('reverse-coded' in notes[c])==(i in v['reverse'])

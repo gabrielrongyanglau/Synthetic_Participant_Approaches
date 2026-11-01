@@ -59,7 +59,7 @@ const StudyCharts=(()=>{
   }
   function pointDescription(r,label){return `SPA${r.method} ${source.method_names[r.method]}. ${label}: ${fmt(r.mean)}. 95% CI ${fmt(r.lower)} to ${fmt(r.upper)}. ${r.n} scored repetitions.${r.method===8?' Actual psychological predictors are retained.':''}`}
   function intervalChart(target,rows,axisLabel,readout,highlight){
-    const spec=intervalSpec(rows),svg=base(target,axisLabel,'Eight methods, each shown by a mean point and a 95% confidence interval. Lower error means closer reproduction of human data. SPA8 retains actual psychological predictors.');
+    const spec=intervalSpec(rows),svg=base(target,axisLabel,'Eight approaches, each shown by a mean point and a 95% confidence interval. Lower error means closer reproduction of human data. SPA8 retains actual psychological predictors.');
     const x=axis(svg,spec,axisLabel);text(svg,990,8,'Mean / 95% CI',{'text-anchor':'end','font-size':11});
     rows.slice().sort((a,b)=>order.indexOf(a.method)-order.indexOf(b.method)).forEach((r,i)=>{
       const y=spec.top+i*spec.row;
@@ -74,7 +74,7 @@ const StudyCharts=(()=>{
     document.getElementById(readout).textContent=pointDescription(rows.find(r=>r.method===highlight),axisLabel);
   }
   function agreementChart(wave){
-    const rows=series.flatMap(s=>dataFor(source,s.metric,wave));const spec=intervalSpec(rows,true),svg=base('agreementChart','Pattern similarity and numerical agreement','Pearson pattern correlation, ICC(A,1) and Lin’s CCC across eight methods. Means and 95% confidence intervals use a common zero-to-one scale. Target: one.');
+    const rows=series.flatMap(s=>dataFor(source,s.metric,wave));const spec=intervalSpec(rows,true),svg=base('agreementChart','Pattern similarity and numerical agreement','Pearson pattern correlation, ICC(A,1) and Lin’s CCC across eight approaches. Means and 95% confidence intervals use a common zero-to-one scale. Target: one.');
     const x=axis(svg,spec,'Mean agreement or pattern correlation · target = 1');
     svg.append(node('line',{x1:x(1),x2:x(1),y1:12,y2:spec.bottom,stroke:'#637a82','stroke-width':1.6,'stroke-dasharray':'5 4'}));
     const legend=document.getElementById('agreementLegend');legend.replaceChildren();
@@ -120,9 +120,9 @@ const StudyCharts=(()=>{
     document.getElementById('distributionMeaning').textContent=definitions[metric].meaning;
     intervalChart('distributionChart',distributions,definitions[metric].axis,'distributionReadout',5);
     const worst=distributions.filter(r=>r.method!==8).reduce((a,b)=>a.mean>b.mean?a:b);
-    document.getElementById('distributionFinding').textContent=`SPA5 has the smallest error among methods that generate psychological scores (${fmt(get(distributions,5).mean)}). SPA${worst.method} has the largest error for this measure (${fmt(worst.mean)}). SPA8’s low error (${fmt(get(distributions,8).mean)}) reflects its use of actual psychological scores.`;
+    document.getElementById('distributionFinding').textContent=`SPA5 has the smallest error among approaches that generate psychological scores (${fmt(get(distributions,5).mean)}). SPA${worst.method} has the largest error for this measure (${fmt(worst.mean)}). SPA8’s low error (${fmt(get(distributions,8).mean)}) reflects its use of actual psychological scores.`;
     intervalChart('relationshipChart',relationships,`Correlation mean absolute error at MIDUS ${wave} · lower is closer`,'relationshipReadout',6);
-    document.getElementById('relationshipFinding').textContent=`SPA6 has lower relationship error (${fmt(m6.mean)}) than SPA5 (${fmt(get(relationships,5).mean)}) among methods generating psychological scores. SPA8 is closest overall (${fmt(m8.mean)}) while retaining actual predictors. SPA7’s error remains ${fmt(get(relationships,7).mean)} despite using actual demographic profiles.`;
+    document.getElementById('relationshipFinding').textContent=`SPA6 has lower relationship error (${fmt(m6.mean)}) than SPA5 (${fmt(get(relationships,5).mean)}) among approaches generating psychological scores. SPA8 is closest overall (${fmt(m8.mean)}) while retaining actual predictors. SPA7’s error remains ${fmt(get(relationships,7).mean)} despite using actual demographic profiles.`;
     agreementChart(wave);scatterChart(wave);for(const id of ['distributionReadout','distributionFinding','relationshipReadout','relationshipFinding','agreementReadout','correlationReadout']){const e=document.getElementById(id);e.textContent=display(e.textContent)}
   }
   function render(data){
@@ -130,7 +130,7 @@ const StudyCharts=(()=>{
     for(const m of order){const option=html('option',`SPA${m} · ${data.method_names[m]}`);option.value=m;select.append(option)}select.value='5';
     for(const id of ['studyWave','studyDistribution','studyScatterMethod'])document.getElementById(id).onchange=update;
     const guide=document.getElementById('studyMethodGuide');guide.replaceChildren();
-    const table=html('table'),head=html('tr');['Method','Information supplied'].forEach(t=>head.append(html('th',t)));const thead=html('thead');thead.append(head);table.append(thead);const tbody=html('tbody');
+    const table=html('table'),head=html('tr');['Approach','Information supplied'].forEach(t=>head.append(html('th',t)));const thead=html('thead');thead.append(head);table.append(thead);const tbody=html('tbody');
     const inputs={1:'Definitions and an instruction to imagine a different person for each row.',2:'Definitions and an instruction to generate records directly.',3:'Definitions plus qualitative population guidance.',4:'Constructed demographic profiles matching marginal proportions.',5:'50 pilot records plus precomputed statistical summaries.',6:'50 pilot records, which the model is instructed to analyse itself.',7:'Actual demographic profiles, kept fixed.',8:'Actual demographic and psychological profiles, kept fixed.'};
     for(const m of order){const row=html('tr');row.append(html('td',`SPA${m} · ${data.method_names[m]}`),html('td',inputs[m]));tbody.append(row)}table.append(tbody);guide.append(table);update();
   }
