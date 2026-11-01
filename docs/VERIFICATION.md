@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.4.1: Clear this session fixed
+
+Clear this session on the Datasets step failed with "Something went wrong" since version 8.1, because it still referred to the removed instruction preview. It now clears the session as intended. A new test checks that every element the page scripts look up exists in the page. All tests pass.
+
 ## Version 8.4: consistency review
 
 A full review of every page for both study paths. All eight approaches were run end to end for both goals and both study paths (32 runs, from Start to the ZIP download) with no errors.

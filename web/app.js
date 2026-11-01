@@ -322,7 +322,6 @@ async function retryFailed(){
 }
 function clearSession(){
   session=null;
-  $('systemPrompt').textContent='';$('userPrompt').textContent='';$('promptPanel').hidden=true;
   $('uploads').querySelectorAll('input').forEach(f=>f.value='');
 }
 async function discard(){
