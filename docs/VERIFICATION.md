@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.5: clearing keeps your inputs (Jungmin's comment)
+
+Clear this session now removes only the run's results and progress. The uploaded file and every choice (study, goal, questionnaire, information and approach) are kept, and the page returns to Check and generate, so the same inputs can be generated again without re-uploading. The confirmation and the message after clearing say this. Start over still removes everything. All tests pass.
+
 ## Version 8.4.1: Clear this session fixed
 
 Clear this session on the Datasets step failed with "Something went wrong" since version 8.1, because it still referred to the removed instruction preview. It now clears the session as intended. A new test checks that every element the page scripts look up exists in the page. All tests pass.

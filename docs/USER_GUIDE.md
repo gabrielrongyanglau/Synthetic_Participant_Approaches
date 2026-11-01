@@ -14,6 +14,8 @@ The side navigation lists the steps in order, each marked to do, locked or compl
 6. Under **6 Check and generate**, tick the data-sharing confirmation, then choose **Generate 100 participants with AI**. **Check inputs** is optional: it shows a summary of the settings and any problems, without an AI call. The same checks run when you generate.
 7. Under **7 Datasets**, choose **Download dataset and codebook (ZIP)**. It contains the CSV, variable codebook and metadata, with only the variables you chose. Generation time varies: simple runs can finish in a few minutes, while complex data can take up to an hour. Participants are generated in several smaller requests that run at the same time.
 
+Each tab holds one run at a time. To generate again, choose **Clear this session** under Datasets after downloading. It removes the results and progress, keeps your uploaded file and every choice, and returns you to Check and generate. **Start over** removes everything.
+
 Changing the study, goal, information or approach asks you to confirm the approach again, and changing the questionnaire asks you to confirm it again. Messages and advice appear just below the top bar, so they stay in view. To run another simulation, clear the session under *Datasets*. *Start over* in the top bar resets everything.
 
 ## Your own study
