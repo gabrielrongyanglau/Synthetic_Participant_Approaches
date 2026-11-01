@@ -35,7 +35,7 @@ def test_catalogue_entries_are_complete():
  ('email value',5,'identifier_values'),('text value',5,'non_numeric_value'),('decimal comma quoted',5,'decimal_comma'),
  ('out of range',5,'value_out_of_range'),('decimal category',5,'not_whole_number'),('blank outcome',5,'missing_required_value'),
  ('49 rows',5,'wrong_row_count'),('51 rows',6,'wrong_row_count'),('all identical',5,'duplicate_participants'),
- ('10 copies',6,'duplicate_participants'),('99 profiles',8,'too_few_profiles'),('one person',7,'duplicate_participants'),
+ ('10 copies',6,'duplicate_participants'),('99 profiles',8,'wrong_row_count'),('120 profiles',8,'wrong_row_count'),('one person',7,'duplicate_participants'),
 ('ragged',5,'ragged_rows')])
 def test_upload_errors_are_specific(client,case,m,expected):
     f=example(client,m);text={
@@ -58,6 +58,7 @@ def test_upload_errors_are_specific(client,case,m,expected):
      'all identical':lambda:pd.concat([f.iloc[[0]]]*len(f)).to_csv(index=False),
      '10 copies':lambda:pd.concat([f.iloc[:40],f.iloc[:10]]).to_csv(index=False),
      '99 profiles':lambda:f.iloc[:99].to_csv(index=False),
+     '120 profiles':lambda:pd.concat([f,f.iloc[20:40]]).to_csv(index=False),
      'one person':lambda:pd.concat([f.iloc[[0]]]*len(f)).to_csv(index=False),
      'ragged':lambda:f.to_csv(index=False).replace('\n','\n1,2,',2)}[case]()
     r=check(client,m,text);body=r.json()
@@ -69,7 +70,21 @@ def test_upload_warnings_do_not_block(client):
     r=check(client,5,f.assign(self_esteem=30,notes='x').to_csv(index=False));assert r.status_code==200
     codes={w['code'] for w in r.json()['warnings']};assert {'constant_column','ignored_columns'}<=codes
     r=check(client,5,first(f,'self_esteem','N/A'));assert r.status_code==200 and 'missing_tokens' in {w['code'] for w in r.json()['warnings']}
-    r=check(client,5,pd.concat([f.iloc[:47],f.iloc[:3]]).to_csv(index=False));assert r.status_code==200 and 'duplicate_rows' in {w['code'] for w in r.json()['warnings']}
+    r=check(client,5,pd.concat([f.iloc[:47],f.iloc[:3]]).to_csv(index=False));assert r.status_code==200
+    dup=[w for w in r.json()['warnings'] if w['code']=='duplicate_rows'][0]
+    # The note names the rows and the columns compared (file rows count the header as row 1).
+    assert 'row 49 repeats row 2' in dup['message'] and 'row 51 repeats row 4' in dup['message'] and 'every checked column' in dup['message']
+
+def test_inputs_step_checks_the_upload(client):
+    # The Inputs step runs the same upload checks, so a wrong row count is reported before Check and generate.
+    f=example(client,5)
+    r=client.post('/api/check-upload',json={'methods':[5],'examples':False,'assets':{KEYS[5]:f.iloc[:40].to_csv(index=False)}},headers=H)
+    assert r.status_code==400 and r.json()['code']=='wrong_row_count' and '40 rows' in r.json()['detail']
+    r=client.post('/api/check-upload',json={'methods':[5],'examples':False,'assets':{KEYS[5]:f.to_csv(index=False)}},headers=H)
+    assert r.status_code==200 and r.json()['rows']=={KEYS[5]:50}
+    g=example(client,8)
+    r=client.post('/api/check-upload',json={'methods':[8],'examples':False,'assets':{KEYS[8]:pd.concat([g,g.iloc[:20]]).to_csv(index=False)}},headers=H)
+    assert r.status_code==400 and r.json()['code']=='wrong_row_count' and 'exactly 100' in r.json()['detail']
 
 def custom_study(item='I feel positive about my day.'):
     return dict(title='T',population='Adults',variables=[dict(code='mood',name='Mood',role='predictor',definition='Mood.',citation='Fictional.',items=[item,'I feel calm.'],minimum=1,maximum=5,anchorLow='Low',anchorHigh='High',responseType='integer',aggregation='mean',reverse=[]),
@@ -225,3 +240,16 @@ def test_custom_proportions_use_declared_categories(client):
 def r_ok(r):
     assert r.status_code==200,r.text
     return True
+
+
+def test_few_coarse_columns_are_not_called_copies(client):
+    # Distinct people can share every value when a file has few, coarse columns. The completed SPA8 example for a
+    # small own study (two demographics, one score) must pass, while true copies in a wide file are still caught.
+    from spa import custom
+    study=dict(title='T',population='Adults',demographics=[dict(code='sex',name='Sex',categories={'1':'Male','2':'Female'}),dict(code='marital_status',name='Marital status',categories={str(i):str(i) for i in range(1,6)})],
+     variables=[dict(code='optimism',name='Optimism',role='predictor',definition='d',citation='c',items=['a','b','c'],minimum=1,maximum=5,anchorLow='l',anchorHigh='h',responseType='integer',aggregation='mean',reverse=[]),
+                dict(code='life_satisfaction',name='Life satisfaction',role='outcome',definition='d',citation='c',items=['a','b'],minimum=0,maximum=10,anchorLow='l',anchorHigh='h',responseType='integer',aggregation='mean',reverse=[])])
+    text=custom.template(custom.definition(study),'psychology').to_csv(index=False)
+    r=client.post('/api/check-upload',json={'study':study,'methods':[8],'examples':False,'assets':{KEYS[8]:text}},headers=H)
+    assert r.status_code==200,r.text
+    assert 'duplicate_rows' not in {w['code'] for w in r.json()['warnings']}

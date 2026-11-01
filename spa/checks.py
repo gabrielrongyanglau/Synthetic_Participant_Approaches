@@ -94,10 +94,23 @@ def structure(rows,label,required,public=lambda f:f,complete=(),complete_reason=
     for c in complete:
         blank=[i+2 for i in np.flatnonzero(f[c].isna().to_numpy())]
         if blank:raise AppError('missing_required_value',label=label,column=public(c),rows=', '.join(map(str,blank[:10]))+(' …' if len(blank)>10 else ''),reason=complete_reason)
-    n=len(f);unique=len(f.round(6).drop_duplicates());dup=n-unique
-    if duplicates=='strict' and (unique==1 or dup>=max(2,int(np.ceil(.2*n)))):raise AppError('duplicate_participants',label=label,unique=unique,rows=n,duplicates=dup)
-    if duplicates=='demographic' and unique<min(5,n):raise AppError('duplicate_participants',label=label,unique=unique,rows=n,duplicates=dup)
-    if duplicates=='strict' and dup:warn.append(warning('duplicate_rows',label=label,count=dup))
+    n=len(f);rounded=f.round(6);unique=len(rounded.drop_duplicates());dup=n-unique
+    # Rows are compared on every checked column (participant_id and unused columns are left out). File row numbers count the header as row 1.
+    names=[public(c) for c in required];columns=', '.join(names[:6])+(f' and {len(names)-6} more' if len(names)>6 else '')
+    first={};pairs=[]
+    for i,key in enumerate(map(tuple,rounded.fillna(-9.87654321e9).to_numpy())):
+        if key in first:pairs.append(f'row {i+2} repeats row {first[key]+2}')
+        else:first[key]=i
+    examples=('Repeated: '+'; '.join(pairs[:5])+(f'; and {len(pairs)-5} more.' if len(pairs)>5 else '.')) if pairs else ''
+    detail=dict(label=label,unique=unique,rows=n,duplicates=dup,columns=columns,examples=examples)
+    # Different people can share identical values when a file has few columns with few possible values (for example sex,
+    # marital status and one score). Matches therefore count as likely copies only beyond what chance would produce:
+    # expected matching rows ≈ pairs of rows × probability that two rows agree on every column (columns treated as independent).
+    agree=float(np.prod([(rounded[c].fillna(-9.87654321e9).value_counts(normalize=True)**2).sum() for c in rounded.columns])) if n>1 else 0.0
+    chance=min(n-1,n*(n-1)/2*agree)
+    if duplicates=='strict' and (unique==1 or (dup>=max(2,int(np.ceil(.2*n))) and dup>3*chance+5)):raise AppError('duplicate_participants',**detail)
+    if duplicates=='demographic' and unique<min(5,n):raise AppError('duplicate_participants',**detail)
+    if duplicates=='strict' and dup and dup>2*chance+1:warn.append(warning('duplicate_rows',label=label,count=dup,columns=columns,examples=examples))
     if n>1:
         for c in required:
             col=f[c].dropna()
@@ -149,7 +162,7 @@ def content(req):
         raise AppError('sensitive_content',topics=' and '.join(found),where=', '.join(sorted(set(found.values()))))
     return sorted(found)
 
-ROWS={'pilot_SPA5':('exact',50),'pilot_SPA6':('exact',50),'profiles_SPA7':('min',100),'profiles_SPA8':('min',100)}
+ROWS={'pilot_SPA5':('exact',50),'pilot_SPA6':('exact',50),'profiles_SPA7':('exact',100),'profiles_SPA8':('exact',100)}
 
 def midus_specs(study):
     specs={}
@@ -182,8 +195,7 @@ def check_upload(key,text,custom=None):
     identifiers(rows,label,allowed)
     if key in ROWS:
         rule,n=ROWS[key];found=len(rows)-1
-        if rule=='exact' and found!=n:raise AppError('wrong_row_count',label=label,expected=n,found=found)
-        if rule=='min' and found<n:raise AppError('too_few_profiles',label=label,expected=n,found=found)
+        if found!=n:raise AppError('wrong_row_count',label=label,expected=n,found=found)
     header=[h.strip() for h in rows[0]]
     if custom is None:
         demo=study['demographic_covariates']

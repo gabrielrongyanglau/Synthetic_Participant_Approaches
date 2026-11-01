@@ -372,3 +372,12 @@ progress::-moz-progress-bar{background:var(--accent);border-radius:99px}
 .check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 18px;margin:8px 0}
 .check-grid .check{margin:4px 0;font-size:14px;font-weight:400}
 #customSetup h3{margin-top:22px}
+
+/* Inputs step: result of checking the uploaded file */
+.input-check{border-radius:var(--r-sm);padding:10px 14px;margin:12px 0;border:1px solid var(--line)}
+.input-check p{margin:0}
+.input-check.ok{border-color:#cfe3d4;background:#f1f8f3}
+.input-check.warn{border-color:var(--warn-line);background:var(--warn-soft)}
+.input-check.warn h4{margin:8px 0 4px;color:var(--warn)}
+.input-check.bad{border:0;padding:0}
+.limit-note p{margin:0}

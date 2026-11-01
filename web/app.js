@@ -15,7 +15,6 @@ const CLIENT_ERRORS={
   wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
   file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the blank template, fill it with your data and choose it here.'},
-  review_needed:{title:'Check your inputs first',detail:'The inputs have not been checked, or they changed after the check.',advice:'Choose Check inputs, review the summary, tick the confirmation, then generate.'},
   session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets before starting another run.'},
   not_configured:{title:'AI generation is offline',detail:'The toolkit owner has not set up the AI service key yet.',advice:'You can still check inputs. Contact the research team to ask when generation will be available.'}
 };
@@ -74,7 +73,7 @@ function saveBlob(blob,name){
 }
 
 const ROWS={5:50,6:50,7:100,8:100};
-function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. 100 demographic profiles are built to match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including every outcome. All 50 are used.':m===7?'Participant profiles: 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
+function inputRule(m){return m===4?'Target proportions: one row per demographic category, giving the share of participants in that category. Proportions add up to 1 within each demographic. 100 demographic profiles are built to match them. No participant data are needed.':m<7?'Pilot sample: exactly 50 participants, one row each, one column per variable, including every outcome. All 50 are used.':m===7?'Participant profiles: exactly 100 participants, one row each, one column per demographic. Each row becomes one synthetic participant.':'Participant profiles: exactly 100 participants, one row each, one column per demographic and psychological score. Each row becomes one synthetic participant, and the AI generates the outcomes.'}
 function proportionInstructions(m,custom){return `INPUT TEMPLATE FOR ${Research.methodLabel(m)}
 
 ${inputRule(m)}
@@ -136,7 +135,7 @@ const PILOT_TEXT={5:PILOT_SOURCE+'SPA5 uses their demographic information, psych
 const EXAMPLE_TEXT={4:'the example target proportions',5:'the example pilot sample of 50 participants',6:'the example pilot sample of 50 participants',7:'100 example demographic profiles',8:'100 example demographic and psychological profiles'};
 function uploadCard(m,old){
   const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'target proportions (one row per category)':(m<7?'pilot sample':'participant profiles')+` (${ROWS[m]} rows)`}`),f=old[key]||el('input');
-  f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=()=>{invalidateReview();notice('');if(f.files[0])try{checkFile(f.files[0])}catch(e){notice(e,true)}};label.append(f);
+  f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=action(async()=>{invalidateReview();inputsChecked=null;showInputCheck();if(f.files[0]){checkFile(f.files[0]);await checkInputsStep(true)}});label.append(f);
   d.append(label,el('p',inputRule(m),'help'));
   const links=el('div',undefined,'link-row');let a;
   const what=m===4?'fictional proportions':`${ROWS[m]} fictional rows`;let empty;
@@ -145,6 +144,17 @@ function uploadCard(m,old){
   const blank=el('button','Instructions and variable guide (ZIP)');blank.type='button';blank.className='link';
   blank.onclick=action(async()=>{if(Research.custom())await Research.blankTemplate(m);else{const [t,e]=await Promise.all([fetch('/api/template/'+m,{cache:'no-store'}),fetch(`/api/example/SPA${m}_template.csv`,{cache:'no-store'})]);if(!t.ok||!e.ok)throw Error('The template could not be downloaded. Try again.');saveBlob(makeZip({'template.csv':await e.text(),'blank_template.csv':await t.text(),'input_variable_guide.csv':csvText(cfg.variable_guide),'READ_ME.txt':inputInstructions(m,false)}),`SPA${m}_template_and_instructions.zip`)}});
   links.append(empty,a,blank);d.append(links,el('p','The completed example shows a filled template with fictional values. It passes the checks as it is, so you can upload it to try this step, then replace the values with your own data.','help'));return d;
+}
+// Inputs step: the upload is checked as soon as it is chosen and again on Continue, so problems show on the step where the file is uploaded.
+let inputsChecked=null;
+function showInputCheck(text,warnings,error){const box=$('inputCheck');box.replaceChildren();box.hidden=!text&&!error;box.className='input-check'+(error?' bad':warnings?.length?' warn':' ok');
+  if(error){box.append(errorCard(error,'notice error'));return}
+  if(text)box.append(el('p',text));if(warnings?.length){box.append(el('h4',`Please review ${warnings.length} note${warnings.length>1?'s':''} about your file`),warningList(warnings))}}
+async function checkInputsStep(quiet=false){
+  const req=await request(),key=JSON.stringify(req);if(inputsChecked===key)return;
+  try{const r=await api('/api/check-upload',req);inputsChecked=key;
+    const rows=Object.values(r.rows||{})[0];showInputCheck(rows!==undefined?`File checked: ${rows} rows, ready for the next step.`:'Inputs checked, ready for the next step.',r.warnings)}
+  catch(e){inputsChecked=null;showInputCheck('',null,e);if(!quiet)throw e}
 }
 function chosenFiles(){return [...$('uploads').querySelectorAll('input')].filter(x=>x.files&&x.files[0])}
 function usesExamples(){
@@ -168,7 +178,7 @@ function inputs(){
   else if(!custom){summary=PILOT_TEXT[m]||`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
   else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Continue, then return here.`;blocked=true}
   else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`;$('uploads').append(uploadCard(m,own))}
-  $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;
+  $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;inputsChecked=null;showInputCheck();
   $('exampleLink').hidden=custom||!needs;
   $('total').textContent='';
   updateRail();

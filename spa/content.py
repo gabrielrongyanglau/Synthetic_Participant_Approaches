@@ -28,10 +28,10 @@ METHODS={
  6:dict(input='A pilot sample of exactly 50 people, including demographics, psychological scores and life satisfaction at MIDUS 2 and MIDUS 3.',
         procedure='The AI receives all 50 records, is instructed to analyse them itself and then use that analysis to generate new records. The AI receives the raw records only.',
         output='New demographic values, psychological scores and life-satisfaction scores at MIDUS 2 and MIDUS 3.'),
- 7:dict(input='One row per person with their observed demographic values. Supply at least the number of people you want in the output.',
+ 7:dict(input='Exactly 100 people, one row each, with their observed demographic values. Each row becomes one synthetic participant.',
         procedure='The AI keeps each person’s demographic values and generates psychological and life-satisfaction scores. This method receives demographics only.',
         output='Psychological scores and life satisfaction at MIDUS 2 and MIDUS 3. Supplied demographic values are retained.'),
- 8:dict(input='One row per person with their observed demographics and psychological scores. Supply at least the number of people you want in the output.',
+ 8:dict(input='Exactly 100 people, one row each, with their observed demographics and psychological scores. Each row becomes one synthetic participant.',
         procedure='The AI generates life-satisfaction scores for the supplied people. Their demographic and psychological values stay unchanged.',
         output='Only life satisfaction at MIDUS 2 and MIDUS 3. All supplied demographic and psychological values are retained.')}
 

@@ -28,6 +28,16 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.3: Tommy's comments, the 100-participant note and an error audit
+
+- Uploads are checked on the Inputs step (6), as soon as a file is chosen and again on Next, through `/api/check-upload`. This runs the same checks as generation without building prompts or calling the AI. Problems and notes show beside the upload, and Next stays on the step until the file passes.
+- SPA7 and SPA8 participant profiles need exactly 100 rows, one per synthetic participant, used in order. The approach card, the Inputs step, the error message and Errors and help state the same rule. A file with more rows is no longer reduced to 100 at random.
+- The repeated-participant check names the rows (for example "row 49 repeats row 2") and the columns compared. Rows count as likely copies only when matches exceed what chance would produce for those columns, so files with a few coarse columns (for example sex, marital status and one score) are not flagged. The completed SPA8 example for a small study now passes.
+- Overview: Prof Kim's 100-participant limit note.
+- Error audit: removed the unreachable "Check your inputs first" error, corrected step names in two messages ("Check and generate") and removed a reference to the removed instruction preview. Every server error code has a catalogue entry with a title, message and advice, and docs/ERRORS.md is regenerated from the catalogue.
+
+All tests pass.
+
 ## Version 8.2: remaining points from Luna's comments
 
 - "Your selections" and the activity log show the approach and its data only after step 5 (Approach) has been opened, so no approach appears before its explanation. Changing the study, goal or information hides them again until step 5 is reopened.

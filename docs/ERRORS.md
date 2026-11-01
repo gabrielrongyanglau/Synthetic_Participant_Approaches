@@ -22,8 +22,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | `not_whole_number` | A whole number is required | Row ‹row›, column ‹column› of ‹label› contains ‹value›, but this column takes whole numbers (‹allowed›). | Round or correct the value. Category columns use the numeric codes in the variable guide. | User action |
 | `missing_required_value` | A required value is blank | ‹column› is blank in row(s) ‹rows› of ‹label›. ‹reason› | Fill these cells, or replace the participant with one who has complete data. The row count must stay the same. | User action |
 | `wrong_row_count` | The file has the wrong number of participants | ‹label› needs exactly ‹expected› participants, one row each. This file has ‹found› rows. | Add or remove participants so there are exactly ‹expected› rows below the header row. Blank rows at the end of the file also count, so delete them. | User action |
-| `too_few_profiles` | Not enough participant profiles | ‹label› needs at least ‹expected› participants, one per synthetic participant. This file has ‹found› rows. | Add profiles until there are at least ‹expected› rows. If you have more, the toolkit selects ‹expected› at random. | User action |
-| `duplicate_participants` | The same participant appears many times | ‹label› contains ‹unique› distinct participant(s) across ‹rows› rows. ‹duplicates› row(s) are exact copies of another row. | Check for rows copied or filled down by mistake. Each row must be a different participant, because repeated people distort the averages and relationships the AI learns from. | User action |
+| `duplicate_participants` | The same participant appears many times | ‹label› contains ‹unique› distinct participant(s) across ‹rows› rows. ‹duplicates› row(s) have the same values as an earlier row in every checked column (‹columns›), far more often than chance would explain for these columns. ‹examples› | Check for rows copied or filled down by mistake. Each row must be a different participant, because repeated people distort the averages and relationships the AI learns from. | User action |
 | `invalid_input` | Check your inputs | ‹detail› | Correct the file or setting named above, then choose Check inputs again. | User action |
 
 ## SPA4 target proportions
@@ -50,7 +49,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | Code | Title | Message | What the user is told to do | Automatic handling |
 | --- | --- | --- | --- | --- |
 | `not_configured` | AI generation is offline | The toolkit owner still needs to add the AI service key. | You can still check inputs. Contact the research team. | User action |
-| `consent_missing` | Confirmation needed | Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget. | Tick the data-sharing confirmation under Check and confirm, then try again. | User action |
+| `consent_missing` | Confirmation needed | Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget. | Tick the data-sharing confirmation on the Check and generate step, then try again. | User action |
 | `run_limits` | This run is outside the trial limits | Each simulation can use one approach and create one dataset of 100 participants. | Select one approach. This research-funded trial supports one 100-person dataset per run. | User action |
 | `inputs_changed` | The inputs changed after they were prepared | The inputs sent for generation differ from the prepared, signed inputs. | Clear this session, check your inputs again and start a new run. Keep files and settings unchanged while a run is starting. | User action |
 | `handle_invalid` | This request has expired | The temporary link to an AI request is invalid or more than 24 hours old. | Download anything already received. To generate the missing participants, clear the session and start a new run. | User action |
@@ -92,7 +91,7 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 | --- | --- | --- | --- |
 | `percentages_converted` | Percentages converted to proportions | ‹label› used percentages (totals of 100), so every value was divided by 100. | No action needed. |
 | `proportions_rescaled` | Rounded proportions adjusted | The proportions for ‹variables› were scaled slightly so each set adds up to exactly 1. | No action needed if the difference came from rounding. |
-| `duplicate_rows` | Some participants are repeated | ‹label› has ‹count› row(s) that exactly repeat another participant. | Check whether rows were copied by mistake. Repeated people give their responses extra weight. |
+| `duplicate_rows` | Some participants are repeated | ‹label› has ‹count› row(s) with the same values as an earlier row in every checked column (‹columns›), more often than chance would explain for these columns. ‹examples› | Check whether these rows were copied by mistake. Repeated people give their responses extra weight. The participant_id column and columns the toolkit does not use are not compared. Some matches are expected when a file has only a few columns, so this note appears only when matches exceed that. |
 | `constant_column` | A variable has no variation | ‹column› has the same value (‹value›) for every participant in ‹label›. | Correlations involving this variable will be blank. Check the column was filled correctly. |
 | `empty_column` | A variable is completely blank | ‹column› is blank for every participant in ‹label›. | The AI will receive only blanks for this variable. Fill it if you have the values. |
 | `ignored_columns` | Some columns were ignored | ‹label› has extra column(s) that the toolkit ignored and left out of the request: ‹columns›. | Only template columns are used. Remove extra columns if they contain anything you did not mean to upload. |
@@ -106,4 +105,5 @@ Generated from `spa/errors.py`. Every error shows a title, what happened and wha
 
 ## Browser-only errors
 
-Raised in `web/app.js` before anything reaches the server: `offline`, `network_error`, `server_timeout`, `unreadable_response`, `wrong_file_type`, `file_too_large`, `upload_missing`, `review_needed`, `session_exists`, `reference_missing`. Each has a title, message and advice in the same format.
+Raised in `web/app.js` before anything reaches the server: `offline`, `network_error`, `server_timeout`, `unreadable_response`, `wrong_file_type`, `file_too_large`, `upload_missing`, `session_exists`. Each has a title, message and advice in the same format.
+

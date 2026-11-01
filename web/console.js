@@ -105,7 +105,7 @@ const Console=(()=>{
   $('nextGoal').addEventListener('click',()=>page('questionnaire'));
   $('confirmStudy').addEventListener('click',action(async()=>{if(own())await Research.checkDefinition();else Research.confirmMidus();refresh();page('situation')}));
   $('confirmApproach').addEventListener('click',()=>{if(!spa())return;inputs();confirmed=true;log('Confirmed '+Research.methodLabel(spa()));refresh();page(own()?'inputs':'run')});
-  $('confirmInputs').addEventListener('click',()=>{inputsDone=true;log('Inputs ready');refresh();page('run')});
+  $('confirmInputs').addEventListener('click',action(async()=>{await checkInputsStep();inputsDone=true;log('Inputs ready');refresh();page('run')}));
   $('startOver').addEventListener('click',()=>{if(session&&!confirm('Start over? Datasets in this tab that you have not downloaded will be lost.'))return;session=null;location.reload()});
   const original=notice;notice=function(text,error){original(text,error);if(error&&text)log('Message: '+(typeof text==='string'?text:text.title||'Something went wrong'))};
   refresh();

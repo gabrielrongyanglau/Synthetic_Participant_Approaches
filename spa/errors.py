@@ -55,11 +55,8 @@ CATALOGUE={
  'wrong_row_count':dict(title='The file has the wrong number of participants',status=400,auto='none',
    message='{label} needs exactly {expected} participants, one row each. This file has {found} rows.',
    advice='Add or remove participants so there are exactly {expected} rows below the header row. Blank rows at the end of the file also count, so delete them.'),
- 'too_few_profiles':dict(title='Not enough participant profiles',status=400,auto='none',
-   message='{label} needs at least {expected} participants, one per synthetic participant. This file has {found} rows.',
-   advice='Add profiles until there are at least {expected} rows. If you have more, the toolkit selects {expected} at random.'),
  'duplicate_participants':dict(title='The same participant appears many times',status=400,auto='none',
-   message='{label} contains {unique} distinct participant(s) across {rows} rows. {duplicates} row(s) are exact copies of another row.',
+   message='{label} contains {unique} distinct participant(s) across {rows} rows. {duplicates} row(s) have the same values as an earlier row in every checked column ({columns}), far more often than chance would explain for these columns. {examples}',
    advice='Check for rows copied or filled down by mistake. Each row must be a different participant, because repeated people distort the averages and relationships the AI learns from.'),
  'missing_demographic':dict(title='Demographic variables are missing',status=400,auto='none',
    message='{label} has no proportions for {count} demographic variable(s): {columns}.',
@@ -97,7 +94,7 @@ CATALOGUE={
    advice='You can still check inputs. '+'{team}'),
  'consent_missing':dict(title='Confirmation needed',status=400,auto='none',
    message='Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget.',
-   advice='Tick the data-sharing confirmation under Check and confirm, then try again.'),
+   advice='Tick the data-sharing confirmation on the Check and generate step, then try again.'),
  'run_limits':dict(title='This run is outside the trial limits',status=422,auto='none',
    message='Each simulation can use one approach and create one dataset of 100 participants.',
    advice='Select one approach. This research-funded trial supports one 100-person dataset per run.'),
@@ -175,8 +172,8 @@ WARNINGS={
    message='{label} used percentages (totals of 100), so every value was divided by 100.'),
  'proportions_rescaled':dict(title='Rounded proportions adjusted',advice='No action needed if the difference came from rounding.',
    message='The proportions for {variables} were scaled slightly so each set adds up to exactly 1.'),
- 'duplicate_rows':dict(title='Some participants are repeated',advice='Check whether rows were copied by mistake. Repeated people give their responses extra weight.',
-   message='{label} has {count} row(s) that exactly repeat another participant.'),
+ 'duplicate_rows':dict(title='Some participants are repeated',advice='Check whether these rows were copied by mistake. Repeated people give their responses extra weight. The participant_id column and columns the toolkit does not use are not compared. Some matches are expected when a file has only a few columns, so this note appears only when matches exceed that.',
+   message='{label} has {count} row(s) with the same values as an earlier row in every checked column ({columns}), more often than chance would explain for these columns. {examples}'),
  'constant_column':dict(title='A variable has no variation',advice='Correlations involving this variable will be blank. Check the column was filled correctly.',
    message='{column} has the same value ({value}) for every participant in {label}.'),
  'empty_column':dict(title='A variable is completely blank',advice='The AI will receive only blanks for this variable. Fill it if you have the values.',
@@ -215,7 +212,7 @@ def warning(code,**params):
     return dict(code=code,title=spec['title'],message=spec['message'].format(**fill),advice=spec['advice'].format(**fill))
 
 AUTO_TEXT={'none':'User action','retry':'Server retries immediately (no charge), then the browser retries twice more after a pause','resubmit':'Browser resubmits the batch once automatically (paid)','repoll':'Browser keeps checking progress (free)'}
-GROUPS=[('Uploaded files',['file_empty','not_csv','wrong_delimiter','ragged_rows','duplicate_columns','missing_columns','identifier_columns','identifier_values','non_numeric_value','decimal_comma','value_out_of_range','not_whole_number','missing_required_value','wrong_row_count','too_few_profiles','duplicate_participants','invalid_input']),
+GROUPS=[('Uploaded files',['file_empty','not_csv','wrong_delimiter','ragged_rows','duplicate_columns','missing_columns','identifier_columns','identifier_values','non_numeric_value','decimal_comma','value_out_of_range','not_whole_number','missing_required_value','wrong_row_count','duplicate_participants','invalid_input']),
  ('SPA4 target proportions',['missing_demographic','unknown_variable','unknown_category','duplicate_category','invalid_proportion','proportions_sum','invalid_age_band']),
  ('Sensitive content',['sensitive_content','prohibited_content']),
  ('Starting a run',['not_configured','consent_missing','run_limits','inputs_changed','handle_invalid','request_too_large','blocked_request']),
@@ -238,5 +235,5 @@ def catalogue_markdown():
         out+=['## Other','','| Code | Title | Message | Advice | Automatic handling |','| --- | --- | --- | --- | --- |']+[f"| `{c}` | {CATALOGUE[c]['title']} | {fill(CATALOGUE[c]['message'])} | {fill(CATALOGUE[c]['advice'])} | {AUTO_TEXT[CATALOGUE[c]['auto']]} |" for c in rest]+['']
     out+=['## Warnings (shown with results, download stays available)','','| Code | Title | Message | Advice |','| --- | --- | --- | --- |']
     out+=[f"| `{c}` | {s['title']} | {fill(s['message'])} | {fill(s['advice'])} |" for c,s in WARNINGS.items()]
-    out+=['','## Browser-only errors','','Raised in `web/app.js` before anything reaches the server: `offline`, `network_error`, `server_timeout`, `unreadable_response`, `wrong_file_type`, `file_too_large`, `upload_missing`, `review_needed`, `session_exists`, `reference_missing`. Each has a title, message and advice in the same format.','']
+    out+=['','## Browser-only errors','','Raised in `web/app.js` before anything reaches the server: `offline`, `network_error`, `server_timeout`, `unreadable_response`, `wrong_file_type`, `file_too_large`, `upload_missing`, `session_exists`. Each has a title, message and advice in the same format.','']
     return '\n'.join(out)

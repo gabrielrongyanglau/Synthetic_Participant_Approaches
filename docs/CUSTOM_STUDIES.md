@@ -15,8 +15,8 @@ Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. Def
 Choosing **Continue** on the Questionnaire step checks the structure and create examples matching the declared columns. Download examples on the Inputs step. These records are invented numerical examples, not human observations.
 
 - **Pilot input:** exactly 50 participants, one row each, with every demographic and, for each construct, either all of its item columns or one construct-score column. Scores are computed from items when items are supplied. SPA5 receives the records plus descriptive statistics, correlations and covariances calculated by the toolkit. SPA6 receives only records and is instructed to analyze them itself.
-- **SPA7 profiles:** at least n demographic rows. Items and scores are generated.
-- **SPA8 profiles:** at least n rows with demographics and observed predictor scores. Predictor scores may be supplied directly or as their item columns (scored by the toolkit). For item-only predictors, supply their item columns. Outcomes are withheld. No predictor items are invented when only a composite was supplied.
+- **SPA7 profiles:** exactly 100 demographic rows, one per synthetic participant. Items and scores are generated.
+- **SPA8 profiles:** exactly 100 rows, one per synthetic participant, with demographics and observed predictor scores. Predictor scores may be supplied directly or as their item columns (scored by the toolkit). For item-only predictors, supply their item columns. Outcomes are withheld. No predictor items are invented when only a composite was supplied.
 - **SPA4 target proportions:** one row per declared demographic category, with `variable`, `category`, `category_label` and `proportion`. Proportions add up to 1 within each demographic. The toolkit matches each demographic's proportions separately, so combinations across demographics are random.
 
 CSV headers must match the guide. Missing fixed predictor values remain missing; nulls are not imputed. Generated items are required to be observed. Repeated generated profiles and pilot matches are flagged and retained.

@@ -144,9 +144,9 @@ def prepare_context(study,method,n,seed=1,replication=1,assets=None,examples=Fal
                        summary_source='Computed by this tool before model generation' if method==5 else 'Model instructed to analyse supplied records')
     elif method in (7,8):
         fields=predictors(study) if method==8 else study['demographic_covariates'];profiles=assets.get(f'profiles_SPA{method}')
-        if profiles is None or len(profiles)<n:raise ValueError(f'SPA{method} needs at least {n} participant profiles (one row each), one for every synthetic participant.')
+        if profiles is None or len(profiles)!=n:raise ValueError(f'SPA{method} needs exactly {n} participant profiles, one row each. Each row becomes one synthetic participant.')
         profiles=_clean_fields(profiles,study,fields)
-        indices=np.arange(n) if len(profiles)==n else rng.choice(len(profiles),n,replace=False)
+        indices=np.arange(n)
         chosen=profiles.iloc[indices]
         ctx['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(chosen))]
         details.update(source_pool_n=len(profiles),input_rows_in_output_order=[int(i)+1 for i in indices],

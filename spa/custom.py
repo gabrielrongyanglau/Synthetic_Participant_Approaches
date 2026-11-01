@@ -160,14 +160,14 @@ def contexts(req,assets):
                 if m==5:ctx['summary']={'descriptive':json_records(f.describe().T.reset_index()),'correlations':json_records(f.corr().reset_index()),'covariances':json_records(f.cov().reset_index())}
             if m in (7,8):
                 kind='psychology' if m==8 else 'demographics';f=assets.get(f'profiles_SPA{m}')
-                if f is None or len(f)<req.n:raise ValueError(f'SPA{m} needs at least {req.n} participant profiles (one row each), one for every synthetic participant.')
+                if f is None or len(f)!=req.n:raise ValueError(f'SPA{m} needs exactly {req.n} participant profiles, one row each. Each row becomes one synthetic participant.')
                 if m==8:
                     f=f.copy()
                     for v in s['variables']:
                         if v['role']=='predictor' and v['aggregation']!='individual' and v['code'] not in f and all(c in f for c in item_fields(v)):
                             f[v['code']]=construct_score(f.assign(**numeric(f,s,item_fields(v))),v)
                 fields=demographics(s)+(predictor_fields(s) if m==8 else []);f=numeric(f,s,fields)
-                idx=np.arange(req.n) if len(f)==req.n else rng.choice(len(f),req.n,replace=False);f=f.iloc[idx]
+                idx=np.arange(req.n);f=f.iloc[idx]
                 ctx['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(f))];ctx['provenance']['input_rows_in_output_order']=(idx+1).tolist()
             if m==4:
                 table=assets.get('proportions_SPA4');data={}

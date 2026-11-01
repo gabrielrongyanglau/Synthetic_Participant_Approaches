@@ -282,6 +282,12 @@ async def custom_tools(request:Request):
     blank={k:(f.assign(proportion=None) if k=='proportions' else f.iloc[:0]) for k,f in tables.items()}
     return dict(guide=guide(s),templates={k:f.to_csv(index=False) for k,f in tables.items()},blank_templates={k:f.to_csv(index=False) for k,f in blank.items()})
 
+@app.post('/api/check-upload')
+def check_upload(req:Run):
+    # Inputs step: runs every check on the uploaded file and the approach's inputs (the same checks as generation) without building prompts or calling the AI.
+    warnings=[];frames=assets(req,warnings);jobs.prepare(req,frames)
+    return dict(warnings=warnings,rows={k:len(f) for k,f in frames.items()})
+
 @app.post('/api/check-inputs')
 def check_inputs(req:Run):
     from spa.checks import content
@@ -297,7 +303,7 @@ def check_inputs(req:Run):
       mode=ctx['provenance']['prompt_mode'],
       prompt_policy='Fixed research-team method template with a server-controlled study layer.',
       generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,
-      note='Structural checks passed. Scientific validity needs your own review. Review the read-only instructions if needed.',
+      note='Structural checks passed. Scientific validity needs your own review.',
       warnings=warnings,sensitive_topics=topics)
 
 @app.get('/api/template/{method}')
