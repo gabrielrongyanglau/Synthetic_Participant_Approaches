@@ -56,7 +56,7 @@ Visitors cannot edit prompts. `prompts/methods.json` is unchanged from the origi
 
 ## Approach numbering
 
-The toolkit uses SPA1–SPA8 throughout, numbered as in the revised proposal (Table 3): **SPA7 retains actual demographics only; SPA8 retains actual demographics and psychological scores**. Code, run names (`SPA8_R0001`), upload templates, charts, tables and downloads all use this numbering. The original study's prompt bank and verified result files are kept byte-identical; they number the last two approaches the other way round, and `spa/numbering.py` is the single place that relabels them when they are loaded.
+The toolkit uses SPA1–SPA8 throughout, numbered as in the revised proposal (Table A2): **SPA7 retains actual demographics only; SPA8 retains actual demographics and psychological scores**. Code, run names (`SPA8_R0001`), upload templates, charts, tables and downloads all use this numbering. The original study's prompt bank and verified result files are kept byte-identical; they number the last two approaches the other way round, and `spa/numbering.py` is the single place that relabels them when they are loaded.
 
 ## Upload templates
 

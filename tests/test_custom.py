@@ -66,12 +66,17 @@ def test_templates_and_routes(study):
 
 def test_recommendations_mapping():
     assert all(PUBLIC_ID[m]==m for m in range(1,9))
-    # Table 3 and the proposal's two goals: no data -> SPA2; pilot -> SPA5 (SPA6 alternative); baseline demographic and psychological scores -> SPA8
-    for goal in ('distributions','relationships'):
-        assert suggest(goal,[])['primary']==2 and suggest(goal,['psychology'])['primary']==8 and suggest(goal,['pilot'])['primary']==5
-        assert suggest(goal,['demographics'])['primary']==7 and suggest(goal,['proportions'])['primary']==4
-        assert suggest(goal,['description'])['primary']==3 and suggest(goal,['description'])['feasible']==[1,2,3]
-        assert suggest(goal,['pilot'])['task_supported'] and 'fidelity' not in suggest(goal,['pilot'])['reason'].lower()
+    # Every goal and information combination recommends at least one feasible approach, justified with figures from our proposal.
+    expected={'distributions':{'none':[2],'description':[3,2],'proportions':[4,2],'pilot':[5,6],'demographics':[7,2],'psychology':[8]},
+              'relationships':{'none':[2],'description':[2,3],'proportions':[2,4],'pilot':[6,5],'demographics':[2,7],'psychology':[8]}}
+    banned=['fidelity','therefore','rather than',';','Table 3','Table 6']
+    for goal,cases in expected.items():
+        for info,rec in cases.items():
+            r=suggest(goal,[] if info=='none' else [info])
+            assert r['recommended']==rec and r['primary']==rec[0] and set(rec)<=set(r['feasible'])
+            assert all(f'SPA{m}' in r['reason'] for m in rec) and any(ch.isdigit() for ch in r['reason'].replace('SPA',''))
+            assert not any(b in r['reason']+r['caution'] for b in banned),(goal,info)
+    assert suggest('distributions',['description'])['feasible']==[1,2,3] and suggest('distributions',['pilot'])['task_supported']
     assert {5,6}<=set(suggest('distributions',['pilot'])['feasible']) and {7,8}<=set(suggest('relationships',['psychology'])['feasible'])
     assert 'SPA6' in suggest('relationships',['pilot'])['reason']
     goal1=suggest('distributions',['psychology']);assert goal1['primary']==8 and 'psychological outcomes (Goal 1)' in goal1['reason']

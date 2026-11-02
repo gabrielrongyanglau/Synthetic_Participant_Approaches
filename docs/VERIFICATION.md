@@ -28,6 +28,16 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.6: alignment with the Organization Science submission
+
+- Study findings no longer says its research-use table comes from Table 3 of the proposal, and the recommendation limits no longer say the suggestions follow Table 3.
+- Every goal and information combination now recommends one or two approaches, first choice first, with the evidence from Tables 1 and 2 of the submission. Where two are recommended, the first did better on that goal, or the results were mixed and the first uses more of the researcher's information. Goal 1: no data SPA2; description SPA3 then SPA2; proportions SPA4 then SPA2; pilot SPA5 then SPA6; demographic profiles SPA7 then SPA2; demographic and psychological scores SPA8. Goal 2: no data SPA2; description SPA2 then SPA3; proportions SPA2 then SPA4; pilot SPA6 then SPA5; demographic profiles SPA2 then SPA7; demographic and psychological scores SPA8. Both SPA8 descriptions are unchanged.
+- The average human correlation with life satisfaction is given as .32 (.3178 in the submission), against .95 to .97 for approaches that generated scores.
+- MIDUS demographic names follow Table A4: Age, Sex, Highest educational attainment, Current marital status, Racial origin (first response), Religious preference (first choice).
+- Study findings charts label SPA8 "Demographic and psychological profiles".
+
+All tests pass.
+
 ## Version 8.5: clearing keeps your inputs (Jungmin's comment)
 
 Clear this session now removes only the run's results and progress. The uploaded file is kept, so the same inputs can be generated again without going back to the Inputs step to upload it again. The confirmation no longer says inputs are removed. Start over still removes everything. All tests pass.

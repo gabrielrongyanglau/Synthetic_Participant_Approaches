@@ -71,10 +71,10 @@ const Console=(()=>{
   const host=$('resultsTable'),r=Research.recommendation(),ready=!!(r&&stage()),fit=ready?r.feasible:[],chosen=spa();
   const t=el('table'),head=el('tr');['','Approach','Fits your information'].forEach(x=>{const th=el('th',x);th.setAttribute('scope','col');head.append(th)});const thead=el('thead');thead.append(head);t.append(thead);const body=el('tbody');
   for(const m of [1,2,3,4,5,6,7,8]){
-   const ok=fit.includes(m),tr=el('tr');tr.className=[ok?'fit':'nofit',ready&&r.primary===m?'rec':''].join(' ');
+   const ok=fit.includes(m),tr=el('tr');tr.className=[ok?'fit':'nofit',ready&&r.recommended.includes(m)?'rec':''].join(' ');
    const pick=el('input');pick.type='radio';pick.name='consoleSpa';pick.checked=chosen===m&&ready;pick.disabled=!ok;pick.setAttribute('aria-label','Choose '+Research.methodLabel(m));
    pick.addEventListener('change',()=>{const card=document.querySelector(`input[name=chosenApproach][value="${m}"]`);if(card){card.checked=true;card.dispatchEvent(new Event('change'))}});
-   const c0=el('td');c0.append(pick);const c1=el('td',Research.methodLabel(m));if(ready&&r.primary===m)c1.append(el('span','Recommended','tag tag-accent'));
+   const c0=el('td');c0.append(pick);const c1=el('td',Research.methodLabel(m));if(ready&&r.recommended.includes(m))c1.append(el('span',r.primary===m?'Recommended':'Also recommended','tag tag-accent'));
    tr.append(c0,c1,el('td',!ready?'':ok?'Yes':'No'));body.append(tr)}
   t.append(body);host.replaceChildren(t,el('p','You can choose any approach that fits. Results for every approach are under Study findings.','table-note'));
  }

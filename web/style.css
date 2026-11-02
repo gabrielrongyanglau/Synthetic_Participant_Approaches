@@ -179,6 +179,7 @@ button.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px;bor
 .recommendation{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r-sm);padding:16px 18px;margin:0 0 16px}
 .rec-label{font-size:13px;font-weight:600;color:var(--accent-ink);margin:0 0 2px}
 .rec-title{font:600 22px/1.3 var(--serif);margin:0 0 8px}
+.rec-also{font-weight:600;margin:-4px 0 8px}
 .rec-warn{color:var(--warn);font-size:14px;font-weight:600}
 .rec-caution{font-size:13.5px;color:var(--muted)}
 .rec-caution summary{cursor:pointer;font-weight:600;color:var(--ink-2)}

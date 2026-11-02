@@ -4,7 +4,7 @@ const StudyCharts=(()=>{
   const display=text=>String(text);
   const order=[1,2,3,4,5,6,7,8];
   const NS='http://www.w3.org/2000/svg';
-  const short={1:'Persona prompted',2:'Direct generation',3:'Population guided',4:'Quota matched',5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographic-only profiles',8:'Demographics + psychology *'};
+  const short={1:'Persona prompted',2:'Direct generation',3:'Population guided',4:'Quota matched',5:'Pilot calibrated',6:'Pilot analysis guided',7:'Demographic-only profiles',8:'Demographic and psychological profiles *'};
   const definitions={
     wasserstein:{axis:'Normalised Wasserstein distance · lower is closer',meaning:'Wasserstein distance compares the full score distributions, expressed in human standard deviations. Zero means identical distributions. Values are averaged across the 38 psychological predictors.'},
     smd:{axis:'Absolute standardised mean difference · lower is closer',meaning:'Standardised mean error measures gaps between simulated and human average scores relative to their pooled score variability. Zero means equal averages. Absolute errors are averaged across 38 predictors.'},
