@@ -29,11 +29,11 @@ const StudyCharts=(()=>{
   }
   function intervalSpec(rows,unit=false){
     const high=Math.max(...rows.map(r=>r.upper)),step=unit ? .2 : (high<=.36 ? .1 : .2),max=unit ? 1 : Math.ceil(high*1.1/step)*step;
-    return {min:0,max,step,width:1000,height:430,left:282,right:78,top:30,row:39,bottom:356};
+    return {min:0,max,step,width:820,height:430,left:340,right:80,top:30,row:39,bottom:356};
   }
   function node(tag,attrs={},text){const e=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,display(v)));if(text!==undefined)e.textContent=display(text);return e}
   function html(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=display(text);if(cls)e.className=cls;return e}
-  function base(target,title,desc,width=1000,height=430){
+  function base(target,title,desc,width=820,height=430){
     const svg=node('svg',{viewBox:`0 0 ${width} ${height}`,role:'group','aria-label':title,class:'study-svg'});
     svg.append(node('title',{},title),node('desc',{},desc));document.getElementById(target).replaceChildren(svg);return svg;
   }
@@ -60,16 +60,16 @@ const StudyCharts=(()=>{
   function pointDescription(r,label){return `SPA${r.method} ${source.method_names[r.method]}. ${label}: ${fmt(r.mean)}. 95% CI ${fmt(r.lower)} to ${fmt(r.upper)}. ${r.n} scored repetitions.${r.method===8?' Actual psychological predictors are retained.':''}`}
   function intervalChart(target,rows,axisLabel,readout,highlight){
     const spec=intervalSpec(rows),svg=base(target,axisLabel,'Eight approaches, each shown by a mean point and a 95% confidence interval. Lower error means closer reproduction of human data. SPA8 retains actual psychological predictors.');
-    const x=axis(svg,spec,axisLabel);text(svg,990,8,'Mean / 95% CI',{'text-anchor':'end','font-size':11});
+    const x=axis(svg,spec,axisLabel);text(svg,spec.width-10,8,'Mean / 95% CI',{'text-anchor':'end','font-size':11});
     rows.slice().sort((a,b)=>order.indexOf(a.method)-order.indexOf(b.method)).forEach((r,i)=>{
       const y=spec.top+i*spec.row;
-      if(r.method===highlight||r.method===8)svg.append(node('rect',{x:3,y:y-18,width:990,height:36,rx:5,fill:r.method===8?'#f8f1e7':'#edf4f1'}));
+      if(r.method===highlight||r.method===8)svg.append(node('rect',{x:3,y:y-18,width:spec.width-6,height:36,rx:5,fill:r.method===8?'#f8f1e7':'#edf4f1'}));
       text(svg,12,y+5,`SPA${r.method}  ${short[r.method]}`,{'font-weight':r.method===highlight||r.method===8?650:400});
       const color=rowColor(r.method);whisker(svg,x,r.lower,r.upper,y,color);
       const dot=node('circle',{cx:x(r.mean),cy:y,r:5,fill:r.method===8?'white':color,stroke:color,'stroke-width':2.5});
       interactive(dot,pointDescription(r,axisLabel),readout);svg.append(dot);
-      text(svg,990,y+1,fmt(r.mean),{'text-anchor':'end','font-weight':600});
-      text(svg,990,y+15,`${fmt(r.lower)}–${fmt(r.upper)}`,{'text-anchor':'end','font-size':10,fill:'#60757c'});
+      text(svg,spec.width-10,y+1,fmt(r.mean),{'text-anchor':'end','font-weight':600});
+      text(svg,spec.width-10,y+15,`${fmt(r.lower)}–${fmt(r.upper)}`,{'text-anchor':'end','font-size':10,fill:'#60757c'});
     });
     document.getElementById(readout).textContent=pointDescription(rows.find(r=>r.method===highlight),axisLabel);
   }

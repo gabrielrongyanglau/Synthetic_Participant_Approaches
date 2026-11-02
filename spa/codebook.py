@@ -66,8 +66,11 @@ def build(columns,method,study=None):
             if v:
                 is_item=code in item_fields(v);name=v['name']+(f' item {item_fields(v).index(code)+1}' if is_item else ' score')
                 definition=v['definition']+(' Item wording: '+v['items'][item_fields(v).index(code)] if is_item else '')
-                score=g['Scoring']+'. Reverse-coded item positions: '+json.dumps(v['reverse'])
-                src='User-supplied source (not automatically verified): '+v['citation'];provenance='Retained from supplied profiles' if fixed else 'Generated raw item' if is_item else 'Calculated locally from generated items'
+                score=g['Scoring'].rstrip('.')+'. Reverse-coded item positions: '+json.dumps(v['reverse'])
+                src='User-supplied source (not automatically verified): '+v['citation']
+                supplied_items=method==8 and v['role']=='predictor' and any(c in columns for c in item_fields(v))
+                if supplied_items:provenance='Retained from supplied profiles' if is_item else 'Calculated locally from supplied items'
+                else:provenance='Retained from supplied profiles' if fixed else 'Generated raw item' if is_item else 'Calculated locally from generated items'
             else:
                 v=next(v for v in study['demographics'] if v['code']==code);name=v['name'];definition='Researcher-defined demographic characteristic: '+name;score='Numeric category codes: '+json.dumps(v['categories'],ensure_ascii=False);src='Researcher-defined demographic';provenance='Constructed locally to match demographic proportions' if method==4 and fixed else 'Retained from supplied profiles' if fixed else 'Generated'
             result.append(dict(column=code,name=name,definition=definition,role=g['Role'],assessment='Researcher-defined study',allowed_values=(f"{bounds(study)[code][0]} to {bounds(study)[code][1]}" if g['Allowed']=='Composite score' else g['Allowed']),scoring=score,missing_values='Blank means missing, and fixed blanks are retained. Composite scores require all items.',source=src,provenance=provenance))

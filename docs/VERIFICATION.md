@@ -28,6 +28,17 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.9: final-check fixes
+
+- Generation follows the protocol in our proposal: each dataset is generated in one request of 100 participants, and SPA1 to SPA7 receive the original data collection's participant diversity and duplication check, word for word (SPA8 did not receive it in the original collection). The batch-size setting is removed.
+- Study findings: the research-use table is summarised from Table 3 of our proposal, with its five research purposes and stages (relationships before data collection, score distributions with a pilot, longitudinal planning, an unmeasured outcome, and effect sizes and power).
+- Your own study, SPA8: when predictor items are uploaded, they are kept unchanged in the dataset next to the calculated score. The AI still receives the scores only. The codebook marks the items "Retained from supplied profiles" and the score "Calculated locally from supplied items".
+- The consent message names the Check and generate step. The codebook scoring note no longer has a double full stop.
+- Messages and the glossary say CSV and no longer mention Excel.
+- Study findings charts fit their panel at normal window widths (they scroll sideways only on narrow screens), and SPA8's longer label no longer touches the plot.
+
+All tests pass.
+
 ## Version 8.8: SPA3 description and one name for the proposal
 
 - The MIDUS demonstration's SPA3 population description is the Table A2 wording: "Broad demographic characteristics of U.S. adults, including variation in age, sex, education, and marital status." The information option describes it the same way.

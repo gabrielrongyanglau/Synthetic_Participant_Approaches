@@ -12,7 +12,7 @@ const CLIENT_ERRORS={
   server_timeout:{title:'The server took too long to respond',detail:'The hosting service stopped waiting for a reply ({status}).',advice:'Try again in a moment. Running batches continue, and the toolkit keeps checking them.'},
   unreadable_response:{title:'The server sent an unexpected reply',detail:'The reply could not be read ({status}).',advice:'Try again. If it continues, download any completed datasets and contact the research team.'},
   request_too_large:{title:'The inputs are too large to send',detail:'The uploaded data exceed the 3 MB request limit.',advice:'Use a smaller profile file (100 rows is enough), or remove unused columns.'},
-  wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'In Excel or another spreadsheet program, use Save As › CSV UTF-8 (comma delimited), then upload the .csv file.'},
+  wrong_file_type:{title:'Upload a CSV file',detail:'{name} has a different file type. The toolkit reads .csv files.',advice:'Save the file as a CSV file (CSV UTF-8, comma delimited), then upload the .csv file.'},
   file_too_large:{title:'The file is too large',detail:'{name} is {size}. The limit is 2.2 MB.',advice:'Upload only the rows and columns in the template. 50 or 100 rows is enough.'},
   upload_missing:{title:'A file is needed',detail:'{label} has no file selected.',advice:'Download the blank template, fill it with your data and choose it here.'},
   session_exists:{title:'A run is already in this tab',detail:'Only one dataset can be generated per session.',advice:'Download its dataset, then choose Clear this session under Datasets before starting another run.'},
@@ -336,7 +336,7 @@ async function start(){
   busy=true;$('generate').disabled=true;
   try{
     const req=await request();
-    if(!req.consent)throw new AppError({code:'consent_missing',title:'Confirmation needed',detail:'Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget.',advice:'Tick the data-sharing confirmation under Check and confirm, then try again.'});
+    if(!req.consent)throw new AppError({code:'consent_missing',title:'Confirmation needed',detail:'Please confirm that these inputs may be sent to OpenAI and that the run uses the research team’s budget.',advice:'Tick the data-sharing confirmation on the Check and generate step, then try again.'});
     const brief=Research.snapshot();
     notice('Preparing the inputs in memory…');
     const plan=await api('/api/prepare',req);plan.settings.study=req.study;plan.settings.midus_fields=req.midus_fields;

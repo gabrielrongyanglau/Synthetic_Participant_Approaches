@@ -175,7 +175,10 @@ def contexts(req,assets):
                     for v in s['variables']:
                         if v['role']=='predictor' and v['aggregation']!='individual' and v['code'] not in f and all(c in f for c in item_fields(v)):
                             f[v['code']]=construct_score(f.assign(**numeric(f,s,item_fields(v))),v)
-                fields=demographics(s)+(predictor_fields(s) if m==8 else []);f=numeric(f,s,fields)
+                # SPA8: predictor items supplied in full are kept with the profile so they appear unchanged in the dataset. The AI
+                # receives the scores only (see batch), as in the original SPA8.
+                kept=[c for v in s['variables'] if m==8 and v['role']=='predictor' and v['aggregation']!='individual' and all(x in f for x in item_fields(v)) for c in item_fields(v)]
+                fields=list(dict.fromkeys(demographics(s)+(predictor_fields(s) if m==8 else [])+kept));f=numeric(f,s,fields)
                 idx=np.arange(req.n);f=f.iloc[idx]
                 ctx['fixed']=[dict(participant_id=i+1,**r) for i,r in enumerate(json_records(f))];ctx['provenance']['input_rows_in_output_order']=(idx+1).tolist()
             if m==4:
@@ -210,14 +213,17 @@ def batch(ctx,m,ids,fixed):
     from .study import PROJECT_ROOT
     bank=json.loads((PROJECT_ROOT/'prompts/methods.json').read_text(encoding='utf-8'))
     template=next(p['user'] for p in bank['prompts'] if p['method']==SPA_TO_ORIGINAL[m])
+    # SPA8 profiles may carry supplied predictor items for the dataset. The AI receives the predictor scores only.
+    hidden={c for v in s['variables'] if v['role']=='predictor' and v['aggregation']!='individual' for c in item_fields(v)} if m==8 else set()
+    shown=[{k:x for k,x in r.items() if k not in hidden} for r in fixed] if fixed else fixed
     specifications=json.dumps(dict(study=s,participant_ids=ids,output_fields=list(props),
       population_guidance=ctx['provenance'].get('population_guidance',''),precomputed_summary=ctx['summary']),ensure_ascii=False,allow_nan=False)
     replacements={'N':str(len(ids)),'STUDY_SPECIFICATIONS':specifications,'PARTICIPANT_IDS':json.dumps(ids),
       'OUTPUT_SCHEMA':json.dumps(schema),'pilot_data':json.dumps(ctx['pilot'],allow_nan=False),
       'calibration_summary':json.dumps(ctx['summary'],allow_nan=False),
-      'Wave_1_demographic_profiles':json.dumps(fixed,allow_nan=False),
-      'Wave_1_actual_demographic_profiles':json.dumps(fixed,allow_nan=False),
-      'Wave_1_predictor_profiles':json.dumps(fixed,allow_nan=False)}
+      'Wave_1_demographic_profiles':json.dumps(shown,allow_nan=False),
+      'Wave_1_actual_demographic_profiles':json.dumps(shown,allow_nan=False),
+      'Wave_1_predictor_profiles':json.dumps(shown,allow_nan=False)}
     user=template
     for key,value in replacements.items():user=user.replace('{'+key+'}',value)
     # Domain changes belong to this fixed server-owned system layer, never a visitor prompt editor.
@@ -247,7 +253,9 @@ def clean_dataset(rows,s,method):
     f=pd.DataFrame(rows)
     if 'participant_id' not in f or f.participant_id.tolist()!=list(range(1,len(f)+1)):raise ValueError('Participant IDs must be sequential.')
     required=demographics(s)+[c for v in s['variables'] for c in (score_fields(v) if method==8 and v['role']=='predictor' else item_fields(v))]
-    composites=[v['code'] for v in s['variables'] if v['aggregation']!='individual'];allowed={'participant_id',*required,*composites}
+    composites=[v['code'] for v in s['variables'] if v['aggregation']!='individual']
+    supplied=[c for v in s['variables'] if method==8 and v['role']=='predictor' and v['aggregation']!='individual' for c in item_fields(v)]  # SPA8 items kept from the profiles
+    allowed={'participant_id',*required,*composites,*supplied}
     if set(f)-allowed:raise ValueError('Unexpected custom dataset columns.')
     computed=scored(f,s,method==8)
     for c in composites:

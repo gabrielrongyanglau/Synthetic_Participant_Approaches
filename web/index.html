@@ -17,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v8.8</span>
+  <span class="chip">v8.9</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -187,7 +187,7 @@
     <div><span class="fact-label">Generation time</span><span class="fact-value">A few minutes to an hour</span></div>
     <div><span class="fact-label">Paid by</span><span class="fact-value">Research team’s API budget</span></div>
   </div>
-  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes. Runs with many variables or large pilot inputs can take up to an hour. Participants are generated in several smaller requests at the same time to keep this short.</p>
+  <p class="help timing">Generation time varies with the complexity of the data being generated. Simple runs can finish in a few minutes. Runs with many variables or large pilot inputs can take up to an hour. All 100 participants are generated in one request, as in our proposal.</p>
   <div id="notConnected" class="banner warn" hidden><strong>AI generation is offline.</strong> The owner needs to add OPENAI_API_KEY in Vercel. You can still check inputs.</div>
   <details class="note">
     <summary>About the research-funded trial</summary>
@@ -298,16 +298,15 @@
   <details class="note"><summary>What each approach receives</summary><div id="studyMethodGuide"></div></details>
 
   <h2 class="section-title">How might researchers use these approaches?</h2>
-  <p class="help">Our evaluation covered distributions and correlations. Effects on research decisions need separate study.</p>
+  <p class="help">Summarised from Table 3 of our proposal. Our evaluation covered distributions and correlations. Effects on research decisions need separate study.</p>
   <div class="table-wrap"><table>
-    <thead><tr><th>Research situation</th><th>Possible starting point</th><th>Interpretation</th></tr></thead>
+    <thead><tr><th>Research purpose and stage</th><th>Recommended SPA</th><th>Expected benefits and limitations</th></tr></thead>
     <tbody>
-      <tr><td>No participant data, exploring theoretical predictions</td><td>SPA2, with SPA1 and SPA3 as alternatives</td><td>Explore possible patterns. Synthetic associations suggest patterns to test with human data.</td></tr>
-      <tr><td>Pilot data, exploring score distributions or ceiling effects</td><td>SPA5, with SPA6 as an alternative</td><td>Pilot-informed scores were closer in MIDUS. Reliability, factor structure and construct validity need separate evidence.</td></tr>
-      <tr><td>Pilot data, inspecting relationships</td><td>SPA6 and SPA5</td><td>SPA6 had smaller relationship errors. Both substantially overstated strengths.</td></tr>
-      <tr><td>Actual demographics only</td><td>SPA7</td><td>Preserves profiles. Its psychological scores were no closer to human data than SPA2.</td></tr>
-      <tr><td>Observed psychological profiles, exploring possible outcomes</td><td>SPA8</td><td>Closer relationship agreement for life satisfaction. Individual predictions, new outcomes and imputations need separate validation.</td></tr>
-      <tr><td>Effect sizes and statistical power</td><td>Human evidence</td><td>Use human evidence or explicitly specified effect-size scenarios.</td></tr>
+      <tr><td>Exploring hypothesised relationships before collecting human data. You have a theoretical model but no participant records or pilot data.</td><td>SPA2 (direct generation). SPA1 and SPA3 are alternatives, but neither showed a meaningful advantage over SPA2.</td><td>Useful for preliminary exploration of relationship directions. All eight SPAs reproduced broad human correlation patterns, but SPA1–SPA7 substantially exaggerated their magnitudes. A synthetic positive or negative correlation can suggest a direction worth examining. It cannot show whether a relationship is weak or absent, establish that it exists in humans, estimate its effect size or provide evidence for a hypothesis.</td></tr>
+      <tr><td>Exploring plausible score distributions for study planning. You have a small pilot sample and want to see how features of your measures, such as floor or ceiling effects, limited variability or skewness, may affect planned analyses.</td><td>SPA5 (pilot calibrated), or SPA6 when precomputed summaries are unavailable.</td><td>SPA5 and SPA6 reproduced human score distributions substantially better than approaches without pilot data, with SPA5 performing best. This correspondence partly reflects the human information provided to the AI. Synthetic datasets cannot independently establish measurement quality or predict the distributions in a new human sample.</td></tr>
+      <tr><td>Planning longitudinal research after collecting baseline predictors. You have measured demographic characteristics and psychological predictors at baseline, and the outcomes at a later wave are still to be collected.</td><td>SPA8 (demographic and psychological profiles).</td><td>SPA8 reproduced human correlation strengths more closely than the other approaches, because it uses observed psychological scores as predictors. The simulated outcomes are not validated individual-level predictions, and their relationships with baseline predictors are not evidence of actual longitudinal effects. Human follow-up data remain necessary to test these relationships.</td></tr>
+      <tr><td>Exploring an unmeasured outcome with existing psychological assessments. You have participants’ psychological assessments, and a particular outcome has not been measured.</td><td>SPA8, with validation required for each new outcome.</td><td>This extends SPA8 beyond the two-wave setting studied in our proposal. SPA8 improved correlation agreement for life satisfaction, and its accuracy for other outcomes is unknown. Synthetic results may inform what to investigate next. They cannot establish the existence, relative strength or causal interpretation of relationships with the outcome, and they are not valid imputations.</td></tr>
+      <tr><td>Considering effect sizes and statistical power before human data collection.</td><td>No evaluated SPA is sufficiently validated to supply effect-size assumptions.</td><td>Base power calculations on prior human studies, observed pilot estimates or transparently specified effect-size scenarios. SPA1–SPA7 substantially overestimated relationship strengths, and SPA8 also retained meaningful errors, so power calculated from synthetic correlations could be misleading.</td></tr>
     </tbody>
   </table></div>
   <p class="help">Approach numbers follow our proposal: SPA7 uses demographic-only profiles and SPA8 uses demographic and psychological profiles. Individual predictions, replacement of missing responses and intervention effects need separate evidence.</p>

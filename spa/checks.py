@@ -16,7 +16,7 @@ def sniff(text,label):
     """Reject non-CSV content early with a specific explanation. Returns the parsed rows (header first)."""
     if text is None or not str(text).strip():raise AppError('file_empty',label=label)
     head=str(text)[:4096]
-    if head.startswith('PK\x03\x04'):raise AppError('not_csv',label=label,kind='an Excel workbook (.xlsx)')
+    if head.startswith('PK\x03\x04'):raise AppError('not_csv',label=label,kind='a spreadsheet workbook (.xlsx)')
     if head.startswith('%PDF'):raise AppError('not_csv',label=label,kind='a PDF')
     if '\x00' in head or head.startswith('￾') or head.startswith('\xff\xfe'):raise AppError('not_csv',label=label,kind='a binary or UTF-16 file')
     if re.match(r'\s*<(!doctype|html|\?xml)',head,re.I):raise AppError('not_csv',label=label,kind='a web page or XML file')

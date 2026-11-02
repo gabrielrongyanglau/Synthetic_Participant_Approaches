@@ -1,4 +1,4 @@
-"""MIDUS source codes never leave the server, and AI generation runs as parallel batches."""
+"""MIDUS source codes never leave the server, and each dataset is generated in one request of 100 participants."""
 import io,json
 import pandas as pd
 import pytest
@@ -62,16 +62,17 @@ def test_inbound_csv_only_changes_exact_public_names():
     assert inbound_csv(text).splitlines()[0]=='B1PRAGE_2019,B1PRSEX,notes'
     assert '"age and sex"' in inbound_csv(text) or 'age and sex' in inbound_csv(text)
 
-@pytest.mark.parallel
-@pytest.mark.parametrize('method',[2,5,7])
-def test_parallel_batches_assemble_one_dataset(client,monkeypatch,method):
+@pytest.mark.parametrize('method',[2,5,7,8])
+def test_one_request_of_100_assembles_one_dataset(client,monkeypatch,method):
     fake=FakeProvider();monkeypatch.setattr(jobs,'provider',lambda:fake)
     plan=client.post('/api/prepare',json={'methods':[method],'consent':True},headers=H).json()
-    size=plan['settings']['batch_size'];assert size==25
+    size=plan['settings']['batch_size'];assert size==100
     run=f'SPA{method}_R0001';ctx=plan['contexts'][run]
     handles=[client.post('/api/submit',json=dict(ticket=plan['ticket'],run=run,offset=o,context=ctx),headers=H).json()['handle'] for o in range(0,100,size)]
-    assert len(fake.created)==4
-    for body in fake.created:assert len(body['text']['format']['schema']['properties']['participants']['items']['properties']['participant_id']['enum'])==25
+    assert len(fake.created)==1
+    for body in fake.created:assert len(body['text']['format']['schema']['properties']['participants']['items']['properties']['participant_id']['enum'])==100
+    # The original collection's diversity instruction goes to SPA1-SPA7, not SPA8.
+    assert ('PARTICIPANT DIVERSITY AND DUPLICATION CHECK' in fake.created[0]['instructions'])==(method!=8)
     rows=[]
     for h in handles:
         r=client.post('/api/poll',json={'handle':h,'context':ctx},headers=H).json();assert r['status']=='completed';rows+=r['records']
@@ -83,10 +84,9 @@ def test_parallel_batches_assemble_one_dataset(client,monkeypatch,method):
     assert result.status_code==200 and not contains_code(result.text)
     assert client.post('/api/submit',json=dict(ticket=plan['ticket'],run=run,offset=10,context=ctx),headers=H).status_code==400
 
-@pytest.mark.parallel
-def test_batch_size_setting(monkeypatch):
-    for raw,expected in [('25',25),('50',50),('100',100),('7',25),('',25),('abc',25)]:
-        monkeypatch.setenv('SPA_BATCH_SIZE',raw);assert jobs.batch_size()==expected
+def test_batch_size_is_one_request_of_100(monkeypatch):
+    for raw in ('25','50','100',''):
+        monkeypatch.setenv('SPA_BATCH_SIZE',raw);assert jobs.batch_size()==100
 
 @pytest.mark.parametrize('method',[4,7,8])
 def test_participant_id_is_first_for_fixed_profile_datasets(client,method):

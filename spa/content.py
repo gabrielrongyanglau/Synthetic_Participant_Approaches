@@ -50,7 +50,7 @@ TERMS={
  'Repetition / run':'A separate generation of a dataset. The current research-funded trial permits one dataset per simulation. Our proposal’s evaluation used 1,000 repetitions per approach.',
  'Human reference / benchmark':'Observed human data used to assess generated data. In our proposal, this was 2,709 MIDUS participants.',
  'Goals 1 and 2':'Goal 1 is reproducing psychological scores: whether generated averages, spread and distributions resemble human data. Goal 2 is reproducing relationships among variables: their direction and pattern, and their strength. An approach can do well on one goal and poorly on the other.',
- 'CSV file':'A comma-separated values file containing a table. It can be opened in Excel. Preserve the template’s column names and save uploads as CSV.',
+ 'CSV file':'A comma-separated values file containing a table. Templates and downloads are CSV files. Preserve the template’s column names and save uploads as CSV.',
  'API key':'A secret credential used by the app to connect to a paid AI service. It is needed for AI generation.',
  'Confidence interval (CI)':'Here, an interval describing the precision of average performance across generated datasets. It describes average performance, so individual participants or datasets can fall outside it.'}
 TERMS.update({

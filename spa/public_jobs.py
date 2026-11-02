@@ -12,10 +12,13 @@ from .numbering import run_spa
 MODEL='gpt-5.6-luna'
 
 def batch_size():
-    """Participants per AI request. Requests for one dataset run in parallel, so smaller batches finish sooner.
-    SPA_BATCH_SIZE may be 25, 50 or 100; 100 reproduces the single-request protocol of the original MIDUS evaluation."""
-    raw=os.environ.get('SPA_BATCH_SIZE','25').strip()
-    return int(raw) if raw in ('25','50','100') else 25
+    """Participants per AI request: all 100 in one request, as in the evaluation reported in our proposal."""
+    return 100
+
+# Added to the instructions for SPA1 to SPA7, exactly as in the original data collection (src/collection.py). SPA8 keeps every
+# supplied profile and generates outcomes only, so the original collection did not send it for SPA8.
+DIVERSITY='\n\n'+'PARTICIPANT DIVERSITY AND DUPLICATION CHECK: Generate 100 distinct participant profiles. Generate each participant individually; do not reuse an earlier participant profile or repeat a sequence of participants. Changing only the identifier does not create a new participant. Each participant must have a distinct combination of psychological scores and demographic values after rounding generated values to four decimal places. Differences must reflect plausible participant variation; do not introduce arbitrary tiny numerical changes solely to satisfy uniqueness. Before returning the dataset, check for repeated profiles and replace repeated profiles with newly generated participants. Return exactly 100 participants in the required JSON format. Preserve original fixed inputs and all method-specific information restrictions.'
+def diversity(method,system):return system if method==8 else system+DIVERSITY
 
 def canonical(value):
     """Browsers serialise whole-number decimals (3.0) as integers (3); normalise so signatures survive the round trip."""
@@ -96,10 +99,11 @@ def batch(ctx,method,offset,n,size=None):
     ids=list(range(offset+1,min(n,offset+size)+1));fixed=ctx['fixed'][offset:offset+len(ids)] if ctx['fixed'] else None
     if ctx.get('custom'):
         from .custom import batch as custom_batch
-        system,user,schema=custom_batch(ctx,method,ids,fixed)
+        system,user,schema=custom_batch(ctx,method,ids,fixed);system=diversity(method,system)
         return dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,background=True,store=False,text={'format':{'type':'json_schema','name':'custom_participant_batch','strict':True,'schema':schema}}),fixed,ids
     system,user=build_prompt(midus_study(ctx),method,ids,fixed,ctx['pilot'],ctx['summary'],generated_only=True,
       population_guidance=ctx['provenance'].get('population_guidance',''))
+    system=diversity(method,system)
     body=dict(model=MODEL,instructions=system,input=user,reasoning={'effort':'medium'},max_output_tokens=128000,
       background=True,store=False,text={'format':{'type':'json_schema','name':'participant_batch','strict':True,
       'schema':output_schema(midus_study(ctx),ids,fixed)}})

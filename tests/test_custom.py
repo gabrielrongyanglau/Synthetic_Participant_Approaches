@@ -197,3 +197,23 @@ def test_one_column_order_for_dataset_codebook_and_guide(study):
     notes={r['Column']:r['Scoring'] for r in custom.guide(s)}
     for v in s['variables']:
         for i,c in enumerate(custom.item_fields(v),1):assert ('reverse-coded' in notes[c])==(i in v['reverse'])
+
+
+def test_spa8_keeps_supplied_predictor_items(study):
+    # Items uploaded for SPA8 predictors appear unchanged in the dataset, the AI receives the scores only, and the codebook says so.
+    from spa.codebook import build
+    s=custom.definition(study);f=custom.fake(s,100)
+    preds=[v for v in s['variables'] if v['role']=='predictor' and v['aggregation']!='individual']
+    items=[c for v in preds for c in custom.item_fields(v)]
+    upload=f[custom.demographics(s)+items].copy()
+    ctx=public_jobs.prepare(Run(study=study,methods=[8],examples=False),{'profiles_SPA8':upload})['SPA8_R0001']
+    assert all(c in ctx['fixed'][0] for c in items+[v['code'] for v in preds])
+    body,fixed,ids=public_jobs.batch(ctx,8,0,100)
+    assert not any(f'"{c}"' in body['input'] for c in items) and all(f'"{v["code"]}"' in body['input'] for v in preds)
+    assert 'PARTICIPANT DIVERSITY' not in body['instructions']
+    rows=[{**r,**{c:4 for c in custom.item_fields(next(v for v in s['variables'] if v['role']=='outcome'))}} for r in ctx['fixed']]
+    out=custom.clean_dataset(rows,s,8)
+    assert all(c in out.columns for c in items) and out[items].reset_index(drop=True).equals(upload[items].reset_index(drop=True).astype(out[items].dtypes))
+    book={r['column']:r for r in build(list(out.columns),8,s)}
+    assert book[items[0]]['provenance']=='Retained from supplied profiles' and book[preds[0]['code']]['provenance']=='Calculated locally from supplied items'
+    assert '..' not in book[preds[0]['code']]['scoring']

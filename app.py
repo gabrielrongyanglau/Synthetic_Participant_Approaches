@@ -174,7 +174,7 @@ def preview(req:Run):
     content(req);bank=jobs.prepare(req,assets(req));run=next(iter(bank));ctx=bank[run]
     body,_,_=jobs.batch(ctx,run_spa(run),0,req.n)
     return dict(run=run,system=body['instructions'],user=body['input'],provenance={k:c['provenance'] for k,c in bank.items()},
-                note=f'This preview is the first of {req.n//jobs.batch_size()} requests that run at the same time. Each request receives its own participant IDs and fixed profiles.')
+                note='This preview shows the single request that generates all 100 participants.')
 
 class Submit(BaseModel):
     model_config=ConfigDict(extra='forbid')
