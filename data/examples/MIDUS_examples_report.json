@@ -1,0 +1,17 @@
+{
+ "source": "Linked MIDUS 2 and 3 file (registered ICPSR users); no participant records are stored here",
+ "participants": 2709,
+ "calibration_pool": 542,
+ "evaluation_pool": 2167,
+ "SPA4_male_share": 0.4363,
+ "pilot_vs_calibration_pool": {
+  "mean_gap_sd": 0.067,
+  "sd_ratio_gap": 0.062,
+  "correlation_gap": 0.112
+ },
+ "profiles_vs_evaluation_pool": {
+  "mean_gap_sd": 0.045,
+  "sd_ratio_gap": 0.049,
+  "correlation_gap": 0.075
+ }
+}

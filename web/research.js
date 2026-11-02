@@ -114,10 +114,10 @@ const Research=(()=>{
  const OPTIONS=[
    ['none','No participant data','You have only your study’s definitions and survey questions.','The AI works from the MIDUS measures alone.'],
    ['description','General population description','A broad description of the people you want to simulate, without numerical targets. For example, UK working adults.','A short written description of the MIDUS participants: middle-aged and older adults in the United States.'],
-   ['proportions','Population demographic proportions','Known percentages, such as the share in each age group or education level.','Example percentages for each demographic category, such as the share in each age group.'],
-   ['pilot','A small human pilot dataset','50 real participants with their demographics, psychological scores and outcomes.','50 example participants with demographics, psychological scores and life satisfaction.'],
-   ['demographics','Actual demographic profiles','Each participant’s demographic details, without their psychological scores.','100 example participants’ demographic details, without their psychological scores.'],
-   ['psychology','Actual demographic and psychological scores','Each participant’s demographics and psychological scores, with the outcome still to be measured.','100 example participants’ demographics and psychological scores, with life satisfaction to be generated.']];
+   ['proportions','Population demographic proportions','Known percentages, such as the share in each age group or education level.','The actual MIDUS percentages for each demographic category, such as the share in each age group.'],
+   ['pilot','A small human pilot dataset','50 real participants with their demographics, psychological scores and outcomes.','50 generated participants who match the MIDUS pilot pool, with demographics, psychological scores and life satisfaction.'],
+   ['demographics','Actual demographic profiles','Each participant’s demographic details, without their psychological scores.','100 generated participants who match MIDUS, with demographic details only.'],
+   ['psychology','Actual demographic and psychological scores','Each participant’s demographics and psychological scores, with the outcome still to be measured.','100 generated participants who match MIDUS, with demographics and psychological scores. Life satisfaction is generated.']];
  const SITUATION=Object.fromEntries(OPTIONS.map(([k,t])=>[k,t]));
  function stage(){return document.querySelector('#infoChoices input:checked')?.value||null}
  function situation(){const st=stage();return st?(custom()?SITUATION[st]:(MIDUS_TITLES[st]||SITUATION[st])):''}

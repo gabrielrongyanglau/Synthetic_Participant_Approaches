@@ -21,7 +21,7 @@ Generation time varies with the complexity of the data being generated: simple r
 | `spa/` | Study definitions, prompt assembly, generation, scoring and statistics; `public.py` (readable names) and `numbering.py` (SPA numbering) |
 | `config/study.yaml`, `prompts/methods.json` | MIDUS variable definitions and the original method prompts (unchanged) |
 | `data/original_study/` | Verified aggregate results shown under Study findings |
-| `data/examples/` | Fictional example files (one row per participant) served as upload templates |
+| `data/examples/` | MIDUS demonstration inputs: actual MIDUS proportions (SPA4) and generated participants who match MIDUS (SPA5–SPA8), built by `tools/make_midus_examples.py` |
 | `tests/`, `pytest.ini`, `requirements-dev.txt` | Automated tests (no paid API calls) |
 | `analyse.py`, `import_r.py` | Offline reproduction of the original study results |
 | `verification/` | Build record, core-file hashes and the original workbook verification summary |
@@ -48,7 +48,7 @@ You can try out the toolkit with the MIDUS study used in the proposal, where eve
 
 ## Study modes
 
-**MIDUS study** preserves the original representative prompts, score definitions and statistical engine. It uses 38 psychological scores, six demographics and life satisfaction at MIDUS 2 and MIDUS 3. The original study benchmark contains 2,709 eligible people. Only invented example records and aggregate study results are distributed.
+**MIDUS study** preserves the original representative prompts, score definitions and statistical engine. It uses 38 psychological scores, six demographics and life satisfaction at MIDUS 2 and MIDUS 3. The original study benchmark contains 2,709 eligible people. No individual MIDUS records are distributed: the demonstration uses actual MIDUS proportions, generated participants who match MIDUS, and aggregate study results.
 
 **My own study** accepts construct definitions, source citations, exact items, response ranges and anchors, reverse coding, predictor/outcome roles and mean, sum or item-only scoring. Define up to 30 psychological measures (each with up to 30 items) and up to eight demographics, with at most 60 item and demographic fields in total. Demographic categories are optional and needed only for SPA4, SPA7 and SPA8. They use numeric category codes. Every text field shows an example of how to fill it in. Generated raw items are scored locally, and mean and sum scores require all items. Your own study always uses your own uploaded data for SPA4 to SPA8. Custom studies are a functional extension, not an empirically validated result of the MIDUS study. Sources and measurement validity are not automatically verified. See [Custom studies](docs/CUSTOM_STUDIES.md).
 
@@ -69,7 +69,7 @@ Uploads apply to your own study. SPA5 to SPA8 uploads have one row per participa
 | SPA7 | Demographic profiles, one per synthetic participant | 100 |
 | SPA8 | Demographic and psychological profiles, one per synthetic participant | 100 |
 
-In a custom study, each construct may be supplied as its item columns or as one construct-score column. The supplied fictional examples are the same files offered as templates.
+In a custom study, each construct may be supplied as its item columns or as one construct-score column. Custom studies use their own uploads. The completed examples offered as templates contain fictional values.
 
 ## Variable names
 

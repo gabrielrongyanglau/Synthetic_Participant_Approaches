@@ -299,7 +299,7 @@ def check_inputs(req:Run):
     # Schema/prompt construction is checked here without calling any provider.
     from spa.recommendations import public_label
     return dict(api_calls=0,approach=public_label(run_spa(run)),participants=req.n,
-      input_source='Supplied fictional examples' if req.examples and not req.study else 'Your supplied study information',
+      input_source=({4:'Actual MIDUS demographic proportions'}.get(run_spa(run),'Generated participants who match MIDUS' if run_spa(run)>=5 else 'MIDUS study definitions') if req.examples and not req.study else 'Your supplied study information'),
       mode=ctx['provenance']['prompt_mode'],
       prompt_policy='Fixed research-team method template with a server-controlled study layer.',
       generated_fields=len(body['text']['format']['schema']['properties']['participants']['items']['required'])-1,

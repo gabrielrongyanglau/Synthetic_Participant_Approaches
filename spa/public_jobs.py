@@ -80,7 +80,7 @@ def midus_bank(req,assets):
     for ctx in bank.values():
         if fields:
             ctx['fields']=fields
-            if req.examples:ctx['provenance']['source']='Invented example inputs'
+            if req.examples:ctx['provenance']['source']='MIDUS demonstration inputs (actual proportions or generated records matching MIDUS)'
             ctx['provenance']['selected_variables']=f"{len(fields['demographics'])} of 6 demographics and {len(fields['predictors'])} of 38 psychological predictors"
     return bank
 def plan(req,assets):
@@ -89,7 +89,7 @@ def plan(req,assets):
     bank=prepare(req,assets);config=settings(req)
     if len(json.dumps(bank,allow_nan=False).encode())>3_500_000:raise ValueError('Prepared inputs are too large for one web response. Choose fewer approaches or repetitions in this run.')
     ticket=issue(dict(kind='plan',settings=config,runs={run:digest(ctx) for run,ctx in bank.items()},nonce=secrets.token_hex(16)))
-    return dict(ticket=ticket,contexts=bank,settings=config,source='Fictional example inputs' if req.examples and not getattr(req,'study',None) else 'Researcher-supplied inputs')
+    return dict(ticket=ticket,contexts=bank,settings=config,source='MIDUS demonstration inputs' if req.examples and not getattr(req,'study',None) else 'Researcher-supplied inputs')
 
 def batch(ctx,method,offset,n,size=None):
     size=size or batch_size()

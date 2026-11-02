@@ -111,7 +111,7 @@ EXAMPLE_FILES={4:'SPA4_proportions_example.csv',5:'SPA5_pilot_example.csv',6:'SP
                7:'SPA7_profiles_example.csv',8:'SPA8_profiles_example.csv'}
 
 def example_assets(method):
-    """The fictional example files offered for download (one row per participant) are the supplied examples."""
+    """The MIDUS demonstration inputs offered for download (built by tools/make_midus_examples.py) are the supplied examples."""
     from .study import PROJECT_ROOT
     from .io import read_csv
     return {ASSET_KEYS[method]:read_csv(PROJECT_ROOT/'data/examples'/EXAMPLE_FILES[method])}
@@ -120,7 +120,7 @@ def prepare_context(study,method,n,seed=1,replication=1,assets=None,examples=Fal
     if method not in range(1,9) or n not in range(100,1001,100):raise ValueError('Choose SPA1–SPA8 and 100–1,000 participants in steps of 100.')
     assets=assets or {};rng=np.random.default_rng(np.random.SeedSequence([seed,method,replication]))
     ctx=dict(fixed=None,pilot=None,summary=None,quota_audit=None)
-    details={'source':'Invented example inputs' if examples else 'Researcher-supplied inputs','method':method,'repetition':replication,
+    details={'source':'MIDUS demonstration inputs (actual proportions or generated records matching MIDUS)' if examples else 'Researcher-supplied inputs','method':method,'repetition':replication,
              'reference_required':False,'population_guidance':population if method==3 else ''}
     if method==3 and not population.strip():raise ValueError('SPA3 needs a population description.')
     if examples and method>=4:assets=example_assets(method)

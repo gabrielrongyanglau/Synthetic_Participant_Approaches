@@ -28,6 +28,10 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 8.7: MIDUS-derived demonstration inputs
+
+The MIDUS demonstration inputs now come from the linked MIDUS 2 and 3 file through `tools/make_midus_examples.py`, which reads the file from outside the repository. SPA4 uses the actual demographic proportions of the 2,709 participants (43.63% male, as reported in the submission). SPA5 and SPA6 use 50 generated participants who reproduce the calibration pool's distributions and correlations (average mean gap 0.07 SD, correlation gap 0.11, against the 542-person pool), and SPA7 and SPA8 use 100 generated participants who reproduce the evaluation pool (0.05 SD and 0.08 against 2,167 people). No generated record matches a real participant, and the median distance from a generated record to its nearest real participant (4.51 SD units) is similar to that between two real participants (4.26). No individual MIDUS records are in the repository or the app. The information, approach and Check and generate steps describe these inputs accordingly. All tests pass.
+
 ## Version 8.6: alignment with the Organization Science submission
 
 - Study findings no longer says its research-use table comes from Table 3 of the proposal, and the recommendation limits no longer say the suggestions follow Table 3.

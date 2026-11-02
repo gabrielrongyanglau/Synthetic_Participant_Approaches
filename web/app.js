@@ -128,11 +128,11 @@ async function reviewInputs(){
 }
 
 const uploadMap={4:'proportions_SPA4',5:'pilot_SPA5',6:'pilot_SPA6',7:'profiles_SPA7',8:'profiles_SPA8'};
-// MIDUS pilot wording for SPA5 and SPA6 (Prof Kim's text). The supplied 50 rows are fictional, in the format of the proposal's random draw.
-const PILOT_SOURCE='In our proposal, 50 participants were randomly selected from the MIDUS dataset to create a pilot sample. This demonstration provides a fictional pilot sample of 50 participants in the same format. ';
+// MIDUS pilot wording for SPA5 and SPA6 (Prof Kim's text). The supplied 50 rows are generated to match the MIDUS calibration pool (tools/make_midus_examples.py).
+const PILOT_SOURCE='In our proposal, 50 participants were randomly selected from the MIDUS dataset to create a pilot sample. This demonstration provides 50 generated participants who match the distributions and correlations of the MIDUS participants that pilots were drawn from, so no real participant’s record is shared. ';
 const PILOT_TEXT={5:PILOT_SOURCE+'SPA5 uses their demographic information, psychological scores and life-satisfaction outcomes, together with summary statistics calculated from these records, to generate synthetic participants. This pilot sample is already provided, so no upload is required.',
  6:PILOT_SOURCE+'SPA6 gives the AI their demographic information, psychological scores and life-satisfaction outcomes, and asks it to analyse these records itself before generating synthetic participants. This pilot sample is already provided, so no upload is required.'};
-const EXAMPLE_TEXT={4:'the example target proportions',5:'the example pilot sample of 50 participants',6:'the example pilot sample of 50 participants',7:'100 example demographic profiles',8:'100 example demographic and psychological profiles'};
+const EXAMPLE_TEXT={4:'the actual MIDUS demographic proportions',5:'50 generated participants who match MIDUS',6:'50 generated participants who match MIDUS',7:'100 generated demographic profiles that match MIDUS',8:'100 generated demographic and psychological profiles that match MIDUS'};
 function uploadCard(m,old){
   const key=uploadMap[m],d=el('div',undefined,'upload'),label=el('label',`${Research.methodLabel(m)}: upload your ${m===4?'target proportions (one row per category)':(m<7?'pilot sample':'participant profiles')+` (${ROWS[m]} rows)`}`),f=old[key]||el('input');
   f.type='file';f.accept='.csv,text/csv';f.dataset.asset=key;f.onchange=action(async()=>{invalidateReview();inputsChecked=null;showInputCheck();if(f.files[0]){checkFile(f.files[0]);await checkInputsStep(true)}});label.append(f);
@@ -178,7 +178,7 @@ function inputs(){
   const name=m?`SPA${m}`:'This approach';let summary,blocked=false;
   if(!needs)summary=`${name} needs no participant data. The AI works from the study definitions${m===3?' and the population description below':''}. Choose Next: check and generate to continue.`;
   else if(!custom&&[4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs at least one demographic characteristic. Tick some under Questionnaire.`;blocked=true}
-  else if(!custom){summary=PILOT_TEXT[m]||`${name} uses ${EXAMPLE_TEXT[m]} supplied with the MIDUS demonstration. Nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
+  else if(!custom){summary=PILOT_TEXT[m]||`${name} uses ${EXAMPLE_TEXT[m]}. They are supplied with the MIDUS demonstration, so nothing needs uploading.`;$('exampleFile').href=`/api/example/SPA${m}_template.csv`;$('exampleFile').download=`SPA${m}_example_input.csv`}
   else if([4,7,8].includes(m)&&!Research.demographicCount()){summary=`${name} keeps demographic details fixed, so it needs demographic categories. Add them under Questionnaire, choose Continue, then return here.`;blocked=true}
   else{summary=`Upload ${m===4?'your target proportions':m<7?'your pilot sample of exactly 50 participants':'your participant profiles'} below.`;$('uploads').append(uploadCard(m,own))}
   $('dataSummary').textContent=summary;$('confirmInputs').disabled=blocked;inputsChecked=null;showInputCheck();
