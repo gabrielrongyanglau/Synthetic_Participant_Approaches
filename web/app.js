@@ -205,7 +205,7 @@ async function request(){
 
 function metadata(){
   const size=session.settings.batch_size;
-  return {schema_version:'4.5',study_brief:session.brief,approach_numbering:'SPA1–SPA8 as in the revised proposal: SPA7 uses demographic-only profiles, and SPA8 uses demographic and psychological profiles.',source:session.source,settings:session.settings,model:cfg.model,reasoning_effort:cfg.reasoning,
+  return {schema_version:'4.5',study_brief:session.brief,approach_numbering:'SPA1–SPA8 as in our proposal: SPA7 uses demographic-only profiles, and SPA8 uses demographic and psychological profiles.',source:session.source,settings:session.settings,model:cfg.model,reasoning_effort:cfg.reasoning,
     validation_status:'Not evaluated against a human reference',datasets:Object.keys(session.details).length,records:Object.values(session.details).reduce((n,d)=>n+d.count,0),
     input_provenance:Object.fromEntries(Object.entries(session.contexts).map(([run,ctx])=>[run,ctx.provenance])),
     quality_flags:Object.fromEntries(Object.entries(session.details).map(([run,d])=>[run,d.quality])),

@@ -27,7 +27,7 @@ class Run(BaseModel):
     repetitions:int=Field(default=1,ge=1,le=1)
     seed:int=Field(default=1,ge=0,le=2147483647)
     examples:bool=True
-    population:str=Field(default='Middle-aged and older adults in the specified US longitudinal cohort.',max_length=4000)
+    population:str=Field(default='Broad demographic characteristics of U.S. adults, including variation in age, sex, education, and marital status.',max_length=4000)
     assets:dict[str,str]=Field(default_factory=dict)
     consent:bool=False
     study:dict|None=None

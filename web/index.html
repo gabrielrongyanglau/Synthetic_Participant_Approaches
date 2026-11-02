@@ -17,7 +17,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="name" href="#" data-goto="overview">SPA Research Toolkit</a>
-  <span class="chip">v8.7</span>
+  <span class="chip">v8.8</span>
   <span class="chip"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="accountLabel">Open access</span></span>
   <span class="chip">Model: GPT-5.6 Luna, medium reasoning</span>
   <span class="chip">Paid by: research team budget</span>
@@ -48,9 +48,9 @@
       <select id="studyMode" hidden aria-hidden="true"></select>
       <div id="studyChoices" class="choice-grid two-up" role="radiogroup" aria-label="Study"></div>
       <div id="midusSetup" class="hint" hidden>
-        <p>This demonstration allows you to explore the eight synthetic participant approaches (SPAs) presented in our <em>Organization Science</em> special-issue proposal.</p>
-        <p>You will select the demographic characteristics and psychological variables you want to examine, choose an SPA, and generate a synthetic dataset using that approach. You can also review our original research findings to understand how each SPA performed in reproducing human psychological variables and relationships among them.</p>
-        <p>Our research evaluated the eight SPAs using data from 2,709 participants in the Midlife in the United States (MIDUS) study.</p>
+        <p>This demonstration allows you to explore the eight synthetic participant approaches (SPAs) presented in our proposal for the <em>Organization Science</em> special issue.</p>
+        <p>You will select the demographic characteristics and psychological variables you want to examine, choose an SPA, and generate a synthetic dataset using that approach. You can also review the findings of our proposal to understand how each SPA performed in reproducing human psychological variables and relationships among them.</p>
+        <p>Our proposal evaluated the eight SPAs using data from 2,709 participants in the Midlife in the United States (MIDUS) study.</p>
         <details class="note vars"><summary>Demographic characteristics (6, measured at MIDUS 2)</summary><ul id="midusDemo" class="var-list"></ul></details>
         <details class="note vars"><summary>Psychological predictors (38, measured at MIDUS 2)</summary><ul id="midusPsych" class="var-list cols"></ul><p class="help">Our proposal’s relationship comparisons used 37 of these, leaving out anxiety symptoms.</p></details>
         <details class="note vars"><summary>Outcomes (2)</summary><ul class="var-list"><li>Life satisfaction at MIDUS 2</li><li>Life satisfaction at MIDUS 3</li></ul></details>
@@ -154,7 +154,7 @@
     <div class="panel">
       <h2 id="dataHeading">Data for this approach</h2>
       <p id="dataSummary" class="data-summary"></p>
-      <label id="populationLabel">Who are the participants? (used by SPA3)<textarea id="population" rows="2" placeholder="e.g. Middle-aged and older adults in the United States who took part in a long-term study of health and well-being.">Middle-aged and older adults in the specified US longitudinal cohort.</textarea></label>
+      <label id="populationLabel">Who are the participants? (used by SPA3)<textarea id="population" rows="2" placeholder="e.g. Middle-aged and older adults in the United States who took part in a long-term study of health and well-being.">Broad demographic characteristics of U.S. adults, including variation in age, sex, education, and marital status.</textarea></label>
       <div id="uploads" class="uploads"></div>
       <div id="inputCheck" class="input-check" role="status" aria-live="polite" hidden></div>
       <p id="exampleLink" class="help" hidden><a id="exampleFile" download>View the example input (CSV)</a></p>
@@ -240,7 +240,7 @@
 <section id="evidence" class="page" hidden>
   <header class="page-head">
     <p class="crumb">Reference</p>
-    <h1>What did our research find?</h1>
+    <h1>What did our proposal find?</h1>
     <p class="lead">Approaches differ in which goal they serve best: reproducing psychological scores (Goal 1) or reproducing relationships among variables (Goal 2). These are the original MIDUS results: eight approaches, each with 1,000 datasets of 100 participants, compared with 2,709 human participants. They are separate from your own simulations.</p>
   </header>
 
@@ -310,7 +310,7 @@
       <tr><td>Effect sizes and statistical power</td><td>Human evidence</td><td>Use human evidence or explicitly specified effect-size scenarios.</td></tr>
     </tbody>
   </table></div>
-  <p class="help">Approach numbers follow our revised proposal: SPA7 uses demographic-only profiles and SPA8 uses demographic and psychological profiles. Individual predictions, replacement of missing responses and intervention effects need separate evidence.</p>
+  <p class="help">Approach numbers follow our proposal: SPA7 uses demographic-only profiles and SPA8 uses demographic and psychological profiles. Individual predictions, replacement of missing responses and intervention effects need separate evidence.</p>
 
   <h2 class="section-title">Detailed statistical results</h2>
   <p class="help">Means, confidence intervals, variable-level results and adjusted pairwise comparisons.</p>

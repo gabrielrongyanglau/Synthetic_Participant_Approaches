@@ -1,4 +1,4 @@
-> Approaches are numbered SPA1–SPA8 as in the revised proposal. Files in `data/original_study/` and the offline archive use the original study's numbering, in which 7 and 8 are swapped; `spa/numbering.py` relabels them when the toolkit loads them. Custom-study definitions and examples are described in CUSTOM_STUDIES.md.
+> Approaches are numbered SPA1–SPA8 as in our proposal. Files in `data/original_study/` and the offline archive use the original study's numbering, in which 7 and 8 are swapped; `spa/numbering.py` relabels them when the toolkit loads them. Custom-study definitions and examples are described in CUSTOM_STUDIES.md.
 
 # Data and files
 
