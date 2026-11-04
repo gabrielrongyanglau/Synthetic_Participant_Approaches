@@ -28,6 +28,15 @@ Dataset responses provide a column-matched codebook for MIDUS and custom studies
 
 The interface states that generation time varies from a few minutes to up to an hour depending on the complexity of the data generated. This is a planning estimate, not a measured performance result.
 
+## Version 9.0: Tommy's and Jungmin's feedback
+
+- Goal 2 with a small pilot dataset now lists SPA5 first and SPA6 second, the same order as Goal 1, because our proposal recommends SPA5 for pilot data. The explanation still reports that SPA6 came slightly closer to human relationship strengths. The limits note says the first approach is the one our proposal recommends, where it makes a recommendation.
+- The SPA5 description says its precomputed summaries are calculated automatically from the 50 records, so researchers do not need to supply them.
+- Goal 1 with demographic and psychological scores uses Prof Kim's SPA8 text as written, with "Our proposal" in place of "Our study".
+- Response anchors in the examples read "Strongly disagree" and "Strongly agree".
+
+All tests pass.
+
 ## Version 8.9: final-check fixes
 
 - Generation follows the protocol in our proposal: each dataset is generated in one request of 100 participants, and SPA1 to SPA7 receive the original data collection's participant diversity and duplication check, word for word (SPA8 did not receive it in the original collection). The batch-size setting is removed.
